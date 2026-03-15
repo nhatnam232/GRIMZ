@@ -1042,6 +1042,7 @@
     renderSupportMessages(uid);
     renderSupportList();
     updateSupportUnread();
+    loadUserInfo(uid);
     setTimeout(()=>document.getElementById('support-chat-input').focus(),100);
   }
 
@@ -1172,12 +1173,7 @@
     panel.classList.add('show');
   }
 
-  // Patch openSupportChat to load user info
-  const _origOpenSupportChat = openSupportChat;
-  function openSupportChat(uid) {
-    _origOpenSupportChat(uid);
-    loadUserInfo(uid);
-  }
+
 
   // ===== DELETE MESSAGE =====
   async function deleteAdminMsg(id) {
