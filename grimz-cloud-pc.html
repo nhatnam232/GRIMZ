@@ -86,7 +86,10 @@
   .plan-card.featured::after { content:'PHỔ BIẾN NHẤT'; position:absolute; top:-1px; right:2rem; background:var(--accent); color:var(--bg); font-family:'Share Tech Mono',monospace; font-size:0.65rem; letter-spacing:0.15em; padding:0.2rem 0.6rem; }
   .plan-card.soon { opacity:0.7; }
   .plan-card:hover { transform:translateY(-6px); box-shadow:0 20px 40px rgba(0,0,0,0.4), 0 0 20px rgba(124,92,191,0.1); }
-  .plan-name { font-family:'Rajdhani',sans-serif; font-size:0.8rem; font-weight:600; letter-spacing:0.2em; text-transform:uppercase; color:var(--muted); margin-bottom:0.75rem; }
+  .plan-name { font-family:'Rajdhani',sans-serif; font-size:0.78rem; font-weight:600; letter-spacing:0.2em; text-transform:uppercase; margin-bottom:0.85rem; display:flex; align-items:center; gap:0.5rem; }
+  .plan-num { color:var(--muted); font-size:0.72rem; }
+  .plan-codename { color:var(--accent2); font-size:0.95rem; font-weight:700; letter-spacing:0.15em; text-shadow:0 0 10px rgba(155,127,232,0.5); }
+  .plan-card.featured .plan-codename { color:#fff; text-shadow:0 0 12px rgba(124,92,191,0.8); }
   .plan-price { font-family:'Rajdhani',sans-serif; font-size:2.8rem; font-weight:700; color:var(--accent); line-height:1; margin-bottom:0.3rem; }
   .plan-price span { font-size:1rem; color:var(--muted); font-weight:400; }
   .plan-price.soon-price { font-size:1rem; color:var(--muted); font-weight:400; margin-top:0.5rem; }
@@ -374,7 +377,7 @@
     <!-- RTX 3060 -->
     <div class="plan-card featured fade-up">
       <div>
-        <div class="plan-name">RTX 3060</div>
+        <div class="plan-name"><span class="plan-num">GÓI 1 ·</span><span class="plan-codename">G-NOVA</span></div>
         <div class="plan-price">3.000<span> đ/giờ</span></div>
         <div class="plan-divider"></div>
         <ul class="plan-specs">
@@ -393,7 +396,7 @@
     <!-- RTX 4060 -->
     <div class="plan-card fade-up">
       <div>
-        <div class="plan-name">RTX 4060</div>
+        <div class="plan-name"><span class="plan-num">GÓI 2 ·</span><span class="plan-codename">G-ORBIT</span></div>
         <div style="margin:0.5rem 0;">
           <div class="plan-price" style="font-size:2.2rem;margin:0.5rem 0;">5.000<span style="font-size:0.9rem"> đ/giờ</span></div>
         </div>
@@ -414,7 +417,7 @@
     <!-- RTX 4070 -->
     <div class="plan-card fade-up">
       <div>
-        <div class="plan-name">RTX 4070</div>
+        <div class="plan-name"><span class="plan-num">GÓI 3 ·</span><span class="plan-codename">G-PULSAR</span></div>
         <div style="margin:0.5rem 0;">
           <div class="plan-price" style="font-size:2.2rem;margin:0.5rem 0;">6.000<span style="font-size:0.9rem"> đ/giờ</span></div>
         </div>
@@ -610,8 +613,8 @@
     document.querySelectorAll('.plan-price').forEach(el => {
       const card = el.closest('.plan-card');
       if (!card) return;
-      const name = card.querySelector('.plan-name')?.textContent?.trim();
-      const key = name?.includes('4070') ? '4070' : name?.includes('4060') ? '4060' : '3060';
+      const name = card.querySelector('.plan-codename')?.textContent?.trim();
+      const key = name?.includes('PULSAR') ? '4070' : name?.includes('ORBIT') ? '4060' : '3060';
       const span = el.querySelector('span');
       if (span) { el.childNodes[0].textContent = prices[key][mode]; span.textContent = ' ' + units[mode]; }
     });

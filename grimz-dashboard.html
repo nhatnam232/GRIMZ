@@ -417,7 +417,7 @@
     document.getElementById('machineName').textContent = m.gpu || 'Cloud PC';
     document.getElementById('machineStatus').className = 'badge badge-online';
     document.getElementById('machineStatus').textContent = 'Đang chạy';
-    document.getElementById('statPlan').textContent = m.plan || 'ACTIVE';
+    document.getElementById('statPlan').textContent = m.plan || 'G-NOVA';
     document.getElementById('statPlan').classList.remove('empty');
     document.getElementById('statPlan').style.color = 'var(--green)';
     document.getElementById('noBuyCard').style.display = 'none';
@@ -455,7 +455,7 @@
     }
 
     // Sidebar
-    document.getElementById('userPlan').textContent = m.plan || 'Active';
+    document.getElementById('userPlan').textContent = m.plan || 'G-NOVA';
   }
 
   function showToast(msg, duration) {

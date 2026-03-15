@@ -150,9 +150,9 @@
       <div class="form-group full">
         <label>Gói</label>
         <select id="f-plan">
-          <option value="RTX 3060">RTX 3060 — 3.000đ/giờ</option>
-          <option value="RTX 4060">RTX 4060</option>
-          <option value="RTX 4070">RTX 4070</option>
+          <option value="G-NOVA">Gói 1 · G-NOVA (RTX 3060) — 3.000đ/giờ</option>
+          <option value="G-ORBIT">Gói 2 · G-ORBIT (RTX 4060) — 5.000đ/giờ</option>
+          <option value="G-PULSAR">Gói 3 · G-PULSAR (RTX 4070) — 6.000đ/giờ</option>
         </select>
       </div>
     </div>
@@ -277,9 +277,9 @@
     }
     // Auto-select plan
     const plan = document.getElementById('f-plan');
-    if (this.value.includes('4070')) plan.value = 'RTX 4070';
-    else if (this.value.includes('4060')) plan.value = 'RTX 4060';
-    else plan.value = 'RTX 3060';
+    if (this.value.includes('4070')) plan.value = 'G-PULSAR';
+    else if (this.value.includes('4060')) plan.value = 'G-ORBIT';
+    else plan.value = 'G-NOVA';
   });
 
   // Validate IP
