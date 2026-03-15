@@ -601,6 +601,12 @@
       rent_btn:'Thuê qua Discord →',
       hero_desc1:'Play games on any device, no powerful PC required.',
       steps_heading:'Just 3 Steps to Start',
+      ping_btn:'⚡ Đo Ping',
+      ping_retry:'⚡ Đo lại',
+      ping_good:'Tốt',
+      ping_high:'Cao',
+      members:'thành viên',
+      loading:'Đang tải...',
       cookie_text:'Chúng tôi dùng cookie để duy trì đăng nhập và cải thiện trải nghiệm.',
       cookie_accept:'Đồng ý', cookie_decline:'Từ chối',
     // Extra keys
@@ -705,9 +711,17 @@
     updateTypingLines();
     // Update page title
     if (t.page_title) document.title = t.page_title;
-    // Update discord counter initial text
+    // Update discord counter text (number stays, just update unit word)
     const dc = document.getElementById('discord-count');
-    if (dc && dc.textContent === '...') dc.textContent = t.loading || 'Loading...';
+    if (dc) {
+      const txt = dc.textContent;
+      const num = txt.match(/[\d,\.]+/);
+      if (num) {
+        dc.textContent = num[0] + ' ' + (t.members || 'members');
+      } else {
+        dc.textContent = t.loading || 'Loading...';
+      }
+    }
   }
 
   function setActiveLang(lang) {
@@ -722,6 +736,7 @@
     document.getElementById('langTrigger').classList.remove('open');
     document.getElementById('langDropdown').classList.remove('open');
     applyLang(lang);
+    setPriceMode(priceMode, null);
   }
 
   function pickLang(lang) {
@@ -813,7 +828,13 @@
   };
   let typingLines = typingLinesByLang['vi'];
   let tIdx = 0, tChar = 0, tDeleting = false;
-  function updateTypingLines() { typingLines = typingLinesByLang[activeLang] || typingLinesByLang.en; tIdx = 0; tChar = 0; tDeleting = false; }
+  function updateTypingLines() {
+    typingLines = typingLinesByLang[activeLang] || typingLinesByLang.en;
+    tIdx = 0; tChar = 0; tDeleting = false;
+    if (tEl) { tEl.textContent = ''; }
+    clearTimeout(window._typeTimeout);
+    window._typeTimeout = setTimeout(typeLoop, 100);
+  }
   const tEl = document.getElementById('typing-text');
   function typeLoop() {
     if (!tEl) return;
@@ -821,7 +842,7 @@
     tEl.textContent = tDeleting ? cur.slice(0, --tChar) : cur.slice(0, ++tChar);
     if (!tDeleting && tChar === cur.length) { tDeleting = true; setTimeout(typeLoop, 1800); return; }
     if (tDeleting && tChar === 0) { tDeleting = false; tIdx = (tIdx + 1) % typingLines.length; }
-    setTimeout(typeLoop, tDeleting ? 35 : 75);
+    window._typeTimeout = setTimeout(typeLoop, tDeleting ? 35 : 75);
   }
   typeLoop();
 
@@ -1045,7 +1066,17 @@
   // Cookie consent
   (function() {
     if (!localStorage.getItem('grimz_cookie')) {
-      setTimeout(() => document.getElementById('cookieBanner').classList.add('show'), 1000);
+      setTimeout(() => {
+        // Apply current lang to cookie banner before showing
+        const t = T[activeLang] || T.vi;
+        const cb = document.getElementById('cookie-text-span');
+        const ca = document.getElementById('cookie-accept-btn');
+        const cd = document.getElementById('cookie-decline-btn');
+        if (cb) cb.innerHTML = t.cookie_text + ' <a href="privacy.html">' + (t.footer_privacy || 'Privacy Policy') + '</a>.';
+        if (ca) ca.textContent = t.cookie_accept;
+        if (cd) cd.textContent = t.cookie_decline;
+        document.getElementById('cookieBanner').classList.add('show');
+      }, 1000);
     }
   })();
   function cookieAccept() {
