@@ -138,10 +138,7 @@
   .discord-btn { transition:all 0.2s cubic-bezier(0.34,1.56,0.64,1); }
   .discord-btn:hover { background:#4752c4; transform:translateY(-3px) scale(1.02); box-shadow:0 10px 30px rgba(88,101,242,0.4); }
 
-  /* BACK TO TOP */
-  .back-top { position:fixed; bottom:2rem; right:2rem; width:40px; height:40px; background:var(--accent); color:#fff; border:none; cursor:pointer; display:none; align-items:center; justify-content:center; font-size:1.2rem; z-index:200; clip-path:polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,0 100%); transition:all 0.2s; }
-  .back-top:hover { background:var(--accent2); }
-  .back-top.visible { display:flex; }
+
 
   /* FOOTER */
   footer { position:relative; z-index:1; padding:2rem 5%; border-top:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:1rem; }
@@ -183,7 +180,8 @@
 
   /* Pricing Toggle */
   .price-toggle { display:flex; align-items:center; gap:0; border:1px solid var(--border); width:fit-content; margin-bottom:2rem; }
-  .price-toggle-btn { padding:0.4rem 1.2rem; font-family:'Share Tech Mono',monospace; font-size:0.7rem; letter-spacing:0.1em; color:var(--muted); cursor:pointer; background:transparent; border:none; text-transform:uppercase; transition:all 0.2s; }
+  .price-toggle-btn { padding:0.5rem 1.2rem; font-family:'Share Tech Mono',monospace; font-size:0.7rem; letter-spacing:0.1em; color:var(--muted); cursor:pointer; background:transparent; border:none; text-transform:uppercase; transition:all 0.2s; min-height:44px; }
+  @media(max-width:768px) { .price-toggle { width:100%; } .price-toggle-btn { flex:1; text-align:center; font-size:0.8rem; } }
   .price-toggle-btn.active { background:var(--accent); color:#fff; }
 
   /* Ping test */
@@ -201,9 +199,25 @@
   /* Confetti canvas */
   #confetti-canvas { position:fixed; inset:0; pointer-events:none; z-index:9998; }
 
-  /* Typing sound toggle */
-  .sound-toggle { position:fixed; bottom:5rem; right:2rem; width:36px; height:36px; background:var(--bg2); border:1px solid var(--border); color:var(--muted); font-size:1rem; cursor:pointer; display:flex; align-items:center; justify-content:center; z-index:200; transition:all 0.2s; }
-  .sound-toggle:hover { border-color:var(--accent); color:var(--accent2); }
+  /* Floating action buttons - cyberpunk cluster */
+  .fab-cluster { position:fixed; right:1.5rem; bottom:1.5rem; z-index:200; display:flex; flex-direction:column; align-items:center; gap:0.5rem; }
+  .fab-btn {
+    width:40px; height:40px; background:rgba(9,8,15,0.9);
+    border:1px solid rgba(124,92,191,0.3);
+    cursor:pointer; display:flex; align-items:center; justify-content:center;
+    transition:all 0.2s; position:relative;
+    clip-path:polygon(6px 0,100% 0,100% calc(100% - 6px),calc(100% - 6px) 100%,0 100%,0 6px);
+  }
+  .fab-btn:hover { border-color:var(--accent2); background:rgba(124,92,191,0.15); box-shadow:0 0 12px rgba(124,92,191,0.3); }
+  .fab-btn:hover svg { filter:drop-shadow(0 0 4px var(--accent2)); }
+  .fab-btn.active svg .wave-bar { animation:waveActive 0.5s ease infinite alternate; }
+  .fab-btn svg { width:20px; height:20px; }
+  /* Tooltip */
+  .fab-btn::after { content:attr(data-tip); position:absolute; right:calc(100% + 10px); top:50%; transform:translateY(-50%); background:var(--bg2); border:1px solid var(--border); color:var(--accent2); font-family:'Share Tech Mono',monospace; font-size:0.6rem; letter-spacing:0.1em; padding:0.25rem 0.6rem; white-space:nowrap; opacity:0; pointer-events:none; transition:opacity 0.2s; }
+  .fab-btn::before { content:'▶'; position:absolute; right:calc(100% + 4px); top:50%; transform:translateY(-50%); color:var(--border); font-size:0.5rem; opacity:0; transition:opacity 0.2s; }
+  .fab-btn:hover::after, .fab-btn:hover::before { opacity:1; }
+  @keyframes waveActive { 0%{transform:scaleY(0.4)} 100%{transform:scaleY(1.2)} }
+  @media(max-width:768px) { .fab-cluster { right:1rem; bottom:1rem; } }
 
   /* RESPONSIVE */
   @media(max-width:768px) {
@@ -222,8 +236,43 @@
 <div class="cursor" id="cursor"></div>
 <div class="cursor-ring" id="cursorRing"></div>
 <div class="mouse-glow" id="mouseGlow"></div>
-<button class="sound-toggle" id="soundToggle" title="Bật/tắt âm thanh">🔇</button>
-<button class="back-top" id="backTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+<div class="fab-cluster">
+  <!-- Back to top: stacked triangles -->
+  <button class="fab-btn" id="backTop" data-tip="VỀ ĐẦU TRANG" onclick="window.scrollTo({top:0,behavior:'smooth'})" style="display:none;">
+    <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <polygon points="10,2 16,8 13,8 13,9 7,9 7,8 4,8" fill="#9b7fe8"/>
+      <polygon points="10,7 16,13 13,13 13,14 7,14 7,13 4,13" fill="#5a3fa0" opacity="0.7"/>
+      <polygon points="10,12 16,18 13,18 13,19 7,19 7,18 4,18" fill="#3d2a6e" opacity="0.4"/>
+    </svg>
+  </button>
+  <!-- Confetti toggle: firework burst -->
+  <button class="fab-btn" id="confettiToggle" data-tip="HIỆU ỨNG: BẬT">
+    <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" id="confetti-icon">
+      <circle cx="10" cy="10" r="2" fill="#9b7fe8"/>
+      <line x1="10" y1="2" x2="10" y2="5" stroke="#9b7fe8" stroke-width="1.5" stroke-linecap="round"/>
+      <line x1="10" y1="15" x2="10" y2="18" stroke="#9b7fe8" stroke-width="1.5" stroke-linecap="round"/>
+      <line x1="2" y1="10" x2="5" y2="10" stroke="#9b7fe8" stroke-width="1.5" stroke-linecap="round"/>
+      <line x1="15" y1="10" x2="18" y2="10" stroke="#9b7fe8" stroke-width="1.5" stroke-linecap="round"/>
+      <line x1="4" y1="4" x2="6.5" y2="6.5" stroke="#7c5cbf" stroke-width="1.5" stroke-linecap="round"/>
+      <line x1="13.5" y1="13.5" x2="16" y2="16" stroke="#7c5cbf" stroke-width="1.5" stroke-linecap="round"/>
+      <line x1="16" y1="4" x2="13.5" y2="6.5" stroke="#7c5cbf" stroke-width="1.5" stroke-linecap="round"/>
+      <line x1="6.5" y1="13.5" x2="4" y2="16" stroke="#7c5cbf" stroke-width="1.5" stroke-linecap="round"/>
+    </svg>
+  </button>
+  <!-- Sound toggle: waveform bars -->
+  <button class="fab-btn" id="soundToggle" data-tip="ÂM THANH: TẮT">
+    <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" id="sound-icon">
+      <rect class="wave-bar" x="3" y="7" width="2.5" height="6" rx="1" fill="#9b7fe8" style="transform-origin:3px 10px"/>
+      <rect class="wave-bar" x="7" y="4" width="2.5" height="12" rx="1" fill="#9b7fe8" style="transform-origin:7px 10px;animation-delay:0.1s"/>
+      <rect class="wave-bar" x="11" y="6" width="2.5" height="8" rx="1" fill="#9b7fe8" style="transform-origin:11px 10px;animation-delay:0.2s"/>
+      <rect class="wave-bar" x="15" y="8" width="2.5" height="4" rx="1" fill="#9b7fe8" style="transform-origin:15px 10px;animation-delay:0.15s"/>
+      <!-- X overlay when muted -->
+      <line id="sound-mute-x1" x1="2" y1="2" x2="18" y2="18" stroke="#f87171" stroke-width="2" stroke-linecap="round" display="none"/>
+      <line id="sound-mute-x2" x1="18" y1="2" x2="2" y2="18" stroke="#f87171" stroke-width="2" stroke-linecap="round" display="none"/>
+    </svg>
+  </button>
+</div>
+
 
 <!-- NAV -->
 <nav>
@@ -486,7 +535,7 @@
 
   // Back to top
   window.addEventListener('scroll', () => {
-    document.getElementById('backTop').classList.toggle('visible', window.scrollY > 400);
+    const bt = document.getElementById('backTop'); if(bt) bt.style.display = window.scrollY > 400 ? 'flex' : 'none';
 
     // Active nav on scroll
     const sections = ['features','pricing','faq','how'];
@@ -586,6 +635,8 @@
     const avg = Math.round(pings.reduce((a,b) => a+b) / pings.length);
     result.textContent = avg + 'ms';
     result.style.color = avg < 50 ? '#4ade80' : avg < 100 ? '#fbbf24' : '#f87171';
+    if (avg > 150) result.textContent = avg + 'ms ⚠️ Cao';
+    else if (avg < 50) result.textContent = avg + 'ms ✓ Tốt';
     const max = Math.max(...pings);
     bars.forEach((b, i) => {
       const h = Math.max(4, Math.round((pings[i] / max) * 24));
@@ -595,12 +646,23 @@
     btn.textContent = '⚡ Đo lại'; btn.disabled = false;
   }
 
-  // ===== DISCORD MEMBER COUNT =====
+  // ===== DISCORD MEMBER COUNT (cached 5 mins) =====
   async function fetchDiscordCount() {
+    const CACHE_KEY = 'grimz_discord_count';
+    const CACHE_TTL = 5 * 60 * 1000; // 5 phút
     try {
+      const cached = localStorage.getItem(CACHE_KEY);
+      if (cached) {
+        const { count, ts } = JSON.parse(cached);
+        if (Date.now() - ts < CACHE_TTL) {
+          document.getElementById('discord-count').textContent = count.toLocaleString() + ' thành viên';
+          return;
+        }
+      }
       const res = await fetch('https://discord.com/api/v9/invites/Ct4Gw7GwJJ?with_counts=true');
       const data = await res.json();
       const count = data.approximate_member_count || 0;
+      localStorage.setItem(CACHE_KEY, JSON.stringify({ count, ts: Date.now() }));
       document.getElementById('discord-count').textContent = count.toLocaleString() + ' thành viên';
     } catch {
       document.getElementById('discord-count').textContent = 'Tham gia Discord';
@@ -612,7 +674,11 @@
   const canvas = document.getElementById('confetti-canvas');
   const ctx = canvas.getContext('2d');
   canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-  window.addEventListener('resize', () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; });
+  window.addEventListener('resize', () => {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  });
   let confettiParticles = [];
   function spawnConfetti() {
     for (let i = 0; i < 80; i++) {
@@ -639,29 +705,57 @@
     requestAnimationFrame(animateConfetti);
   }
   animateConfetti();
+  // Confetti toggle
+  let confettiEnabled = true;
+  document.getElementById('confettiToggle').addEventListener('click', () => {
+    confettiEnabled = !confettiEnabled;
+    const lines = document.querySelectorAll('#confetti-icon line');
+    lines.forEach(l => l.style.opacity = confettiEnabled ? '1' : '0.2');
+    document.getElementById('confettiToggle').setAttribute('data-tip', confettiEnabled ? 'HIỆU ỨNG: BẬT' : 'HIỆU ỨNG: TẮT');
+    document.getElementById('confettiToggle').style.borderColor = confettiEnabled ? '' : 'rgba(248,113,113,0.3)';
+  });
+
   // Trigger confetti on Discord button click
   document.querySelectorAll('.btn-primary, .discord-btn').forEach(btn => {
-    btn.addEventListener('click', spawnConfetti);
+    btn.addEventListener('click', () => { if (confettiEnabled) spawnConfetti(); });
   });
 
   // ===== TYPING SOUND =====
   let soundEnabled = false;
+  let audioCtx = null;
   const soundToggle = document.getElementById('soundToggle');
+
+  // Khởi tạo AudioContext sau khi user tương tác lần đầu
+  function initAudio() {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+  }
+  document.addEventListener('click', initAudio, { once: true });
+
   soundToggle.addEventListener('click', () => {
+    initAudio();
     soundEnabled = !soundEnabled;
-    soundToggle.textContent = soundEnabled ? '🔊' : '🔇';
+    // Toggle X overlay
+    document.getElementById('sound-mute-x1').setAttribute('display', soundEnabled ? 'none' : 'block');
+    document.getElementById('sound-mute-x2').setAttribute('display', soundEnabled ? 'none' : 'block');
+    soundToggle.setAttribute('data-tip', soundEnabled ? 'ÂM THANH: BẬT' : 'ÂM THANH: TẮT');
+    // Animate bars when on
+    document.querySelectorAll('.wave-bar').forEach(b => {
+      b.style.animation = soundEnabled ? 'waveActive 0.5s ease infinite alternate' : 'none';
+    });
   });
+
   function playKeySound() {
-    if (!soundEnabled) return;
+    if (!soundEnabled || !audioCtx) return;
     try {
-      const ctx2 = new (window.AudioContext || window.webkitAudioContext)();
-      const o = ctx2.createOscillator(); const g = ctx2.createGain();
-      o.connect(g); g.connect(ctx2.destination);
+      const o = audioCtx.createOscillator();
+      const g = audioCtx.createGain();
+      o.connect(g); g.connect(audioCtx.destination);
       o.frequency.value = 800 + Math.random() * 200;
       o.type = 'square';
-      g.gain.setValueAtTime(0.03, ctx2.currentTime);
-      g.gain.exponentialRampToValueAtTime(0.001, ctx2.currentTime + 0.05);
-      o.start(); o.stop(ctx2.currentTime + 0.05);
+      g.gain.setValueAtTime(0.03, audioCtx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
+      o.start(); o.stop(audioCtx.currentTime + 0.05);
     } catch {}
   }
   document.addEventListener('keydown', playKeySound);
