@@ -304,6 +304,28 @@
   .sc-img { max-width:180px; max-height:180px; object-fit:cover; cursor:pointer; border:1px solid var(--border); display:block; margin-top:0.3rem; }
   .sc-attach-btn { background:none; border:none; color:var(--muted); cursor:pointer; padding:0 0.5rem; font-size:0.85rem; transition:color 0.2s; }
   .sc-attach-btn:hover { color:var(--accent2); }
+
+  /* ===== CONNECTION MODAL ===== */
+  #conn-modal { position:fixed; inset:0; background:rgba(0,0,0,0.75); z-index:500; display:none; align-items:center; justify-content:center; backdrop-filter:blur(6px); padding:1rem; }
+  #conn-modal.open { display:flex; animation:mIn 0.3s ease; }
+  @keyframes mIn { from{opacity:0;transform:scale(0.95)} to{opacity:1;transform:scale(1)} }
+  .conn-box { background:var(--bg2); border:1px solid rgba(74,222,128,0.4); padding:2rem; width:100%; max-width:440px; position:relative; }
+  .conn-box::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:linear-gradient(90deg,#166534,var(--green)); }
+  .conn-title { font-family:'Rajdhani',sans-serif; font-size:1.2rem; font-weight:700; text-transform:uppercase; letter-spacing:0.1em; color:var(--green); margin-bottom:0.3rem; display:flex; align-items:center; gap:0.5rem; }
+  .conn-sub { font-family:'JetBrains Mono',monospace; font-size:0.65rem; color:var(--muted); letter-spacing:0.1em; margin-bottom:1.25rem; }
+  .conn-row { display:flex; align-items:center; justify-content:space-between; padding:0.65rem 0.85rem; background:var(--bg3); border:1px solid var(--border); margin-bottom:0.6rem; gap:0.5rem; }
+  .conn-row-label { font-family:'JetBrains Mono',monospace; font-size:0.6rem; color:var(--muted); letter-spacing:0.12em; text-transform:uppercase; flex-shrink:0; }
+  .conn-row-val { font-family:'JetBrains Mono',monospace; font-size:0.85rem; color:var(--text); font-weight:500; word-break:break-all; }
+  .conn-copy { background:rgba(124,92,191,0.15); border:1px solid rgba(124,92,191,0.3); color:var(--accent2); font-size:0.65rem; padding:0.2rem 0.5rem; cursor:pointer; transition:all 0.2s; flex-shrink:0; font-family:'JetBrains Mono',monospace; white-space:nowrap; }
+  .conn-copy:hover { background:rgba(124,92,191,0.3); }
+  .conn-copy.copied { background:rgba(74,222,128,0.15); border-color:rgba(74,222,128,0.3); color:var(--green); }
+  .conn-divider { height:1px; background:var(--border); margin:1rem 0; }
+  .conn-steps { display:flex; flex-direction:column; gap:0.4rem; margin-bottom:1.25rem; }
+  .conn-step { font-size:0.78rem; color:var(--muted); display:flex; gap:0.5rem; align-items:flex-start; }
+  .conn-step-num { font-family:'JetBrains Mono',monospace; font-size:0.65rem; color:var(--accent2); flex-shrink:0; margin-top:0.1rem; }
+  .conn-footer { display:flex; gap:0.75rem; justify-content:flex-end; }
+  .conn-countdown { font-family:'JetBrains Mono',monospace; font-size:0.6rem; color:var(--muted); text-align:center; margin-bottom:0.75rem; letter-spacing:0.1em; }
+
   /* ===== MOBILE ===== */
   .hamburger { display:none; background:none; border:none; color:var(--accent2); width:40px; height:40px; align-items:center; justify-content:center; font-size:1.3rem; cursor:pointer; flex-shrink:0; }
   .sidebar-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:49; }
@@ -411,7 +433,10 @@
             <div class="machine-title" id="machineName" data-text="—">—</div>
           </div>
         </div>
-        <div class="badge badge-offline" id="machineStatus">Chưa có máy</div>
+        <div style="display:flex;align-items:center;gap:0.75rem;flex-wrap:wrap;">
+          <div class="badge badge-offline" id="machineStatus">Chưa có máy</div>
+          <button id="show-conn-btn" onclick="showConnModalFromData()" style="display:none;background:rgba(74,222,128,0.1);border:1px solid rgba(74,222,128,0.25);color:var(--green);font-family:'JetBrains Mono',monospace;font-size:0.6rem;padding:0.25rem 0.65rem;cursor:pointer;letter-spacing:0.1em;transition:all 0.2s;">🔑 THÔNG TIN KẾT NỐI</button>
+        </div>
       </div>
       <div class="divider"></div>
       <div class="spec-grid">
@@ -586,6 +611,49 @@
 </div>
 
 
+
+<!-- CONNECTION MODAL -->
+<div id="conn-modal">
+  <div class="conn-box">
+    <div class="conn-title">🖥️ Máy đã sẵn sàng!</div>
+    <div class="conn-sub">// Dùng Parsec để kết nối · parsec.app</div>
+    <div class="conn-row">
+      <span class="conn-row-label">IP</span>
+      <span class="conn-row-val" id="conn-ip">—</span>
+      <button class="conn-copy" onclick="connCopy('conn-ip', this)">📋 Copy</button>
+    </div>
+    <div class="conn-row">
+      <span class="conn-row-label">Password</span>
+      <span class="conn-row-val" id="conn-pass">—</span>
+      <button class="conn-copy" onclick="connCopy('conn-pass', this)">📋 Copy</button>
+    </div>
+    <div class="conn-row">
+      <span class="conn-row-label">GPU</span>
+      <span class="conn-row-val" id="conn-gpu">—</span>
+    </div>
+    <div class="conn-row">
+      <span class="conn-row-label">Hết hạn</span>
+      <span class="conn-row-val" id="conn-expiry">—</span>
+    </div>
+    <div class="conn-divider"></div>
+    <div class="conn-steps">
+      <div class="conn-step"><span class="conn-step-num">01</span><span>Tải <strong>Parsec</strong> tại <strong>parsec.app</strong> (miễn phí, không cần tạo tài khoản)</span></div>
+      <div class="conn-step"><span class="conn-step-num">02</span><span>Mở Parsec → <strong>Computers</strong> → <strong>Connect</strong> → nhập IP bên trên</span></div>
+      <div class="conn-step"><span class="conn-step-num">03</span><span>Nhập <strong>Password</strong> bên trên khi được hỏi → Done!</span></div>
+      <div class="conn-step"><span class="conn-step-num">💡</span><span>Gặp lỗi? Bấm <strong>Hỗ trợ</strong> hoặc nhắn chat bên dưới.</span></div>
+    </div>
+    <div class="conn-countdown" id="conn-countdown"></div>
+    <div class="conn-footer">
+      <a href="https://discord.gg/Ct4Gw7GwJJ" target="_blank" class="btn btn-discord" style="font-size:0.8rem;padding:0.5rem 1rem;">
+        <i class="fas fa-headset"></i> Hỗ trợ
+      </a>
+      <button class="btn btn-outline" style="font-size:0.8rem;padding:0.5rem 1.25rem;" onclick="document.getElementById('conn-modal').classList.remove('open')">
+        Đóng
+      </button>
+    </div>
+  </div>
+</div>
+
 <!-- SUPPORT CHAT FAB -->
 <div class="support-chat-fab">
   <button class="sc-fab-btn" onclick="toggleSupportChat()" title="Hỗ trợ">
@@ -659,6 +727,36 @@
 
 
 
+
+
+  // ===== CONNECTION MODAL =====
+  function showConnModal(m) {
+    document.getElementById('conn-ip').textContent   = m.ip       || '—';
+    document.getElementById('conn-pass').textContent = m.password || '(không có)';
+    document.getElementById('conn-gpu').textContent  = m.gpu      || '—';
+    document.getElementById('conn-expiry').textContent = m.expiry
+      ? new Date(m.expiry).toLocaleString('vi-VN',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'})
+      : '—';
+    document.getElementById('conn-modal').classList.add('open');
+    // Countdown auto-close 60s
+    let sec = 60;
+    const cdEl = document.getElementById('conn-countdown');
+    cdEl.textContent = 'Tự đóng sau ' + sec + 's';
+    const iv = setInterval(() => {
+      sec--;
+      cdEl.textContent = 'Tự đóng sau ' + sec + 's';
+      if(sec <= 0) { clearInterval(iv); document.getElementById('conn-modal').classList.remove('open'); cdEl.textContent=''; }
+    }, 1000);
+  }
+
+  function connCopy(elId, btn) {
+    const val = document.getElementById(elId).textContent;
+    navigator.clipboard.writeText(val).then(() => {
+      btn.textContent = '✓ Copied!';
+      btn.classList.add('copied');
+      setTimeout(() => { btn.textContent = '📋 Copy'; btn.classList.remove('copied'); }, 2000);
+    });
+  }
 
   // ===== SUPPORT CHAT (USER) =====
   let scOpen = false;
@@ -990,7 +1088,10 @@
     update(); countdownInterval=setInterval(update,1000);
   }
 
+  let _currentMachine = null;
+  function showConnModalFromData(){ if(_currentMachine) showConnModal(_currentMachine); }
   function fillMachine(m){
+    _currentMachine = m;
     // Dashboard specs
     const ipEl=document.getElementById('machineIp');
     ipEl.innerHTML=(m.ip||'—')+(m.ip?'<button class="copy-ip" onclick="copyIp(\''+m.ip+'\')">📋</button>':'');
@@ -1008,6 +1109,7 @@
     nameEl.classList.add('has-machine');
     document.getElementById('machineStatus').className='badge badge-online';
     document.getElementById('machineStatus').textContent='Đang chạy';
+    const connBtn=document.getElementById('show-conn-btn'); if(connBtn) connBtn.style.display='inline-flex';
     document.getElementById('statPlan').textContent=m.plan||'ACTIVE';
     document.getElementById('statPlan').classList.remove('empty');
     document.getElementById('statPlan').style.color='var(--green)';
@@ -1069,8 +1171,7 @@
     const machineChannel = sb.channel('machines-realtime-'+session.user.id)
       .on('postgres_changes',{event:'INSERT',schema:'public',table:'machines',filter:'user_id=eq.'+session.user.id},payload=>{
         fillMachine(payload.new);
-        showToast('🖥️ Máy đã được gán! Đang kết nối...', 5000, 'success');
-        // Visual flash on the card
+        showConnModal(payload.new);
         const card = document.querySelector('.card.card-top-line');
         if(card){ card.style.borderColor='rgba(74,222,128,0.6)'; setTimeout(()=>card.style.borderColor='',2000); }
       })

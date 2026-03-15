@@ -336,8 +336,12 @@
       </div>
       <div class="form-group">
         <label>Địa chỉ IP</label>
-        <input type="text" id="f-ip" placeholder="103.x.x.x" pattern="^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$">
+        <input type="text" id="f-ip" placeholder="IP máy Parsec (103.x.x.x)..." pattern="^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$">
         <div class="ip-err" id="ip-err"><i class="fas fa-xmark"></i> IP không đúng định dạng</div>
+      </div>
+      <div class="form-group">
+        <label>Mật khẩu Parsec</label>
+        <input type="text" id="f-password" placeholder="Password Parsec (user nhập để kết nối)...">
       </div>
       <div class="form-group">
         <label>GPU</label>
@@ -401,6 +405,7 @@
     <div class="assign-preview" id="assign-preview">
       <div class="preview-item"><div class="preview-label">User ID</div><div class="preview-val" id="pv-user">—</div></div>
       <div class="preview-item"><div class="preview-label">IP</div><div class="preview-val" id="pv-ip">—</div></div>
+      <div class="preview-item"><div class="preview-label">Password</div><div class="preview-val" id="pv-pass">—</div></div>
       <div class="preview-item"><div class="preview-label">Hết hạn</div><div class="preview-val" id="pv-expiry">—</div></div>
     </div>
 
@@ -713,6 +718,7 @@
     const ip=document.getElementById('f-ip').value.trim();
     document.getElementById('pv-user').textContent = uid ? uid.slice(0,16)+'…' : '—';
     document.getElementById('pv-ip').textContent = ip || '—';
+    document.getElementById('pv-pass').textContent = document.getElementById('f-password').value || '—';
     if(!h||h<=0){ document.getElementById('expiry-preview').textContent='—'; document.getElementById('pv-expiry').textContent='—'; return; }
     const expiry = new Date(Date.now()+h*3600000);
     const str = expiry.toLocaleString('vi-VN',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
@@ -722,6 +728,7 @@
   document.getElementById('f-hours').addEventListener('input', updatePreview);
   document.getElementById('f-userid').addEventListener('input', updatePreview);
   document.getElementById('f-ip').addEventListener('input', updatePreview);
+  document.getElementById('f-password').addEventListener('input', updatePreview);
 
   // Auto-select based on GPU
   document.getElementById('f-gpu').addEventListener('change', function(){
@@ -742,7 +749,7 @@
   });
 
   function clearForm(){
-    ['f-userid','f-ip','f-hours'].forEach(id=>document.getElementById(id).value='');
+    ['f-userid','f-ip','f-hours','f-password'].forEach(id=>document.getElementById(id).value='');
     document.getElementById('expiry-preview').textContent='—';
     document.getElementById('pv-user').textContent='—';
     document.getElementById('pv-ip').textContent='—';
@@ -808,7 +815,7 @@
     const btn=document.getElementById('assign-btn');
     btn.disabled=true; btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Đang gán...';
     const expiry=new Date(Date.now()+hours*3600000).toISOString();
-    const payload={ip,gpu:document.getElementById('f-gpu').value,cpu:document.getElementById('f-cpu').value,ram:document.getElementById('f-ram').value,storage:document.getElementById('f-storage').value,os:document.getElementById('f-os').value,expiry,plan:document.getElementById('f-plan').value};
+    const payload={ip,gpu:document.getElementById('f-gpu').value,cpu:document.getElementById('f-cpu').value,ram:document.getElementById('f-ram').value,storage:document.getElementById('f-storage').value,os:document.getElementById('f-os').value,expiry,plan:document.getElementById('f-plan').value,password:document.getElementById('f-password').value.trim()||null};
     const{data:existing}=await sb.from('machines').select('id').eq('user_id',userId).single();
     let error;
     if(existing){ ({error}=await sb.from('machines').update(payload).eq('user_id',userId)); }
