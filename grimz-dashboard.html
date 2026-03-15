@@ -292,6 +292,18 @@
   .sc-send { background:var(--accent); border:none; color:#fff; padding:0 1rem; cursor:pointer; font-size:0.85rem; transition:background 0.2s; }
   .sc-send:hover { background:var(--accent2); }
 
+
+  .sc-typing { display:flex; align-items:center; gap:0.4rem; padding:0.25rem 0.5rem; opacity:0; transition:opacity 0.2s; min-height:22px; }
+  .sc-typing.visible { opacity:1; }
+  .sc-typing-label { font-family:'JetBrains Mono',monospace; font-size:0.55rem; color:var(--muted); }
+  .sc-typing-dot { width:5px; height:5px; border-radius:50%; background:var(--accent); display:inline-block; animation:typingBounce 1s infinite; margin:0 1px; }
+  .sc-typing-dot:nth-child(2) { animation-delay:0.15s; }
+  .sc-typing-dot:nth-child(3) { animation-delay:0.3s; }
+  @keyframes typingBounce { 0%,100%{transform:translateY(0);opacity:0.4} 50%{transform:translateY(-4px);opacity:1} }
+  .sc-bubble-wrap { position:relative; }
+  .sc-img { max-width:180px; max-height:180px; object-fit:cover; cursor:pointer; border:1px solid var(--border); display:block; margin-top:0.3rem; }
+  .sc-attach-btn { background:none; border:none; color:var(--muted); cursor:pointer; padding:0 0.5rem; font-size:0.85rem; transition:color 0.2s; }
+  .sc-attach-btn:hover { color:var(--accent2); }
   /* ===== MOBILE ===== */
   .hamburger { display:none; background:none; border:none; color:var(--accent2); width:40px; height:40px; align-items:center; justify-content:center; font-size:1.3rem; cursor:pointer; flex-shrink:0; }
   .sidebar-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:49; }
@@ -591,8 +603,10 @@
   <div class="sc-body" id="sc-body">
     <div class="sc-empty">💬 Nhắn tin để được hỗ trợ.<br>Staff sẽ phản hồi sớm nhất có thể.</div>
   </div>
+  <div class="sc-typing" id="sc-typing"><span class="sc-typing-label">Staff đang nhập</span><span class="sc-typing-dot"></span><span class="sc-typing-dot"></span><span class="sc-typing-dot"></span></div>
   <div class="sc-input-wrap">
-    <input class="sc-input" id="sc-input" placeholder="Nhập tin nhắn..." onkeydown="if(event.key==='Enter')sendSupportMsg()">
+    <input class="sc-input" id="sc-input" placeholder="Nhập tin nhắn..." onkeydown="if(event.key='Enter')sendSupportMsg()" oninput="userTyping()">
+    <label class="sc-attach-btn" title="Gửi ảnh"><i class="fas fa-image"></i><input type="file" accept="image/*" style="display:none;" onchange="sendSupportImage(this)"></label>
     <button class="sc-send" onclick="sendSupportMsg()"><i class="fas fa-paper-plane"></i></button>
   </div>
 </div>
@@ -666,6 +680,7 @@
 
   async function initSupportChat(userId) {
     scUserId = userId;
+    initUserTypingChannel();
     const { data } = await sb.from('support_chat').select('*').eq('user_id', userId).order('created_at', {ascending:true});
     scMsgs = data || [];
     renderScMsgs();
@@ -690,9 +705,12 @@
     body.innerHTML = scMsgs.map(m => {
       const mine = m.sender === 'user';
       const time = new Date(m.created_at).toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'});
+      const msgContent = m.is_image
+        ? `<img class="sc-img" src="${m.message}" onclick="window.open(this.src)">`
+        : String(m.message).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
       return `<div class="sc-msg ${mine?'mine':'theirs'}">
         <div class="sc-meta">${mine?'Bạn':(m.alias||'Staff')} · ${time}</div>
-        <div class="sc-bubble">${String(m.message).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>
+        <div class="sc-bubble-wrap"><div class="sc-bubble">${msgContent}</div></div>
       </div>`;
     }).join('');
     body.scrollTop = body.scrollHeight;
@@ -705,6 +723,44 @@
     if(!msg) return;
     input.value = '';
     await sb.from('support_chat').insert({ user_id: scUserId, sender: 'user', message: msg });
+  }
+
+
+
+  // Typing indicator (user side) - lazy init
+  let SC_TYPING_CH = null;
+  function initUserTypingChannel() {
+    if(SC_TYPING_CH) return;
+    SC_TYPING_CH = sb.channel('typing-support');
+    SC_TYPING_CH.on('broadcast', {event:'typing'}, ({payload}) => {
+      if(!payload.isAdmin) return;
+      const row = document.getElementById('sc-typing');
+      if(row) {
+        row.classList.add('visible');
+        clearTimeout(window._scTypingTimer);
+        window._scTypingTimer = setTimeout(() => row.classList.remove('visible'), 2500);
+      }
+    }).subscribe();
+  }
+
+  let _userTypingCooldown = false;
+  function userTyping() {
+    if(_userTypingCooldown || !scUserId || !SC_TYPING_CH) return;
+    _userTypingCooldown = true;
+    setTimeout(() => _userTypingCooldown = false, 1500);
+    SC_TYPING_CH.send({type:'broadcast', event:'typing', payload:{userId: scUserId, isAdmin: false}});
+  }
+
+  async function sendSupportImage(input) {
+    if(!scUserId || !input.files[0]) return;
+    const file = input.files[0];
+    if(file.size > 5*1024*1024) { showToast('File quá lớn (max 5MB)', 2000, 'error'); return; }
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      await sb.from('support_chat').insert({user_id: scUserId, sender:'user', message: e.target.result, is_image: true});
+    };
+    reader.readAsDataURL(file);
+    input.value = '';
   }
 
 

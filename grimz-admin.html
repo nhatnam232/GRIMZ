@@ -97,6 +97,30 @@
   .support-back:hover { color:var(--accent2); }
   .support-back.show { display:inline-flex; align-items:center; gap:0.3rem; }
 
+
+  /* Typing indicator */
+  .typing-row { display:flex; align-items:center; gap:0.4rem; padding:0.3rem 0.5rem; opacity:0; transition:opacity 0.2s; min-height:24px; }
+  .typing-row.visible { opacity:1; }
+  .typing-who { font-family:'JetBrains Mono',monospace; font-size:0.55rem; color:var(--muted); }
+  .typing-dots { display:flex; gap:3px; align-items:center; }
+  .typing-dot { width:5px; height:5px; border-radius:50%; background:var(--accent); animation:typingBounce 1s infinite; }
+  .typing-dot:nth-child(2) { animation-delay:0.15s; }
+  .typing-dot:nth-child(3) { animation-delay:0.3s; }
+  @keyframes typingBounce { 0%,100%{transform:translateY(0);opacity:0.4} 50%{transform:translateY(-4px);opacity:1} }
+  /* Delete msg */
+  .chat-bubble-wrap { position:relative; }
+  .chat-bubble-wrap:hover .del-msg-btn { opacity:1; }
+  .del-msg-btn { position:absolute; top:-6px; right:-6px; background:rgba(248,113,113,0.15); border:1px solid rgba(248,113,113,0.3); color:var(--red); font-size:0.55rem; width:18px; height:18px; border-radius:50%; cursor:pointer; display:flex; align-items:center; justify-content:center; opacity:0; transition:opacity 0.2s; }
+  /* Image attachment */
+  .chat-attach-btn { background:none; border:none; color:var(--muted); cursor:pointer; padding:0 0.5rem; font-size:0.85rem; transition:color 0.2s; }
+  .chat-attach-btn:hover { color:var(--accent2); }
+  .chat-img { max-width:200px; max-height:200px; object-fit:cover; cursor:pointer; border:1px solid var(--border); display:block; margin-top:0.3rem; }
+  /* User info panel */
+  .user-info-panel { background:rgba(124,92,191,0.05); border-bottom:1px solid var(--border); padding:0.6rem 0.75rem; font-family:'JetBrains Mono',monospace; font-size:0.6rem; color:var(--muted); letter-spacing:0.08em; display:none; }
+  .user-info-panel.show { display:block; }
+  .user-info-row { display:flex; justify-content:space-between; padding:0.2rem 0; }
+  .user-info-row span:last-child { color:var(--accent2); text-align:right; }
+
   /* ===== RATE LIMIT NOTICE ===== */
   #rate-limit-msg { display:none; font-family:'JetBrains Mono',monospace; font-size:0.68rem; color:var(--red); text-align:center; letter-spacing:0.08em; margin-top:0.75rem; }
 
@@ -486,8 +510,10 @@
   <!-- ADMIN CHAT -->
   <div id="chat-admin-panel" style="display:flex;flex-direction:column;">
     <div class="chat-body" id="admin-chat-body"><div class="chat-empty">Chưa có tin nhắn</div></div>
+    <div class="typing-row" id="admin-typing-row"><span class="typing-who" id="admin-typing-who"></span><div class="typing-dots"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div></div>
     <div class="chat-input-wrap">
-      <input class="chat-input" id="admin-chat-input" placeholder="Nhắn cho team..." onkeydown="if(event.key==='Enter')sendAdminMsg()">
+      <input class="chat-input" id="admin-chat-input" placeholder="Nhắn cho team..." onkeydown="if(event.key==='Enter')sendAdminMsg()" oninput="adminTyping('admin')">
+      <label class="chat-attach-btn" title="Gửi ảnh"><i class="fas fa-image"></i><input type="file" accept="image/*" style="display:none;" onchange="sendAdminImage(this)"></label>
       <button class="chat-send" onclick="sendAdminMsg()"><i class="fas fa-paper-plane"></i></button>
     </div>
   </div>
@@ -496,9 +522,12 @@
   <div id="chat-support-panel" style="display:none;">
     <div id="support-user-list" class="support-list"><div class="chat-empty">Chưa có user nào nhắn</div></div>
     <div id="support-user-chat" style="display:none; flex-direction:column;">
+      <div class="user-info-panel" id="user-info-panel"></div>
       <div class="chat-body" id="support-chat-body"></div>
+      <div class="typing-row" id="support-typing-admin"><span class="typing-who" id="support-typing-who">User đang nhập</span><div class="typing-dots"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div></div>
       <div class="chat-input-wrap">
-        <input class="chat-input" id="support-chat-input" placeholder="Reply user..." onkeydown="if(event.key==='Enter')sendSupportReply()">
+        <input class="chat-input" id="support-chat-input" placeholder="Reply user..." onkeydown="if(event.key==='Enter')sendSupportReply()" oninput="adminTyping('support')">
+        <label class="chat-attach-btn" title="Gửi ảnh"><i class="fas fa-image"></i><input type="file" accept="image/*" style="display:none;" onchange="sendSupportImage(this)"></label>
         <button class="chat-send" onclick="sendSupportReply()"><i class="fas fa-paper-plane"></i></button>
       </div>
     </div>
@@ -882,6 +911,7 @@
     document.getElementById('chat-panel').classList.toggle('open', chatOpen);
     if(chatOpen) {
       getAdminAlias();
+      initTypingChannels();
       if(!adminChatSub) initAdminChat();
       if(!supportChatSub) initSupportChat();
       markAdminSeen();
@@ -922,9 +952,12 @@
     body.innerHTML = adminMsgs.map(m => {
       const mine = m.alias === adminAlias;
       const time = new Date(m.created_at).toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'});
+      const content = m.is_image
+        ? `<img class="chat-img" src="${m.message}" onclick="window.open(this.src)">`
+        : `<span>${escHtml(m.message)}</span>`;
       return `<div class="chat-msg ${mine?'mine':'theirs'}">
         <div class="chat-meta"><span class="chat-alias">${m.alias}</span> · ${time}</div>
-        <div class="chat-bubble">${escHtml(m.message)}</div>
+        <div class="chat-bubble-wrap"><div class="chat-bubble">${content}</div><button class="del-msg-btn" onclick="deleteAdminMsg('${m.id}')" title="Xóa">✕</button></div>
       </div>`;
     }).join('');
     body.scrollTop = body.scrollHeight;
@@ -1003,8 +1036,7 @@
   function openSupportChat(uid) {
     currentSupportUserId = uid;
     document.getElementById('support-user-list').style.display='none';
-    const uc = document.getElementById('support-user-chat');
-    uc.style.display='flex'; uc.style.flexDirection='column';
+    document.getElementById('support-user-chat').style.cssText='display:flex;flex-direction:column;';
     document.getElementById('support-back-btn').classList.add('show');
     localStorage.setItem('grimz_seen_support_'+uid, Date.now());
     renderSupportMessages(uid);
@@ -1016,8 +1048,9 @@
   function backToSupportList() {
     currentSupportUserId = null;
     document.getElementById('support-user-list').style.display='block';
-    document.getElementById('support-user-chat').style.display='none';
+    document.getElementById('support-user-chat').style.cssText='display:none;';
     document.getElementById('support-back-btn').classList.remove('show');
+    updateSupportUnread();
     renderSupportList();
   }
 
@@ -1027,9 +1060,12 @@
     body.innerHTML = msgs.map(m => {
       const mine = m.sender === 'admin';
       const time = new Date(m.created_at).toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'});
+      const msgContent = m.is_image
+        ? `<img class="chat-img" src="${m.message}" onclick="window.open(this.src)">`
+        : `<span>${escHtml(m.message)}</span>`;
       return `<div class="chat-msg ${mine?'mine':'theirs'}">
         <div class="chat-meta">${mine?('<span class="chat-alias">'+escHtml(m.alias||'Admin')+'</span> · '):'User · '}${time}</div>
-        <div class="chat-bubble">${escHtml(m.message)}</div>
+        <div class="chat-bubble-wrap"><div class="chat-bubble">${msgContent}</div><button class="del-msg-btn" onclick="deleteSupportMsg('${m.id}')" title="Xóa">✕</button></div>
       </div>`;
     }).join('');
     body.scrollTop = body.scrollHeight;
@@ -1074,6 +1110,108 @@
   // Init chat after login
   const origLoadData = loadData;
   // Chat auto-init after session check handled by toggleChat on open
+
+
+
+  // ===== TYPING INDICATOR =====
+  let typingTimers = {};
+  let TYPING_CHANNEL_ADMIN = null;
+  let TYPING_CHANNEL_SUPPORT = null;
+
+  function initTypingChannels() {
+    if(TYPING_CHANNEL_ADMIN) return;
+    TYPING_CHANNEL_ADMIN = sb.channel('typing-admin');
+    TYPING_CHANNEL_SUPPORT = sb.channel('typing-support');
+    TYPING_CHANNEL_ADMIN
+      .on('broadcast', {event:'typing'}, ({payload}) => {
+        if(payload.alias === adminAlias) return;
+        const row = document.getElementById('admin-typing-row');
+        document.getElementById('admin-typing-who').textContent = payload.alias + ' đang nhập';
+        row.classList.add('visible');
+        clearTimeout(typingTimers['admin_'+payload.alias]);
+        typingTimers['admin_'+payload.alias] = setTimeout(() => row.classList.remove('visible'), 2500);
+      }).subscribe();
+    TYPING_CHANNEL_SUPPORT
+      .on('broadcast', {event:'typing'}, ({payload}) => {
+        if(!currentSupportUserId || payload.userId !== currentSupportUserId) return;
+        const row = document.getElementById('support-typing-admin');
+        document.getElementById('support-typing-who').textContent = (payload.alias||'User') + ' đang nhập';
+        row.classList.add('visible');
+        clearTimeout(typingTimers['support_'+payload.userId]);
+        typingTimers['support_'+payload.userId] = setTimeout(() => row.classList.remove('visible'), 2500);
+      }).subscribe();
+  }
+
+  let typingCooldown = {};
+  function adminTyping(channel) {
+    const key = 'cooldown_'+channel;
+    if(typingCooldown[key]) return;
+    typingCooldown[key] = true;
+    setTimeout(() => delete typingCooldown[key], 1500);
+    if(channel === 'admin') {
+      TYPING_CHANNEL_ADMIN.send({type:'broadcast', event:'typing', payload:{alias: adminAlias}});
+    } else if(channel === 'support' && currentSupportUserId) {
+      TYPING_CHANNEL_SUPPORT.send({type:'broadcast', event:'typing', payload:{alias: adminAlias, userId: currentSupportUserId, isAdmin:true}});
+    }
+  }
+
+  // ===== USER INFO in Support Chat =====
+  async function loadUserInfo(uid) {
+    const panel = document.getElementById('user-info-panel');
+    const {data: machine} = await sb.from('machines').select('*').eq('user_id', uid).single();
+    if(!machine) { panel.innerHTML='<div style="color:var(--muted)">Chưa có máy gán</div>'; panel.classList.add('show'); return; }
+    const expiry = machine.expiry ? new Date(machine.expiry).toLocaleString('vi-VN',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}) : '—';
+    const expired = machine.expiry && new Date(machine.expiry) < new Date();
+    panel.innerHTML = `
+      <div class="user-info-row"><span>User</span><span>${uid.slice(0,16)}…</span></div>
+      <div class="user-info-row"><span>GPU</span><span>${machine.gpu?.replace('NVIDIA ','')||'—'}</span></div>
+      <div class="user-info-row"><span>Gói</span><span>${machine.plan||'—'}</span></div>
+      <div class="user-info-row"><span>Hết hạn</span><span style="color:${expired?'var(--red)':'var(--green)'}">${expiry}</span></div>
+      <div class="user-info-row"><span>IP</span><span>${machine.ip||'—'}</span></div>
+    `;
+    panel.classList.add('show');
+  }
+
+  // Patch openSupportChat to load user info
+  const _origOpenSupportChat = openSupportChat;
+  function openSupportChat(uid) {
+    _origOpenSupportChat(uid);
+    loadUserInfo(uid);
+  }
+
+  // ===== DELETE MESSAGE =====
+  async function deleteAdminMsg(id) {
+    await sb.from('admin_chat').delete().eq('id', id);
+    adminMsgs = adminMsgs.filter(m => m.id !== id);
+    renderAdminChat();
+  }
+  async function deleteSupportMsg(id) {
+    await sb.from('support_chat').delete().eq('id', id);
+    if(currentSupportUserId) {
+      supportConvos[currentSupportUserId] = supportConvos[currentSupportUserId].filter(m => m.id !== id);
+      renderSupportMessages(currentSupportUserId);
+    }
+  }
+
+  // ===== IMAGE ATTACHMENT =====
+  async function uploadAndSend(file, table, extraData) {
+    if(!file || file.size > 5*1024*1024) { showToast('File quá lớn (max 5MB)', 'error'); return; }
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      const base64 = e.target.result;
+      await sb.from(table).insert({...extraData, message: base64, is_image: true});
+    };
+    reader.readAsDataURL(file);
+  }
+  function sendAdminImage(input) {
+    uploadAndSend(input.files[0], 'admin_chat', {alias: getAdminAlias()});
+    input.value = '';
+  }
+  function sendSupportImage(input) {
+    if(!currentSupportUserId) return;
+    uploadAndSend(input.files[0], 'support_chat', {user_id: currentSupportUserId, sender:'admin', alias: getAdminAlias()});
+    input.value = '';
+  }
 
 
   // ===== TOAST =====
