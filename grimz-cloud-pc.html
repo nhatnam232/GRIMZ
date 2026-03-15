@@ -161,6 +161,12 @@
   .fade-up.visible { opacity:1; transform:translateY(0); }
 
 
+  /* Hide cursor on touch/mobile */
+  @media (hover: none) {
+    * { cursor: auto !important; }
+    .cursor, .cursor-ring { display: none !important; }
+  }
+
   /* Custom Cursor */
   * { cursor: none !important; }
   .cursor { position:fixed; width:12px; height:12px; background:var(--accent); border-radius:50%; pointer-events:none; z-index:99999; transform:translate(-50%,-50%); transition:width 0.15s, height 0.15s, background 0.15s; box-shadow:0 0 10px var(--accent), 0 0 20px rgba(124,92,191,0.4); }
@@ -503,7 +509,8 @@
   document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
 
 
-  // ===== CUSTOM CURSOR =====
+  // ===== CUSTOM CURSOR (desktop only) =====
+  if (window.matchMedia('(hover: hover)').matches) {
   const cursor = document.getElementById('cursor');
   const cursorRing = document.getElementById('cursorRing');
   const mouseGlow = document.getElementById('mouseGlow');
@@ -517,6 +524,7 @@
   });
   document.addEventListener('mousedown', () => { cursor.classList.add('clicking'); cursorRing.classList.add('clicking'); });
   document.addEventListener('mouseup', () => { cursor.classList.remove('clicking'); cursorRing.classList.remove('clicking'); });
+  }
 
   // ===== TYPING EFFECT =====
   const typingLines = [
