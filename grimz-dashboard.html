@@ -399,16 +399,18 @@
       const expiryStr = new Date(m.expiry).toLocaleDateString('vi-VN');
       document.getElementById('expiryDate').textContent = expiryStr;
       document.getElementById('expiryDate').classList.remove('empty');
-      document.getElementById('statTime').textContent = '...';
       document.getElementById('statTime').classList.remove('empty');
-// update statTime mỗi giây
-setInterval(() => {
-  const diff = Math.max(0, new Date(m.expiry) - new Date());
-  const d = Math.floor(diff/86400000);
-  const h = Math.floor((diff%86400000)/3600000);
-  const m2 = Math.floor((diff%3600000)/60000);
-  document.getElementById('statTime').textContent = d + 'n ' + h + 'g ' + m2 + 'p';
-}, 1000);
+      function updateStatTime() {
+        const diff = Math.max(0, new Date(m.expiry) - new Date());
+        const d = Math.floor(diff/86400000);
+        const h2 = Math.floor((diff%86400000)/3600000);
+        const mn = Math.floor((diff%3600000)/60000);
+        const s = Math.floor((diff%60000)/1000);
+        const txt = d > 0 ? d+'n '+h2+'g '+mn+'p' : h2 > 0 ? h2+'g '+mn+'p '+s+'s' : mn+'p '+s+'s';
+        document.getElementById('statTime').textContent = txt;
+      }
+      updateStatTime();
+      setInterval(updateStatTime, 1000);
     }
 
     // Sidebar
