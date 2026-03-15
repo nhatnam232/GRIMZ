@@ -1001,8 +1001,10 @@
       el.textContent=m[key]||'—'; el.classList.remove('empty');
     });
     const nameEl=document.getElementById('machineName');
-    nameEl.textContent=m.gpu||'Cloud PC';
-    nameEl.setAttribute('data-text',m.gpu||'Cloud PC');
+    // Short display name: plan codename or stripped GPU
+    const shortName = m.plan || (m.gpu||'Cloud PC').replace('NVIDIA ','').replace(' 12GB','').replace(' 8GB','');
+    nameEl.textContent=shortName;
+    nameEl.setAttribute('data-text',shortName);
     nameEl.classList.add('has-machine');
     document.getElementById('machineStatus').className='badge badge-online';
     document.getElementById('machineStatus').textContent='Đang chạy';
@@ -1064,14 +1066,25 @@
     const{data:machine}=await sb.from('machines').select('*').eq('user_id',session.user.id).single();
     if(machine) fillMachine(machine);
 
-    sb.channel('machines-realtime')
-      .on('postgres_changes',{event:'*',schema:'public',table:'machines',filter:'user_id=eq.'+session.user.id},payload=>{
-        if(payload.eventType==='INSERT'||payload.eventType==='UPDATE'){
-          fillMachine(payload.new); showToast('🖥️ Máy của bạn đã được cập nhật!',4000,'success');
-        } else if(payload.eventType==='DELETE'){
-          showToast('⚠️ Máy của bạn đã bị thu hồi.',5000,'error'); location.reload();
-        }
-      }).subscribe();
+    const machineChannel = sb.channel('machines-realtime-'+session.user.id)
+      .on('postgres_changes',{event:'INSERT',schema:'public',table:'machines',filter:'user_id=eq.'+session.user.id},payload=>{
+        fillMachine(payload.new);
+        showToast('🖥️ Máy đã được gán! Đang kết nối...', 5000, 'success');
+        // Visual flash on the card
+        const card = document.querySelector('.card.card-top-line');
+        if(card){ card.style.borderColor='rgba(74,222,128,0.6)'; setTimeout(()=>card.style.borderColor='',2000); }
+      })
+      .on('postgres_changes',{event:'UPDATE',schema:'public',table:'machines',filter:'user_id=eq.'+session.user.id},payload=>{
+        fillMachine(payload.new);
+        showToast('🖥️ Máy của bạn đã được cập nhật!', 4000, 'success');
+      })
+      .on('postgres_changes',{event:'DELETE',schema:'public',table:'machines',filter:'user_id=eq.'+session.user.id},payload=>{
+        showToast('⚠️ Máy của bạn đã bị thu hồi.', 5000, 'error');
+        setTimeout(()=>location.reload(), 1500);
+      })
+      .subscribe((status) => {
+        console.log('Realtime machines status:', status);
+      });
 
     if(machine?.expiry){
       const hours=(new Date(machine.expiry)-new Date())/3600000;
