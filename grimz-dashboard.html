@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Grimz Cloud PC — Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Exo+2:wght@300;400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:     #07090d;
+    --bg2:    #0c1018;
+    --bg3:    #111820;
+    --bg4:    #161e28;
+    --accent: #00e5ff;
+    --accent2:#ff3c6e;
+    --green:  #00ff88;
+    --yellow: #ffd166;
+    --text:   #dce8f5;
+    --muted:  #4a5a70;
+    --border: rgba(0,229,255,0.1);
+    --glow:   0 0 24px rgba(0,229,255,0.2);
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html { scroll-behavior:smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Exo 2', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    overflow-x: hidden;
+  }
+
+  /* GRID BG */
+  body::before {
+    content:'';
+    position:fixed; inset:0;
+    background-image:
+      linear-gradient(rgba(0,229,255,0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,229,255,0.025) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events:none; z-index:0;
+  }
+
+  /* SIDEBAR */
+  .sidebar {
+    position: fixed;
+    left:0; top:0; bottom:0;
+    width: 220px;
+    background: var(--bg2);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    z-index: 50;
+    padding: 0;
+  }
+
+  .sidebar-logo {
+    padding: 1.5rem 1.5rem 1rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .logo-text {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 1.15rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent);
+    text-shadow: 0 0 16px rgba(0,229,255,0.4);
+  }
+
+  .logo-text span { color: var(--accent2); }
+
+  .logo-sub {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.6rem;
+    color: var(--muted);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-top: 0.2rem;
+  }
+
+  .sidebar-user {
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .user-avatar {
+    width: 36px; height: 36px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--bg);
+    flex-shrink: 0;
+    clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 0 100%);
+  }
+
+  .user-info .name {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .user-info .plan {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--accent);
+    letter-spacing: 0.1em;
+  }
+
+  .sidebar-nav {
+    flex: 1;
+    padding: 1rem 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.65rem 1.5rem;
+    font-size: 0.825rem;
+    font-weight: 500;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+    letter-spacing: 0.05em;
+    border-left: 2px solid transparent;
+    position: relative;
+  }
+
+  .nav-item:hover { color: var(--text); background: rgba(255,255,255,0.03); }
+
+  .nav-item.active {
+    color: var(--accent);
+    background: rgba(0,229,255,0.06);
+    border-left-color: var(--accent);
+  }
+
+  .nav-icon { font-size: 1rem; width: 18px; text-align: center; }
+
+  .nav-section-label {
+    padding: 1rem 1.5rem 0.4rem;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.6rem;
+    color: var(--muted);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+  }
+
+  .sidebar-bottom {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid var(--border);
+  }
+
+  .status-dot {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--green);
+    letter-spacing: 0.1em;
+  }
+
+  .status-dot::before {
+    content: '';
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--green);
+    box-shadow: 0 0 8px var(--green);
+    animation: blink 1.5s ease-in-out infinite;
+  }
+
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+  /* MAIN */
+  .main {
+    margin-left: 220px;
+    flex: 1;
+    position: relative;
+    z-index: 1;
+    min-height: 100vh;
+  }
+
+  /* TOPBAR */
+  .topbar {
+    height: 56px;
+    background: rgba(7,9,13,0.9);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 2rem;
+    position: sticky;
+    top: 0;
+    z-index: 40;
+  }
+
+  .topbar-title {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text);
+  }
+
+  .topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .topbar-time {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+  }
+
+  /* CONTENT */
+  .content {
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  /* MACHINE STATUS CARD — BIG */
+  .machine-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    padding: 0;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .machine-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+  }
+
+  .machine-header {
+    padding: 1.5rem 2rem;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .machine-header-left {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .machine-status-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: rgba(0,255,136,0.1);
+    border: 1px solid rgba(0,255,136,0.25);
+    padding: 0.3rem 0.75rem;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--green);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+
+  .machine-status-badge::before {
+    content:'';
+    width:5px; height:5px;
+    border-radius:50%;
+    background: var(--green);
+    box-shadow: 0 0 6px var(--green);
+    animation: blink 1.5s infinite;
+  }
+
+  .machine-name {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 1.4rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .machine-id {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+  }
+
+  .machine-body {
+    padding: 1.5rem 2rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .spec-item {}
+
+  .spec-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.62rem;
+    color: var(--muted);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 0.35rem;
+  }
+
+  .spec-value {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text);
+    letter-spacing: 0.05em;
+  }
+
+  .spec-value.highlight { color: var(--accent); }
+  .spec-value.ip {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.95rem;
+    color: var(--accent);
+    cursor: pointer;
+    transition: color 0.2s;
+  }
+  .spec-value.ip:hover { color: #fff; }
+
+  .copy-hint {
+    font-size: 0.65rem;
+    color: var(--muted);
+    margin-top: 0.2rem;
+    font-family: 'Share Tech Mono', monospace;
+    letter-spacing: 0.08em;
+  }
+
+  /* TIMER CARDS */
+  .cards-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1.25rem;
+  }
+
+  .info-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    padding: 1.5rem;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+
+  .info-card:hover { border-color: rgba(0,229,255,0.25); }
+
+  .info-card-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.62rem;
+    color: var(--muted);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    margin-bottom: 0.75rem;
+  }
+
+  .info-card-value {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 2rem;
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 0.4rem;
+  }
+
+  .info-card-sub {
+    font-size: 0.8rem;
+    color: var(--muted);
+    font-weight: 300;
+  }
+
+  .card-accent-green .info-card-value { color: var(--green); text-shadow: 0 0 16px rgba(0,255,136,0.3); }
+  .card-accent-yellow .info-card-value { color: var(--yellow); text-shadow: 0 0 16px rgba(255,209,102,0.3); }
+  .card-accent-red .info-card-value { color: var(--accent2); text-shadow: 0 0 16px rgba(255,60,110,0.3); }
+  .card-accent-cyan .info-card-value { color: var(--accent); text-shadow: 0 0 16px rgba(0,229,255,0.3); }
+
+  /* PROGRESS BAR */
+  .progress-wrap {
+    margin-top: 1rem;
+  }
+
+  .progress-labels {
+    display: flex;
+    justify-content: space-between;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.62rem;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+    margin-bottom: 0.4rem;
+  }
+
+  .progress-bar {
+    height: 4px;
+    background: var(--bg4);
+    border-radius: 0;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    transition: width 1s ease;
+  }
+
+  /* CONNECT SECTION */
+  .connect-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    overflow: hidden;
+  }
+
+  .connect-header {
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .connect-title {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  .tab-group {
+    display: flex;
+    gap: 0;
+    border: 1px solid var(--border);
+  }
+
+  .tab {
+    padding: 0.35rem 1rem;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.2s;
+    border: none;
+    background: transparent;
+    text-transform: uppercase;
+  }
+
+  .tab.active {
+    background: var(--accent);
+    color: var(--bg);
+    font-weight: 600;
+  }
+
+  .tab:hover:not(.active) { color: var(--text); background: rgba(255,255,255,0.04); }
+
+  .connect-body {
+    padding: 1.5rem;
+  }
+
+  .steps-connect {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .step-row {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+
+  .step-num-sm {
+    width: 24px; height: 24px;
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.7rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 0.1rem;
+  }
+
+  .step-text {
+    font-size: 0.875rem;
+    color: var(--muted);
+    line-height: 1.6;
+    font-weight: 300;
+  }
+
+  .step-text strong { color: var(--text); font-weight: 500; }
+
+  .code-block {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    padding: 0.5rem 0.75rem;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.8rem;
+    color: var(--accent);
+    margin-top: 0.4rem;
+    display: inline-block;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .code-block:hover { background: rgba(0,229,255,0.06); }
+
+  .panel-tab-content { display: none; }
+  .panel-tab-content.active { display: block; }
+
+  /* SUPPORT */
+  .support-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+  }
+
+  .support-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    transition: border-color 0.2s;
+  }
+
+  .support-card:hover { border-color: rgba(0,229,255,0.25); }
+
+  .support-icon { font-size: 1.75rem; }
+
+  .support-title {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 0.25rem;
+  }
+
+  .support-desc {
+    font-size: 0.825rem;
+    color: var(--muted);
+    font-weight: 300;
+    line-height: 1.6;
+    flex: 1;
+  }
+
+  .btn-sm {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1.25rem;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    text-decoration: none;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+    align-self: flex-start;
+    clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 0 100%);
+  }
+
+  .btn-discord {
+    background: #5865F2;
+    color: white;
+  }
+
+  .btn-discord:hover {
+    background: #4752c4;
+    box-shadow: 0 8px 20px rgba(88,101,242,0.35);
+    transform: translateY(-1px);
+  }
+
+  .btn-outline {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text);
+    clip-path: none;
+  }
+
+  .btn-outline:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  /* COUNTDOWN */
+  .countdown {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    margin-top: 0.5rem;
+  }
+
+  .countdown-unit {
+    text-align: center;
+  }
+
+  .countdown-num {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 1.5rem;
+    color: var(--yellow);
+    background: var(--bg3);
+    border: 1px solid rgba(255,209,102,0.2);
+    padding: 0.2rem 0.5rem;
+    display: block;
+    min-width: 44px;
+    text-align: center;
+  }
+
+  .countdown-label {
+    font-size: 0.55rem;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-top: 0.25rem;
+    font-family: 'Share Tech Mono', monospace;
+    display: block;
+  }
+
+  .countdown-sep {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 1.5rem;
+    color: var(--muted);
+    margin-bottom: 1rem;
+  }
+
+  /* TOAST */
+  .toast {
+    position: fixed;
+    bottom: 2rem; right: 2rem;
+    background: var(--bg3);
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    padding: 0.6rem 1.25rem;
+    z-index: 999;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all 0.3s;
+    pointer-events: none;
+  }
+
+  .toast.show { opacity: 1; transform: translateY(0); }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--bg4); border-radius: 0; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--muted); }
+
+  @media (max-width: 768px) {
+    .sidebar { display: none; }
+    .main { margin-left: 0; }
+    .support-row { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-text">GRIMZ <span>CLOUD</span></div>
+    <div class="logo-sub">User Portal v1.0</div>
+  </div>
+  <div class="sidebar-user">
+    <div class="user-avatar">JD</div>
+    <div class="user-info">
+      <div class="name">john_doe</div>
+      <div class="plan">PRO GAMER</div>
+    </div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">// Main</div>
+    <a class="nav-item active" href="#">
+      <span class="nav-icon">⬡</span> Dashboard
+    </a>
+    <a class="nav-item" href="#">
+      <span class="nav-icon">🖥</span> Máy của tôi
+    </a>
+    <a class="nav-item" href="#">
+      <span class="nav-icon">⏱</span> Thời gian
+    </a>
+    <div class="nav-section-label">// Support</div>
+    <a class="nav-item" href="#">
+      <span class="nav-icon">🎮</span> Hướng dẫn kết nối
+    </a>
+    <a class="nav-item" href="#">
+      <span class="nav-icon">💬</span> Tạo ticket
+    </a>
+    <div class="nav-section-label">// Account</div>
+    <a class="nav-item" href="#">
+      <span class="nav-icon">⚙</span> Cài đặt
+    </a>
+    <a class="nav-item" href="grimz-cloud-pc.html">
+      <span class="nav-icon">↩</span> Trang chủ
+    </a>
+  </nav>
+  <div class="sidebar-bottom">
+    <div class="status-dot">SERVER ONLINE</div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-title">Dashboard</div>
+    <div class="topbar-right">
+      <div class="topbar-time" id="clock">--:--:--</div>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- MACHINE CARD -->
+    <div class="machine-card">
+      <div class="machine-header">
+        <div class="machine-header-left">
+          <div>
+            <div class="machine-name">GRIMZ-VM-042</div>
+            <div class="machine-id">ID: GPC-042 · HCM-NODE-01</div>
+          </div>
+          <div class="machine-status-badge">ĐANG CHẠY</div>
+        </div>
+      </div>
+      <div class="machine-body">
+        <div class="spec-item">
+          <div class="spec-label">Địa chỉ IP</div>
+          <div class="spec-value ip" onclick="copyText('103.XXX.XXX.42')" title="Click để copy">103.XXX.XXX.42</div>
+          <div class="copy-hint">↑ click để copy</div>
+        </div>
+        <div class="spec-item">
+          <div class="spec-label">GPU</div>
+          <div class="spec-value highlight">NVIDIA RTX 3060</div>
+          <div class="copy-hint">12GB GDDR6</div>
+        </div>
+        <div class="spec-item">
+          <div class="spec-label">RAM</div>
+          <div class="spec-value">16 GB DDR4</div>
+          <div class="copy-hint">3200MHz Dual Channel</div>
+        </div>
+        <div class="spec-item">
+          <div class="spec-label">CPU</div>
+          <div class="spec-value">8 Cores / 16T</div>
+          <div class="copy-hint">3.6GHz Base</div>
+        </div>
+        <div class="spec-item">
+          <div class="spec-label">Storage</div>
+          <div class="spec-value">256 GB NVMe</div>
+          <div class="copy-hint">SSD · ~3500MB/s</div>
+        </div>
+        <div class="spec-item">
+          <div class="spec-label">Hệ điều hành</div>
+          <div class="spec-value">Windows 11 Pro</div>
+          <div class="copy-hint">Build 22H2</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STATS ROW -->
+    <div class="cards-row">
+      <div class="info-card card-accent-green">
+        <div class="info-card-label">// Trạng thái gói</div>
+        <div class="info-card-value">ACTIVE</div>
+        <div class="info-card-sub">Pro Gamer · 1 tháng</div>
+      </div>
+      <div class="info-card card-accent-yellow">
+        <div class="info-card-label">// Thời gian còn lại</div>
+        <div class="countdown" id="countdown">
+          <div class="countdown-unit">
+            <span class="countdown-num" id="cd-days">12</span>
+            <span class="countdown-label">ngày</span>
+          </div>
+          <span class="countdown-sep">:</span>
+          <div class="countdown-unit">
+            <span class="countdown-num" id="cd-hours">08</span>
+            <span class="countdown-label">giờ</span>
+          </div>
+          <span class="countdown-sep">:</span>
+          <div class="countdown-unit">
+            <span class="countdown-num" id="cd-mins">34</span>
+            <span class="countdown-label">phút</span>
+          </div>
+          <span class="countdown-sep">:</span>
+          <div class="countdown-unit">
+            <span class="countdown-num" id="cd-secs">00</span>
+            <span class="countdown-label">giây</span>
+          </div>
+        </div>
+        <div class="progress-wrap">
+          <div class="progress-labels">
+            <span>Đã dùng 18 ngày</span>
+            <span>Hết hạn: 27/03/2026</span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" style="width:60%"></div>
+          </div>
+        </div>
+      </div>
+      <div class="info-card card-accent-cyan">
+        <div class="info-card-label">// Ping tới server</div>
+        <div class="info-card-value" id="ping-val">12ms</div>
+        <div class="info-card-sub">HCM Node 01 · VN Domestic</div>
+      </div>
+    </div>
+
+    <!-- CONNECT GUIDE -->
+    <div class="connect-card">
+      <div class="connect-header">
+        <div class="connect-title">🔗 Hướng dẫn kết nối</div>
+        <div class="tab-group">
+          <button class="tab active" onclick="switchTab('parsec', this)">Parsec</button>
+          <button class="tab" onclick="switchTab('moonlight', this)">Moonlight</button>
+        </div>
+      </div>
+      <div class="connect-body">
+        <div class="panel-tab-content active" id="tab-parsec">
+          <div class="steps-connect">
+            <div class="step-row">
+              <div class="step-num-sm">1</div>
+              <div class="step-text">Tải và cài <strong>Parsec</strong> tại <strong>parsec.app</strong> (miễn phí)</div>
+            </div>
+            <div class="step-row">
+              <div class="step-num-sm">2</div>
+              <div class="step-text">
+                Đăng nhập tài khoản Parsec, vào tab <strong>Computers</strong><br>
+                Nhập IP máy:
+                <div class="code-block" onclick="copyText('103.XXX.XXX.42')">103.XXX.XXX.42 · click để copy</div>
+              </div>
+            </div>
+            <div class="step-row">
+              <div class="step-num-sm">3</div>
+              <div class="step-text">Nhập <strong>mật khẩu</strong> đã được staff cung cấp qua Discord ticket</div>
+            </div>
+            <div class="step-row">
+              <div class="step-num-sm">4</div>
+              <div class="step-text">Kết nối và chơi! Khuyến nghị: <strong>H.264, 50 Mbps, 1080p</strong></div>
+            </div>
+          </div>
+        </div>
+        <div class="panel-tab-content" id="tab-moonlight">
+          <div class="steps-connect">
+            <div class="step-row">
+              <div class="step-num-sm">1</div>
+              <div class="step-text">Tải <strong>Moonlight</strong> tại <strong>moonlight-stream.org</strong></div>
+            </div>
+            <div class="step-row">
+              <div class="step-num-sm">2</div>
+              <div class="step-text">
+                Mở Moonlight → <strong>Add PC</strong> → nhập IP:
+                <div class="code-block" onclick="copyText('103.XXX.XXX.42')">103.XXX.XXX.42 · click để copy</div>
+              </div>
+            </div>
+            <div class="step-row">
+              <div class="step-num-sm">3</div>
+              <div class="step-text">Nhập <strong>PIN 4 số</strong> hiển thị trên Moonlight vào máy ảo (liên hệ staff để nhập)</div>
+            </div>
+            <div class="step-row">
+              <div class="step-num-sm">4</div>
+              <div class="step-text">Kết nối xong → chọn <strong>Desktop</strong>. Cài đặt: <strong>H.264, 50 Mbps, 1080p/60fps</strong></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SUPPORT -->
+    <div class="support-row">
+      <div class="support-card">
+        <div class="support-icon">💬</div>
+        <div>
+          <div class="support-title">Tạo ticket hỗ trợ</div>
+          <div class="support-desc">Gặp vấn đề với máy? Tạo ticket trong Discord server của Grimz. Staff phản hồi trong vòng 15 phút.</div>
+        </div>
+        <a href="#" class="btn-sm btn-discord">
+          <svg width="16" height="12" viewBox="0 0 71 55" fill="currentColor"><path d="M60.1 4.9A58.5 58.5 0 0 0 45.4.9a40 40 0 0 0-1.8 3.6 54 54 0 0 0-16.2 0A38.4 38.4 0 0 0 25.6.9 58.4 58.4 0 0 0 10.9 5C1.6 18.7-1 32 .3 45a58.7 58.7 0 0 0 17.9 9 44 44 0 0 0 3.8-6.2 38.3 38.3 0 0 1-6-2.9l1.4-1.1a41.9 41.9 0 0 0 35.7 0l1.5 1.1a38.2 38.2 0 0 1-6 2.9 43.6 43.6 0 0 0 3.8 6.2 58.5 58.5 0 0 0 17.9-9C71.8 30 68.2 16.8 60.1 4.9ZM23.7 37.3c-3.5 0-6.4-3.2-6.4-7.1s2.8-7.2 6.4-7.2 6.5 3.2 6.4 7.2c0 3.9-2.8 7.1-6.4 7.1Zm23.6 0c-3.5 0-6.4-3.2-6.4-7.1s2.8-7.2 6.4-7.2 6.5 3.2 6.4 7.2c0 3.9-2.8 7.1-6.4 7.1Z"/></svg>
+          Mở Discord
+        </a>
+      </div>
+      <div class="support-card">
+        <div class="support-icon">🔄</div>
+        <div>
+          <div class="support-title">Gia hạn gói</div>
+          <div class="support-desc">Gói của bạn sắp hết hạn? Tạo ticket gia hạn trong Discord để tiếp tục sử dụng không gián đoạn.</div>
+        </div>
+        <a href="#" class="btn-sm btn-outline">Tạo ticket gia hạn →</a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">✓ Đã copy vào clipboard</div>
+
+<script>
+  // CLOCK
+  function updateClock() {
+    const now = new Date();
+    document.getElementById('clock').textContent =
+      now.toLocaleTimeString('vi-VN', { hour12: false });
+  }
+  setInterval(updateClock, 1000);
+  updateClock();
+
+  // COUNTDOWN — đếm ngược đến ngày hết hạn
+  const expiry = new Date('2026-03-27T23:59:59');
+  function updateCountdown() {
+    const now = new Date();
+    let diff = Math.max(0, expiry - now);
+    const days  = Math.floor(diff / 86400000); diff %= 86400000;
+    const hours = Math.floor(diff / 3600000);  diff %= 3600000;
+    const mins  = Math.floor(diff / 60000);    diff %= 60000;
+    const secs  = Math.floor(diff / 1000);
+    document.getElementById('cd-days').textContent  = String(days).padStart(2,'0');
+    document.getElementById('cd-hours').textContent = String(hours).padStart(2,'0');
+    document.getElementById('cd-mins').textContent  = String(mins).padStart(2,'0');
+    document.getElementById('cd-secs').textContent  = String(secs).padStart(2,'0');
+  }
+  setInterval(updateCountdown, 1000);
+  updateCountdown();
+
+  // FAKE PING fluctuation
+  function updatePing() {
+    const base = 12;
+    const ping = base + Math.floor(Math.random() * 5);
+    document.getElementById('ping-val').textContent = ping + 'ms';
+  }
+  setInterval(updatePing, 3000);
+
+  // TAB SWITCH
+  function switchTab(id, btn) {
+    document.querySelectorAll('.panel-tab-content').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+    document.getElementById('tab-' + id).classList.add('active');
+    btn.classList.add('active');
+  }
+
+  // COPY
+  function copyText(text) {
+    navigator.clipboard.writeText(text).then(() => {
+      const t = document.getElementById('toast');
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2000);
+    });
+  }
+</script>
+</body>
+</html>
