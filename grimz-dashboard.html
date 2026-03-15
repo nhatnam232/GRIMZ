@@ -22,290 +22,101 @@
   }
   * { margin:0; padding:0; box-sizing:border-box; }
   html { scroll-behavior:smooth; }
-  body {
-    background:var(--bg);
-    color:var(--text);
-    font-family:'Exo 2',sans-serif;
-    min-height:100vh;
-    display:flex;
-    overflow-x:hidden;
-  }
-  body::before {
-    content:'';
-    position:fixed; inset:0;
-    background-image:
-      linear-gradient(rgba(124,92,191,0.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(124,92,191,0.03) 1px, transparent 1px);
-    background-size:40px 40px;
-    pointer-events:none; z-index:0;
-  }
+  body { background:var(--bg); color:var(--text); font-family:'Exo 2',sans-serif; min-height:100vh; display:flex; overflow-x:hidden; }
+  body::before { content:''; position:fixed; inset:0; background-image: linear-gradient(rgba(124,92,191,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(124,92,191,0.03) 1px, transparent 1px); background-size:40px 40px; pointer-events:none; z-index:0; }
 
-  /* SIDEBAR */
-  .sidebar {
-    position:fixed; left:0; top:0; bottom:0; width:220px;
-    background:var(--bg2);
-    border-right:1px solid var(--border);
-    display:flex; flex-direction:column;
-    z-index:50;
-  }
-  .sidebar-logo {
-    padding:1.5rem 1.5rem 1rem;
-    border-bottom:1px solid var(--border);
-  }
-  .logo-text {
-    font-family:'Rajdhani',sans-serif;
-    font-size:1.15rem; font-weight:700;
-    letter-spacing:0.15em; text-transform:uppercase;
-    color:var(--accent2);
-    text-shadow:0 0 16px rgba(124,92,191,0.4);
-  }
-  .logo-sub {
-    font-family:'Share Tech Mono',monospace;
-    font-size:0.6rem; color:var(--muted);
-    letter-spacing:0.2em; text-transform:uppercase;
-    margin-top:0.2rem;
-  }
-  .sidebar-user {
-    padding:1.25rem 1.5rem;
-    border-bottom:1px solid var(--border);
-    display:flex; align-items:center; gap:0.75rem;
-  }
-  .user-avatar {
-    width:36px; height:36px;
-    background:linear-gradient(135deg, var(--accent), var(--accent2));
-    display:flex; align-items:center; justify-content:center;
-    font-family:'Rajdhani',sans-serif; font-weight:700; font-size:1rem;
-    color:var(--bg); flex-shrink:0;
-    clip-path:polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 0 100%);
-  }
+  .sidebar { position:fixed; left:0; top:0; bottom:0; width:220px; background:var(--bg2); border-right:1px solid var(--border); display:flex; flex-direction:column; z-index:50; }
+  .sidebar-logo { padding:1.5rem 1.5rem 1rem; border-bottom:1px solid var(--border); }
+  .logo-text { font-family:'Rajdhani',sans-serif; font-size:1.15rem; font-weight:700; letter-spacing:0.15em; text-transform:uppercase; color:var(--accent2); text-shadow:0 0 16px rgba(124,92,191,0.4); }
+  .logo-sub { font-family:'Share Tech Mono',monospace; font-size:0.6rem; color:var(--muted); letter-spacing:0.2em; text-transform:uppercase; margin-top:0.2rem; }
+  .sidebar-user { padding:1.25rem 1.5rem; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:0.75rem; }
+  .user-avatar { width:36px; height:36px; background:linear-gradient(135deg, var(--accent), var(--accent2)); display:flex; align-items:center; justify-content:center; font-family:'Rajdhani',sans-serif; font-weight:700; font-size:1rem; color:var(--bg); flex-shrink:0; clip-path:polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 0 100%); }
   .user-name { font-size:0.875rem; font-weight:600; color:var(--text); }
-  .user-plan {
-    font-family:'Share Tech Mono',monospace;
-    font-size:0.65rem; color:var(--accent2); letter-spacing:0.1em;
-  }
+  .user-plan { font-family:'Share Tech Mono',monospace; font-size:0.65rem; color:var(--accent2); letter-spacing:0.1em; }
   .sidebar-nav { flex:1; padding:1rem 0; display:flex; flex-direction:column; gap:0.1rem; }
-  .nav-section {
-    padding:0.75rem 1.5rem 0.3rem;
-    font-family:'Share Tech Mono',monospace;
-    font-size:0.6rem; color:var(--muted);
-    letter-spacing:0.2em; text-transform:uppercase;
-  }
-  .nav-item {
-    display:flex; align-items:center; gap:0.75rem;
-    padding:0.65rem 1.5rem;
-    font-size:0.825rem; font-weight:500;
-    color:var(--muted); cursor:pointer;
-    transition:all 0.2s; text-decoration:none;
-    border-left:2px solid transparent;
-    background:none; border-right:none; border-top:none; border-bottom:none;
-    width:100%; text-align:left;
-    font-family:'Exo 2',sans-serif;
-  }
+  .nav-section { padding:0.75rem 1.5rem 0.3rem; font-family:'Share Tech Mono',monospace; font-size:0.6rem; color:var(--muted); letter-spacing:0.2em; text-transform:uppercase; }
+  .nav-item { display:flex; align-items:center; gap:0.75rem; padding:0.65rem 1.5rem; font-size:0.825rem; font-weight:500; color:var(--muted); cursor:pointer; transition:all 0.2s; text-decoration:none; border-left:2px solid transparent; background:none; border-right:none; border-top:none; border-bottom:none; width:100%; text-align:left; font-family:'Exo 2',sans-serif; }
   .nav-item:hover { color:var(--text); background:rgba(255,255,255,0.03); }
   .nav-item.active { color:var(--accent2); background:rgba(124,92,191,0.08); border-left-color:var(--accent2); }
+  .nav-item.danger { color:#f87171; }
+  .nav-item.danger:hover { background:rgba(248,113,113,0.07); }
   .nav-icon { font-size:1rem; width:18px; text-align:center; }
-  .sidebar-bottom {
-    padding:1rem 1.5rem;
-    border-top:1px solid var(--border);
-  }
-  .status-dot {
-    display:flex; align-items:center; gap:0.5rem;
-    font-family:'Share Tech Mono',monospace;
-    font-size:0.65rem; color:var(--green); letter-spacing:0.1em;
-  }
-  .status-dot::before {
-    content:''; width:6px; height:6px; border-radius:50%;
-    background:var(--green); box-shadow:0 0 8px var(--green);
-    animation:blink 1.5s infinite;
-  }
+  .sidebar-bottom { padding:1rem 1.5rem; border-top:1px solid var(--border); }
+  .status-dot { display:flex; align-items:center; gap:0.5rem; font-family:'Share Tech Mono',monospace; font-size:0.65rem; color:var(--green); letter-spacing:0.1em; }
+  .status-dot::before { content:''; width:6px; height:6px; border-radius:50%; background:var(--green); box-shadow:0 0 8px var(--green); animation:blink 1.5s infinite; }
   @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
 
-  /* MAIN */
   .main { margin-left:220px; flex:1; position:relative; z-index:1; min-height:100vh; }
-  .topbar {
-    height:56px; background:rgba(9,8,15,0.9); backdrop-filter:blur(10px);
-    border-bottom:1px solid var(--border);
-    display:flex; align-items:center; justify-content:space-between;
-    padding:0 2rem; position:sticky; top:0; z-index:40;
-  }
-  .topbar-title {
-    font-family:'Rajdhani',sans-serif; font-size:1rem; font-weight:600;
-    letter-spacing:0.1em; text-transform:uppercase;
-  }
-  .topbar-clock {
-    font-family:'Share Tech Mono',monospace;
-    font-size:0.75rem; color:var(--muted); letter-spacing:0.1em;
-  }
+  .topbar { height:56px; background:rgba(9,8,15,0.9); backdrop-filter:blur(10px); border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; padding:0 2rem; position:sticky; top:0; z-index:40; }
+  .topbar-title { font-family:'Rajdhani',sans-serif; font-size:1rem; font-weight:600; letter-spacing:0.1em; text-transform:uppercase; }
+  .topbar-clock { font-family:'Share Tech Mono',monospace; font-size:0.75rem; color:var(--muted); letter-spacing:0.1em; }
 
-  /* PAGES */
   .page { display:none; padding:2rem; flex-direction:column; gap:1.5rem; }
   .page.active { display:flex; }
 
-  /* CARDS */
-  .card {
-    background:var(--bg2); border:1px solid var(--border);
-    padding:1.5rem; position:relative; overflow:hidden;
-  }
-  .card-top-line::before {
-    content:''; position:absolute; top:0; left:0; right:0; height:2px;
-    background:linear-gradient(90deg, var(--accent3), var(--accent2));
-  }
-  .card-label {
-    font-family:'Share Tech Mono',monospace; font-size:0.62rem;
-    color:var(--muted); letter-spacing:0.18em; text-transform:uppercase;
-    margin-bottom:0.6rem;
-  }
-  .card-title {
-    font-family:'Rajdhani',sans-serif; font-size:1.1rem; font-weight:700;
-    text-transform:uppercase; letter-spacing:0.05em; margin-bottom:1rem;
-  }
+  .card { background:var(--bg2); border:1px solid var(--border); padding:1.5rem; position:relative; overflow:hidden; }
+  .card-top-line::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:linear-gradient(90deg, var(--accent3), var(--accent2)); }
+  .card-label { font-family:'Share Tech Mono',monospace; font-size:0.62rem; color:var(--muted); letter-spacing:0.18em; text-transform:uppercase; margin-bottom:0.6rem; }
+  .card-title { font-family:'Rajdhani',sans-serif; font-size:1.1rem; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:1rem; }
   .divider { height:1px; background:var(--border); margin:1rem 0; }
 
-  /* SPEC GRID */
-  .spec-grid {
-    display:grid; grid-template-columns:repeat(auto-fit, minmax(160px,1fr)); gap:1.25rem;
-  }
-  .spec-item .spec-label {
-    font-family:'Share Tech Mono',monospace; font-size:0.6rem;
-    color:var(--muted); letter-spacing:0.15em; text-transform:uppercase; margin-bottom:0.3rem;
-  }
-  .spec-item .spec-val {
-    font-family:'Rajdhani',sans-serif; font-size:1.05rem; font-weight:600; color:var(--text);
-  }
+  .spec-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(160px,1fr)); gap:1.25rem; }
+  .spec-item .spec-label { font-family:'Share Tech Mono',monospace; font-size:0.6rem; color:var(--muted); letter-spacing:0.15em; text-transform:uppercase; margin-bottom:0.3rem; }
+  .spec-item .spec-val { font-family:'Rajdhani',sans-serif; font-size:1.05rem; font-weight:600; color:var(--text); }
   .spec-item .spec-val.empty { color:var(--muted); font-style:italic; font-size:0.85rem; }
   .spec-item .spec-sub { font-size:0.7rem; color:var(--muted); margin-top:0.15rem; font-weight:300; }
 
-  /* STATUS BADGE */
-  .badge {
-    display:inline-flex; align-items:center; gap:0.4rem;
-    padding:0.3rem 0.75rem;
-    font-family:'Share Tech Mono',monospace; font-size:0.65rem;
-    letter-spacing:0.15em; text-transform:uppercase;
-  }
-  .badge-online {
-    background:rgba(74,222,128,0.1); border:1px solid rgba(74,222,128,0.25); color:var(--green);
-  }
-  .badge-online::before {
-    content:''; width:5px; height:5px; border-radius:50%;
-    background:var(--green); box-shadow:0 0 6px var(--green); animation:blink 1.5s infinite;
-  }
-  .badge-offline {
-    background:rgba(90,84,112,0.2); border:1px solid var(--border); color:var(--muted);
-  }
+  .badge { display:inline-flex; align-items:center; gap:0.4rem; padding:0.3rem 0.75rem; font-family:'Share Tech Mono',monospace; font-size:0.65rem; letter-spacing:0.15em; text-transform:uppercase; }
+  .badge-online { background:rgba(74,222,128,0.1); border:1px solid rgba(74,222,128,0.25); color:var(--green); }
+  .badge-online::before { content:''; width:5px; height:5px; border-radius:50%; background:var(--green); box-shadow:0 0 6px var(--green); animation:blink 1.5s infinite; }
+  .badge-offline { background:rgba(90,84,112,0.2); border:1px solid var(--border); color:var(--muted); }
 
-  /* STATS ROW */
   .stats-row { display:grid; grid-template-columns:repeat(3,1fr); gap:1.25rem; }
   .stat-card { background:var(--bg2); border:1px solid var(--border); padding:1.25rem 1.5rem; }
-  .stat-label {
-    font-family:'Share Tech Mono',monospace; font-size:0.6rem;
-    color:var(--muted); letter-spacing:0.15em; text-transform:uppercase; margin-bottom:0.5rem;
-  }
-  .stat-val {
-    font-family:'Rajdhani',sans-serif; font-size:1.8rem; font-weight:700;
-    color:var(--accent2); line-height:1;
-  }
+  .stat-label { font-family:'Share Tech Mono',monospace; font-size:0.6rem; color:var(--muted); letter-spacing:0.15em; text-transform:uppercase; margin-bottom:0.5rem; }
+  .stat-val { font-family:'Rajdhani',sans-serif; font-size:1.8rem; font-weight:700; color:var(--accent2); line-height:1; }
   .stat-val.empty { color:var(--muted); font-size:1rem; font-style:italic; }
   .stat-sub { font-size:0.78rem; color:var(--muted); margin-top:0.35rem; font-weight:300; }
 
-  /* COUNTDOWN */
   .countdown { display:flex; align-items:center; gap:0.4rem; margin-top:0.4rem; }
   .cd-unit { text-align:center; }
-  .cd-num {
-    font-family:'Share Tech Mono',monospace; font-size:1.4rem;
-    color:var(--accent2); background:var(--bg3);
-    border:1px solid var(--border); padding:0.2rem 0.45rem;
-    display:block; min-width:40px; text-align:center;
-  }
-  .cd-label {
-    font-size:0.55rem; color:var(--muted); letter-spacing:0.1em;
-    text-transform:uppercase; margin-top:0.2rem;
-    font-family:'Share Tech Mono',monospace; display:block; text-align:center;
-  }
+  .cd-num { font-family:'Share Tech Mono',monospace; font-size:1.4rem; color:var(--accent2); background:var(--bg3); border:1px solid var(--border); padding:0.2rem 0.45rem; display:block; min-width:40px; text-align:center; }
+  .cd-label { font-size:0.55rem; color:var(--muted); letter-spacing:0.1em; text-transform:uppercase; margin-top:0.2rem; font-family:'Share Tech Mono',monospace; display:block; text-align:center; }
   .cd-sep { font-family:'Rajdhani',sans-serif; font-size:1.4rem; color:var(--muted); margin-bottom:1rem; }
 
-  /* PROGRESS */
   .progress-wrap { margin-top:0.75rem; }
-  .progress-labels {
-    display:flex; justify-content:space-between;
-    font-family:'Share Tech Mono',monospace; font-size:0.6rem;
-    color:var(--muted); letter-spacing:0.06em; margin-bottom:0.35rem;
-  }
+  .progress-labels { display:flex; justify-content:space-between; font-family:'Share Tech Mono',monospace; font-size:0.6rem; color:var(--muted); letter-spacing:0.06em; margin-bottom:0.35rem; }
   .progress-bar { height:3px; background:var(--bg4); }
   .progress-fill { height:100%; background:linear-gradient(90deg, var(--accent3), var(--accent2)); transition:width 1s; }
 
-  /* CONNECT TABS */
   .tab-group { display:flex; border:1px solid var(--border); width:fit-content; }
-  .tab {
-    padding:0.35rem 1rem;
-    font-family:'Share Tech Mono',monospace; font-size:0.68rem;
-    letter-spacing:0.1em; color:var(--muted); cursor:pointer;
-    border:none; background:transparent; text-transform:uppercase;
-    transition:all 0.2s;
-  }
+  .tab { padding:0.35rem 1rem; font-family:'Share Tech Mono',monospace; font-size:0.68rem; letter-spacing:0.1em; color:var(--muted); cursor:pointer; border:none; background:transparent; text-transform:uppercase; transition:all 0.2s; }
   .tab.active { background:var(--accent); color:#fff; }
   .tab:hover:not(.active) { color:var(--text); background:rgba(255,255,255,0.04); }
   .tab-content { display:none; margin-top:1.25rem; }
   .tab-content.active { display:block; }
   .steps-list { display:flex; flex-direction:column; gap:0.75rem; }
   .step-row { display:flex; gap:1rem; align-items:flex-start; }
-  .step-num-sm {
-    width:24px; height:24px; border:1px solid var(--accent);
-    color:var(--accent2); font-family:'Share Tech Mono',monospace; font-size:0.7rem;
-    display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:0.1rem;
-  }
+  .step-num-sm { width:24px; height:24px; border:1px solid var(--accent); color:var(--accent2); font-family:'Share Tech Mono',monospace; font-size:0.7rem; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:0.1rem; }
   .step-text { font-size:0.875rem; color:var(--muted); line-height:1.6; font-weight:300; }
   .step-text strong { color:var(--text); font-weight:500; }
-  .code-pill {
-    display:inline-block; background:var(--bg); border:1px solid var(--border);
-    font-family:'Share Tech Mono',monospace; font-size:0.78rem; color:var(--accent2);
-    padding:0.3rem 0.65rem; margin-top:0.35rem; cursor:pointer; transition:background 0.2s;
-  }
+  .code-pill { display:inline-block; background:var(--bg); border:1px solid var(--border); font-family:'Share Tech Mono',monospace; font-size:0.78rem; color:var(--accent2); padding:0.3rem 0.65rem; margin-top:0.35rem; cursor:pointer; transition:background 0.2s; }
   .code-pill:hover { background:rgba(124,92,191,0.1); }
 
-  /* SUPPORT CARDS */
   .support-grid { display:grid; grid-template-columns:1fr 1fr; gap:1.25rem; }
-  .support-card {
-    background:var(--bg2); border:1px solid var(--border);
-    padding:1.5rem; display:flex; flex-direction:column; gap:0.75rem;
-  }
+  .support-card { background:var(--bg2); border:1px solid var(--border); padding:1.5rem; display:flex; flex-direction:column; gap:0.75rem; }
   .support-icon { font-size:1.75rem; }
-  .support-title {
-    font-family:'Rajdhani',sans-serif; font-size:1rem; font-weight:700;
-    text-transform:uppercase; letter-spacing:0.08em;
-  }
+  .support-title { font-family:'Rajdhani',sans-serif; font-size:1rem; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; }
   .support-desc { font-size:0.825rem; color:var(--muted); font-weight:300; line-height:1.6; flex:1; }
-  .btn {
-    display:inline-flex; align-items:center; gap:0.5rem;
-    padding:0.65rem 1.25rem;
-    font-family:'Rajdhani',sans-serif; font-size:0.875rem; font-weight:700;
-    letter-spacing:0.1em; text-transform:uppercase;
-    text-decoration:none; cursor:pointer; border:none;
-    transition:all 0.2s; align-self:flex-start;
-    clip-path:polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 0 100%);
-  }
+  .btn { display:inline-flex; align-items:center; gap:0.5rem; padding:0.65rem 1.25rem; font-family:'Rajdhani',sans-serif; font-size:0.875rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; text-decoration:none; cursor:pointer; border:none; transition:all 0.2s; align-self:flex-start; clip-path:polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 0 100%); }
   .btn-discord { background:#5865F2; color:white; }
   .btn-discord:hover { background:#4752c4; transform:translateY(-1px); }
-  .btn-outline {
-    background:transparent; border:1px solid var(--border); color:var(--text); clip-path:none;
-  }
+  .btn-outline { background:transparent; border:1px solid var(--border); color:var(--text); clip-path:none; }
   .btn-outline:hover { border-color:var(--accent2); color:var(--accent2); }
 
-  /* EMPTY STATE */
-  .empty-state {
-    text-align:center; padding:3rem 1rem;
-    font-family:'Share Tech Mono',monospace; font-size:0.75rem;
-    color:var(--muted); letter-spacing:0.12em; line-height:2;
-  }
+  .empty-state { text-align:center; padding:3rem 1rem; font-family:'Share Tech Mono',monospace; font-size:0.75rem; color:var(--muted); letter-spacing:0.12em; line-height:2; }
 
-  /* TOAST */
-  .toast {
-    position:fixed; bottom:2rem; right:2rem;
-    background:var(--bg3); border:1px solid var(--accent);
-    color:var(--accent2); font-family:'Share Tech Mono',monospace;
-    font-size:0.75rem; letter-spacing:0.1em; padding:0.6rem 1.25rem;
-    z-index:999; opacity:0; transform:translateY(10px);
-    transition:all 0.3s; pointer-events:none;
-  }
+  .toast { position:fixed; bottom:2rem; right:2rem; background:var(--bg3); border:1px solid var(--accent); color:var(--accent2); font-family:'Share Tech Mono',monospace; font-size:0.75rem; letter-spacing:0.1em; padding:0.6rem 1.25rem; z-index:999; opacity:0; transform:translateY(10px); transition:all 0.3s; pointer-events:none; }
   .toast.show { opacity:1; transform:translateY(0); }
 
   ::-webkit-scrollbar { width:5px; }
@@ -318,117 +129,80 @@
 </head>
 <body>
 
-<!-- SIDEBAR -->
 <aside class="sidebar">
   <div class="sidebar-logo">
     <div class="logo-text">Grimz Cloud</div>
     <div class="logo-sub">User Portal</div>
   </div>
   <div class="sidebar-user">
-    <div class="user-avatar">?</div>
+    <div class="user-avatar" id="userAvatar">?</div>
     <div>
-      <div class="user-name">—</div>
-      <div class="user-plan">—</div>
+      <div class="user-name" id="userName">—</div>
+      <div class="user-plan" id="userPlan">—</div>
     </div>
   </div>
   <nav class="sidebar-nav">
     <div class="nav-section">// Main</div>
-    <button class="nav-item active" onclick="goTo('dashboard', this)">
-      <span class="nav-icon">⬡</span> Dashboard
-    </button>
-    <button class="nav-item" onclick="goTo('machine', this)">
-      <span class="nav-icon">🖥</span> Máy của tôi
-    </button>
-    <button class="nav-item" onclick="goTo('time', this)">
-      <span class="nav-icon">⏱</span> Thời gian
-    </button>
+    <button class="nav-item active" onclick="goTo('dashboard', this)"><span class="nav-icon">⬡</span> Dashboard</button>
+    <button class="nav-item" onclick="goTo('machine', this)"><span class="nav-icon">🖥</span> Máy của tôi</button>
+    <button class="nav-item" onclick="goTo('time', this)"><span class="nav-icon">⏱</span> Thời gian</button>
     <div class="nav-section">// Support</div>
-    <button class="nav-item" onclick="goTo('connect', this)">
-      <span class="nav-icon">🔗</span> Hướng dẫn kết nối
-    </button>
-    <button class="nav-item" onclick="goTo('support', this)">
-      <span class="nav-icon">💬</span> Hỗ trợ
-    </button>
+    <button class="nav-item" onclick="goTo('connect', this)"><span class="nav-icon">🔗</span> Hướng dẫn kết nối</button>
+    <button class="nav-item" onclick="goTo('support', this)"><span class="nav-icon">💬</span> Hỗ trợ</button>
     <div class="nav-section">// Account</div>
-    <a class="nav-item" href="index.html">
-      <span class="nav-icon">↩</span> Trang chủ
-    </a>
+    <a class="nav-item" href="index.html"><span class="nav-icon">↩</span> Trang chủ</a>
+    <button class="nav-item danger" onclick="doLogout()"><span class="nav-icon">🚪</span> Đăng xuất</button>
   </nav>
   <div class="sidebar-bottom">
     <div class="status-dot">SERVER ONLINE</div>
   </div>
 </aside>
 
-<!-- MAIN -->
 <div class="main">
   <div class="topbar">
     <div class="topbar-title" id="page-title">Dashboard</div>
     <div class="topbar-clock" id="clock">--:--:--</div>
   </div>
 
-  <!-- PAGE: DASHBOARD -->
+  <!-- DASHBOARD -->
   <div class="page active" id="page-dashboard">
-
     <div class="card card-top-line">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;">
         <div>
           <div class="card-label">// Máy đang thuê</div>
-          <div style="font-family:'Rajdhani',sans-serif;font-size:1.3rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;">—</div>
+          <div style="font-family:'Rajdhani',sans-serif;font-size:1.3rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;" id="machineName">—</div>
         </div>
-        <div class="badge badge-offline">Chưa có máy</div>
+        <div class="badge badge-offline" id="machineStatus">Chưa có máy</div>
       </div>
       <div class="divider"></div>
       <div class="spec-grid">
-        <div class="spec-item">
-          <div class="spec-label">Địa chỉ IP</div>
-          <div class="spec-val empty">—</div>
-        </div>
-        <div class="spec-item">
-          <div class="spec-label">GPU</div>
-          <div class="spec-val empty">—</div>
-        </div>
-        <div class="spec-item">
-          <div class="spec-label">RAM</div>
-          <div class="spec-val empty">—</div>
-        </div>
-        <div class="spec-item">
-          <div class="spec-label">CPU</div>
-          <div class="spec-val empty">—</div>
-        </div>
-        <div class="spec-item">
-          <div class="spec-label">Storage</div>
-          <div class="spec-val empty">—</div>
-        </div>
-        <div class="spec-item">
-          <div class="spec-label">OS</div>
-          <div class="spec-val empty">—</div>
-        </div>
+        <div class="spec-item"><div class="spec-label">Địa chỉ IP</div><div class="spec-val empty" id="machineIp">—</div></div>
+        <div class="spec-item"><div class="spec-label">GPU</div><div class="spec-val empty" id="machineGpu">—</div></div>
+        <div class="spec-item"><div class="spec-label">RAM</div><div class="spec-val empty" id="machineRam">—</div></div>
+        <div class="spec-item"><div class="spec-label">CPU</div><div class="spec-val empty" id="machineCpu">—</div></div>
+        <div class="spec-item"><div class="spec-label">Storage</div><div class="spec-val empty" id="machineStorage">—</div></div>
+        <div class="spec-item"><div class="spec-label">OS</div><div class="spec-val empty" id="machineOs">—</div></div>
       </div>
     </div>
-
     <div class="stats-row">
       <div class="stat-card">
         <div class="stat-label">// Trạng thái gói</div>
-        <div class="stat-val empty">Chưa có</div>
+        <div class="stat-val empty" id="statPlan">Chưa có</div>
         <div class="stat-sub">Mua qua Discord để kích hoạt</div>
       </div>
       <div class="stat-card">
         <div class="stat-label">// Thời gian còn lại</div>
-        <div class="stat-val empty">—</div>
+        <div class="stat-val empty" id="statTime">—</div>
         <div class="stat-sub">Chưa có dữ liệu</div>
       </div>
       <div class="stat-card">
         <div class="stat-label">// Ping tới server</div>
-        <div class="stat-val empty">—</div>
+        <div class="stat-val empty">~30ms</div>
         <div class="stat-sub">Singapore Node</div>
       </div>
     </div>
-
-    <div class="card" style="text-align:center;padding:2rem;">
-      <div class="empty-state">
-        Chưa có máy nào được gán cho tài khoản này.<br>
-        Mua dịch vụ qua Discord để bắt đầu.
-      </div>
+    <div class="card" id="noBuyCard" style="text-align:center;padding:2rem;">
+      <div class="empty-state">Chưa có máy nào được gán cho tài khoản này.<br>Mua dịch vụ qua Discord để bắt đầu.</div>
       <a href="https://discord.gg/Ct4Gw7GwJJ" target="_blank" class="btn btn-discord" style="margin:0 auto;">
         <svg width="16" height="12" viewBox="0 0 71 55" fill="currentColor"><path d="M60.1 4.9A58.5 58.5 0 0 0 45.4.9a40 40 0 0 0-1.8 3.6 54 54 0 0 0-16.2 0A38.4 38.4 0 0 0 25.6.9 58.4 58.4 0 0 0 10.9 5C1.6 18.7-1 32 .3 45a58.7 58.7 0 0 0 17.9 9 44 44 0 0 0 3.8-6.2 38.3 38.3 0 0 1-6-2.9l1.4-1.1a41.9 41.9 0 0 0 35.7 0l1.5 1.1a38.2 38.2 0 0 1-6 2.9 43.6 43.6 0 0 0 3.8 6.2 58.5 58.5 0 0 0 17.9-9C71.8 30 68.2 16.8 60.1 4.9ZM23.7 37.3c-3.5 0-6.4-3.2-6.4-7.1s2.8-7.2 6.4-7.2 6.5 3.2 6.4 7.2c0 3.9-2.8 7.1-6.4 7.1Zm23.6 0c-3.5 0-6.4-3.2-6.4-7.1s2.8-7.2 6.4-7.2 6.5 3.2 6.4 7.2c0 3.9-2.8 7.1-6.4 7.1Z"/></svg>
         Mua qua Discord
@@ -436,56 +210,24 @@
     </div>
   </div>
 
-  <!-- PAGE: MACHINE -->
+  <!-- MACHINE -->
   <div class="page" id="page-machine">
     <div class="card card-top-line">
       <div class="card-label">// Thông tin máy</div>
       <div class="card-title">Máy của tôi</div>
       <div class="spec-grid">
-        <div class="spec-item">
-          <div class="spec-label">Tên máy</div>
-          <div class="spec-val empty">—</div>
-        </div>
-        <div class="spec-item">
-          <div class="spec-label">Địa chỉ IP</div>
-          <div class="spec-val empty">—</div>
-          <div class="spec-sub">Liên hệ staff để nhận IP</div>
-        </div>
-        <div class="spec-item">
-          <div class="spec-label">GPU</div>
-          <div class="spec-val empty">—</div>
-        </div>
-        <div class="spec-item">
-          <div class="spec-label">RAM</div>
-          <div class="spec-val empty">—</div>
-        </div>
-        <div class="spec-item">
-          <div class="spec-label">CPU</div>
-          <div class="spec-val empty">—</div>
-        </div>
-        <div class="spec-item">
-          <div class="spec-label">Storage</div>
-          <div class="spec-val empty">—</div>
-        </div>
-        <div class="spec-item">
-          <div class="spec-label">OS</div>
-          <div class="spec-val empty">—</div>
-        </div>
-        <div class="spec-item">
-          <div class="spec-label">Trạng thái</div>
-          <div class="badge badge-offline" style="margin-top:0.3rem;">Chưa có máy</div>
-        </div>
-      </div>
-    </div>
-    <div class="card">
-      <div class="empty-state">
-        Thông tin máy sẽ hiển thị sau khi staff gán máy cho tài khoản.<br>
-        Tạo ticket trong Discord để được hỗ trợ.
+        <div class="spec-item"><div class="spec-label">Địa chỉ IP</div><div class="spec-val empty" id="m2Ip">—</div></div>
+        <div class="spec-item"><div class="spec-label">GPU</div><div class="spec-val empty" id="m2Gpu">—</div></div>
+        <div class="spec-item"><div class="spec-label">RAM</div><div class="spec-val empty" id="m2Ram">—</div></div>
+        <div class="spec-item"><div class="spec-label">CPU</div><div class="spec-val empty" id="m2Cpu">—</div></div>
+        <div class="spec-item"><div class="spec-label">Storage</div><div class="spec-val empty" id="m2Storage">—</div></div>
+        <div class="spec-item"><div class="spec-label">OS</div><div class="spec-val empty" id="m2Os">—</div></div>
+        <div class="spec-item"><div class="spec-label">Trạng thái</div><div class="badge badge-offline" id="m2Status" style="margin-top:0.3rem;">Chưa có máy</div></div>
       </div>
     </div>
   </div>
 
-  <!-- PAGE: TIME -->
+  <!-- TIME -->
   <div class="page" id="page-time">
     <div class="card card-top-line">
       <div class="card-label">// Thời gian thuê</div>
@@ -495,163 +237,80 @@
         <div>
           <div class="stat-label">Thời gian còn lại</div>
           <div class="countdown">
-            <div class="cd-unit"><span class="cd-num">--</span><span class="cd-label">ngày</span></div>
+            <div class="cd-unit"><span class="cd-num" id="cd-d">--</span><span class="cd-label">ngày</span></div>
             <span class="cd-sep">:</span>
-            <div class="cd-unit"><span class="cd-num">--</span><span class="cd-label">giờ</span></div>
+            <div class="cd-unit"><span class="cd-num" id="cd-h">--</span><span class="cd-label">giờ</span></div>
             <span class="cd-sep">:</span>
-            <div class="cd-unit"><span class="cd-num">--</span><span class="cd-label">phút</span></div>
+            <div class="cd-unit"><span class="cd-num" id="cd-m">--</span><span class="cd-label">phút</span></div>
             <span class="cd-sep">:</span>
-            <div class="cd-unit"><span class="cd-num">--</span><span class="cd-label">giây</span></div>
+            <div class="cd-unit"><span class="cd-num" id="cd-s">--</span><span class="cd-label">giây</span></div>
           </div>
         </div>
         <div>
           <div class="stat-label">Ngày hết hạn</div>
-          <div class="spec-val empty" style="margin-top:0.5rem;">—</div>
-          <div class="spec-sub" style="margin-top:0.3rem;">Chưa có dữ liệu</div>
+          <div class="spec-val empty" id="expiryDate" style="margin-top:0.5rem;">—</div>
         </div>
       </div>
-      <div class="progress-wrap">
-        <div class="progress-labels"><span>—</span><span>—</span></div>
-        <div class="progress-bar"><div class="progress-fill" style="width:0%"></div></div>
-      </div>
     </div>
-    <div class="card">
-      <div class="empty-state">
-        Thời gian sẽ được cập nhật sau khi staff kích hoạt gói.<br>
-        Gia hạn qua Discord ticket.
-      </div>
-      <div style="display:flex;justify-content:center;">
-        <a href="https://discord.gg/Ct4Gw7GwJJ" target="_blank" class="btn btn-discord">Gia hạn qua Discord</a>
-      </div>
+    <div class="card" style="display:flex;flex-direction:column;gap:1rem;align-items:flex-start;">
+      <div class="empty-state" style="padding:1rem 0;text-align:left;">Gia hạn qua Discord ticket.</div>
+      <a href="https://discord.gg/Ct4Gw7GwJJ" target="_blank" class="btn btn-discord">Gia hạn qua Discord</a>
     </div>
   </div>
 
-  <!-- PAGE: CONNECT -->
+  <!-- CONNECT -->
   <div class="page" id="page-connect">
     <div class="card card-top-line">
       <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;margin-bottom:1.25rem;">
-        <div>
-          <div class="card-label">// Hướng dẫn</div>
-          <div class="card-title" style="margin-bottom:0;">Kết nối máy ảo</div>
-        </div>
+        <div><div class="card-label">// Hướng dẫn</div><div class="card-title" style="margin-bottom:0;">Kết nối máy ảo</div></div>
         <div class="tab-group">
           <button class="tab active" onclick="switchTab('parsec', this)">Parsec</button>
           <button class="tab" onclick="switchTab('moonlight', this)">Moonlight</button>
         </div>
       </div>
       <div class="divider"></div>
-
       <div class="tab-content active" id="tab-parsec">
         <div class="steps-list">
-          <div class="step-row">
-            <div class="step-num-sm">1</div>
-            <div class="step-text">Tải và cài <strong>Parsec</strong> tại <strong>parsec.app</strong> (miễn phí)</div>
-          </div>
-          <div class="step-row">
-            <div class="step-num-sm">2</div>
-            <div class="step-text">
-              Đăng nhập tài khoản Parsec → tab <strong>Computers</strong> → nhập IP máy<br>
-              <span class="code-pill" onclick="copyText(this.textContent)">IP do staff cung cấp qua Discord</span>
-            </div>
-          </div>
-          <div class="step-row">
-            <div class="step-num-sm">3</div>
-            <div class="step-text">Nhập <strong>mật khẩu</strong> staff gửi qua Discord ticket</div>
-          </div>
-          <div class="step-row">
-            <div class="step-num-sm">4</div>
-            <div class="step-text">Cài đặt khuyến nghị: <strong>H.264 · 50 Mbps · 1080p</strong></div>
-          </div>
+          <div class="step-row"><div class="step-num-sm">1</div><div class="step-text">Tải và cài <strong>Parsec</strong> tại <strong>parsec.app</strong></div></div>
+          <div class="step-row"><div class="step-num-sm">2</div><div class="step-text">Đăng nhập Parsec → tab <strong>Computers</strong> → nhập IP máy từ Discord</div></div>
+          <div class="step-row"><div class="step-num-sm">3</div><div class="step-text">Nhập <strong>mật khẩu</strong> staff gửi qua Discord ticket</div></div>
+          <div class="step-row"><div class="step-num-sm">4</div><div class="step-text">Cài đặt: <strong>H.264 · 50 Mbps · 1080p</strong></div></div>
         </div>
       </div>
-
       <div class="tab-content" id="tab-moonlight">
         <div class="steps-list">
-          <div class="step-row">
-            <div class="step-num-sm">1</div>
-            <div class="step-text">Tải <strong>Moonlight</strong> tại <strong>moonlight-stream.org</strong></div>
-          </div>
-          <div class="step-row">
-            <div class="step-num-sm">2</div>
-            <div class="step-text">
-              Mở Moonlight → <strong>Add PC</strong> → nhập IP máy<br>
-              <span class="code-pill">IP do staff cung cấp qua Discord</span>
-            </div>
-          </div>
-          <div class="step-row">
-            <div class="step-num-sm">3</div>
-            <div class="step-text">Nhập <strong>PIN 4 số</strong> hiện trên Moonlight vào máy ảo (nhờ staff nhập hộ)</div>
-          </div>
-          <div class="step-row">
-            <div class="step-num-sm">4</div>
-            <div class="step-text">Cài đặt khuyến nghị: <strong>H.264 · 50 Mbps · 1080p · 60fps</strong></div>
-          </div>
+          <div class="step-row"><div class="step-num-sm">1</div><div class="step-text">Tải <strong>Moonlight</strong> tại <strong>moonlight-stream.org</strong></div></div>
+          <div class="step-row"><div class="step-num-sm">2</div><div class="step-text">Mở Moonlight → <strong>Add PC</strong> → nhập IP máy từ Discord</div></div>
+          <div class="step-row"><div class="step-num-sm">3</div><div class="step-text">Nhập <strong>PIN 4 số</strong> hiện trên Moonlight vào máy ảo (nhờ staff nhập hộ)</div></div>
+          <div class="step-row"><div class="step-num-sm">4</div><div class="step-text">Cài đặt: <strong>H.264 · 50 Mbps · 1080p · 60fps</strong></div></div>
         </div>
       </div>
     </div>
-
-    <div class="card">
-      <div class="card-label">// Chưa có IP?</div>
-      <p style="font-size:0.875rem;color:var(--muted);font-weight:300;line-height:1.7;margin-bottom:1rem;">
-        Sau khi mua dịch vụ, staff sẽ gửi IP và mật khẩu qua Discord ticket. Liên hệ nếu chưa nhận được.
-      </p>
-      <a href="https://discord.gg/Ct4Gw7GwJJ" target="_blank" class="btn btn-discord">
-        <svg width="16" height="12" viewBox="0 0 71 55" fill="currentColor"><path d="M60.1 4.9A58.5 58.5 0 0 0 45.4.9a40 40 0 0 0-1.8 3.6 54 54 0 0 0-16.2 0A38.4 38.4 0 0 0 25.6.9 58.4 58.4 0 0 0 10.9 5C1.6 18.7-1 32 .3 45a58.7 58.7 0 0 0 17.9 9 44 44 0 0 0 3.8-6.2 38.3 38.3 0 0 1-6-2.9l1.4-1.1a41.9 41.9 0 0 0 35.7 0l1.5 1.1a38.2 38.2 0 0 1-6 2.9 43.6 43.6 0 0 0 3.8 6.2 58.5 58.5 0 0 0 17.9-9C71.8 30 68.2 16.8 60.1 4.9ZM23.7 37.3c-3.5 0-6.4-3.2-6.4-7.1s2.8-7.2 6.4-7.2 6.5 3.2 6.4 7.2c0 3.9-2.8 7.1-6.4 7.1Zm23.6 0c-3.5 0-6.4-3.2-6.4-7.1s2.8-7.2 6.4-7.2 6.5 3.2 6.4 7.2c0 3.9-2.8 7.1-6.4 7.1Z"/></svg>
-        Liên hệ Discord
-      </a>
-    </div>
   </div>
 
-  <!-- PAGE: SUPPORT -->
+  <!-- SUPPORT -->
   <div class="page" id="page-support">
     <div class="support-grid">
-      <div class="support-card">
-        <div class="support-icon">💬</div>
-        <div class="support-title">Tạo ticket hỗ trợ</div>
-        <div class="support-desc">Gặp vấn đề với máy hoặc dịch vụ? Tạo ticket trong Discord. Staff phản hồi trong vài phút.</div>
-        <a href="https://discord.gg/Ct4Gw7GwJJ" target="_blank" class="btn btn-discord">
-          <svg width="16" height="12" viewBox="0 0 71 55" fill="currentColor"><path d="M60.1 4.9A58.5 58.5 0 0 0 45.4.9a40 40 0 0 0-1.8 3.6 54 54 0 0 0-16.2 0A38.4 38.4 0 0 0 25.6.9 58.4 58.4 0 0 0 10.9 5C1.6 18.7-1 32 .3 45a58.7 58.7 0 0 0 17.9 9 44 44 0 0 0 3.8-6.2 38.3 38.3 0 0 1-6-2.9l1.4-1.1a41.9 41.9 0 0 0 35.7 0l1.5 1.1a38.2 38.2 0 0 1-6 2.9 43.6 43.6 0 0 0 3.8 6.2 58.5 58.5 0 0 0 17.9-9C71.8 30 68.2 16.8 60.1 4.9ZM23.7 37.3c-3.5 0-6.4-3.2-6.4-7.1s2.8-7.2 6.4-7.2 6.5 3.2 6.4 7.2c0 3.9-2.8 7.1-6.4 7.1Zm23.6 0c-3.5 0-6.4-3.2-6.4-7.1s2.8-7.2 6.4-7.2 6.5 3.2 6.4 7.2c0 3.9-2.8 7.1-6.4 7.1Z"/></svg>
-          Mở Discord
-        </a>
-      </div>
-      <div class="support-card">
-        <div class="support-icon">🔄</div>
-        <div class="support-title">Gia hạn dịch vụ</div>
-        <div class="support-desc">Gói sắp hết? Tạo ticket gia hạn trong Discord để tiếp tục sử dụng.</div>
-        <a href="https://discord.gg/Ct4Gw7GwJJ" target="_blank" class="btn btn-outline">Tạo ticket gia hạn →</a>
-      </div>
-      <div class="support-card">
-        <div class="support-icon">❓</div>
-        <div class="support-title">Hỏi đáp</div>
-        <div class="support-desc">Chưa biết cách kết nối hoặc cài đặt? Xem hướng dẫn kết nối hoặc hỏi staff.</div>
-        <button class="btn btn-outline" onclick="goTo('connect', document.querySelector('[onclick*=connect]'))">Xem hướng dẫn →</button>
-      </div>
-      <div class="support-card">
-        <div class="support-icon">🛒</div>
-        <div class="support-title">Mua thêm giờ</div>
-        <div class="support-desc">Hết giờ? Nạp thêm bất cứ lúc nào qua Discord ticket, không giới hạn số lượng.</div>
-        <a href="https://discord.gg/Ct4Gw7GwJJ" target="_blank" class="btn btn-outline">Nạp thêm giờ →</a>
-      </div>
+      <div class="support-card"><div class="support-icon">💬</div><div class="support-title">Tạo ticket hỗ trợ</div><div class="support-desc">Gặp vấn đề? Tạo ticket trong Discord, staff phản hồi trong vài phút.</div><a href="https://discord.gg/Ct4Gw7GwJJ" target="_blank" class="btn btn-discord">Mở Discord</a></div>
+      <div class="support-card"><div class="support-icon">🔄</div><div class="support-title">Gia hạn dịch vụ</div><div class="support-desc">Gói sắp hết? Tạo ticket gia hạn trong Discord.</div><a href="https://discord.gg/Ct4Gw7GwJJ" target="_blank" class="btn btn-outline">Tạo ticket gia hạn →</a></div>
+      <div class="support-card"><div class="support-icon">❓</div><div class="support-title">Hỏi đáp</div><div class="support-desc">Chưa biết cách kết nối? Xem hướng dẫn hoặc hỏi staff.</div><button class="btn btn-outline" onclick="goTo('connect', document.querySelector('[onclick*=connect]'))">Xem hướng dẫn →</button></div>
+      <div class="support-card"><div class="support-icon">🛒</div><div class="support-title">Mua thêm giờ</div><div class="support-desc">Hết giờ? Nạp thêm bất cứ lúc nào qua Discord ticket.</div><a href="https://discord.gg/Ct4Gw7GwJJ" target="_blank" class="btn btn-outline">Nạp thêm giờ →</a></div>
     </div>
   </div>
-
-</div><!-- end main -->
+</div>
 
 <div class="toast" id="toast">✓ Đã copy</div>
 
 <script>
-  const SUPABASE_URL = 'https://vlwevojqfomophsdwsqd.supabase.co';
-  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZsd2V2b2pxZm9tb3Boc2R3c3FkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM1NzE2NDgsImV4cCI6MjA4OTE0NzY0OH0.6NECwQqKKeZH2fIgqp8SkmA6kPAqtsc5dlhEdGVFgBE';
-  const { createClient } = supabase;
-  const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  const sb = window.supabase.createClient(
+    'https://vlwevojqfomophsdwsqd.supabase.co',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZsd2V2b2pxZm9tb3Boc2R3c3FkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM1NzE2NDgsImV4cCI6MjA4OTE0NzY0OH0.6NECwQqKKeZH2fIgqp8SkmA6kPAqtsc5dlhEdGVFgBE'
+  );
 
-  // Clock
   setInterval(() => {
-    document.getElementById('clock').textContent =
-      new Date().toLocaleTimeString('vi-VN', {hour12:false});
+    document.getElementById('clock').textContent = new Date().toLocaleTimeString('vi-VN', {hour12:false});
   }, 1000);
 
-  // Page nav
   const titles = { dashboard:'Dashboard', machine:'Máy của tôi', time:'Thời gian', connect:'Hướng dẫn kết nối', support:'Hỗ trợ' };
   function goTo(id, btn) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -676,7 +335,11 @@
     });
   }
 
-  // Countdown
+  async function doLogout() {
+    await sb.auth.signOut();
+    window.location.href = 'grimz-login.html';
+  }
+
   let countdownInterval = null;
   function startCountdown(expiry) {
     if (countdownInterval) clearInterval(countdownInterval);
@@ -686,111 +349,65 @@
       const h = Math.floor((diff%86400000)/3600000);
       const m = Math.floor((diff%3600000)/60000);
       const s = Math.floor((diff%60000)/1000);
-      document.querySelectorAll('.cd-num').forEach((el, i) => {
-        el.textContent = [d,h,m,s][i].toString().padStart(2,'0');
-      });
+      document.getElementById('cd-d').textContent = String(d).padStart(2,'0');
+      document.getElementById('cd-h').textContent = String(h).padStart(2,'0');
+      document.getElementById('cd-m').textContent = String(m).padStart(2,'0');
+      document.getElementById('cd-s').textContent = String(s).padStart(2,'0');
     }
     update();
     countdownInterval = setInterval(update, 1000);
   }
 
-  // Fill machine data vào UI
   function fillMachine(m) {
-    if (!m) return;
+    // Dashboard
+    document.getElementById('machineIp').textContent = m.ip || '—';
+    document.getElementById('machineGpu').textContent = m.gpu || '—';
+    document.getElementById('machineRam').textContent = m.ram || '—';
+    document.getElementById('machineCpu').textContent = m.cpu || '—';
+    document.getElementById('machineStorage').textContent = m.storage || '—';
+    document.getElementById('machineOs').textContent = m.os || '—';
+    document.getElementById('machineName').textContent = m.gpu || 'Cloud PC';
+    document.getElementById('machineStatus').className = 'badge badge-online';
+    document.getElementById('machineStatus').textContent = 'Đang chạy';
+    document.getElementById('statPlan').textContent = m.plan || 'ACTIVE';
+    document.getElementById('statPlan').classList.remove('empty');
+    document.getElementById('statPlan').style.color = 'var(--green)';
+    document.getElementById('noBuyCard').style.display = 'none';
 
-    // Dashboard + Machine page specs
-    const specs = [
-      { label:'Địa chỉ IP', val: m.ip, cls:'mono' },
-      { label:'GPU', val: m.gpu },
-      { label:'RAM', val: m.ram },
-      { label:'CPU', val: m.cpu },
-      { label:'Storage', val: m.storage },
-      { label:'OS', val: m.os },
-    ];
+    // Machine page
+    document.getElementById('m2Ip').textContent = m.ip || '—';
+    document.getElementById('m2Gpu').textContent = m.gpu || '—';
+    document.getElementById('m2Ram').textContent = m.ram || '—';
+    document.getElementById('m2Cpu').textContent = m.cpu || '—';
+    document.getElementById('m2Storage').textContent = m.storage || '—';
+    document.getElementById('m2Os').textContent = m.os || '—';
+    document.getElementById('m2Status').className = 'badge badge-online';
+    document.getElementById('m2Status').textContent = 'Đang chạy';
 
-    // Update tất cả spec-item trong cả 2 page
-    document.querySelectorAll('.spec-item').forEach(el => {
-      const lbl = el.querySelector('.spec-label')?.textContent?.trim();
-      const match = specs.find(s => s.label === lbl);
-      if (match) {
-        const valEl = el.querySelector('.spec-val');
-        if (valEl) {
-          valEl.textContent = match.val || '—';
-          valEl.classList.remove('empty');
-          if (match.cls) valEl.classList.add(match.cls);
-        }
-      }
-    });
-
-    // Machine name
-    document.querySelectorAll('.spec-val').forEach(el => {
-      if (el.textContent === '—' && el.closest('.card-top-line')) {
-        // skip
-      }
-    });
-
-    // Badge online
-    document.querySelectorAll('.badge-offline').forEach(b => {
-      b.className = 'badge badge-online';
-      b.textContent = 'Đang chạy';
-    });
-
-    // Plan
-    document.querySelectorAll('.stat-val').forEach(el => {
-      if (el.classList.contains('empty') && el.closest('.stat-card')) {
-        const lbl = el.closest('.stat-card')?.querySelector('.stat-label')?.textContent;
-        if (lbl?.includes('Trạng thái')) {
-          el.textContent = 'ACTIVE';
-          el.classList.remove('empty');
-          el.style.color = 'var(--green)';
-          el.nextElementSibling.textContent = m.plan || '';
-        }
-      }
-    });
-
-    // Expiry countdown
+    // Time
     if (m.expiry) {
       startCountdown(m.expiry);
-      const expiryDate = new Date(m.expiry).toLocaleDateString('vi-VN');
-      document.querySelectorAll('.progress-labels span').forEach((el, i) => {
-        if (i === 1) el.textContent = 'Hết hạn: ' + expiryDate;
-      });
-
-      // Time page
-      document.querySelectorAll('.spec-val.empty').forEach(el => {
-        const lbl = el.closest('div')?.previousElementSibling?.textContent;
-        if (lbl?.includes('Ngày hết hạn')) {
-          el.textContent = expiryDate;
-          el.classList.remove('empty');
-        }
-      });
+      const expiryStr = new Date(m.expiry).toLocaleDateString('vi-VN');
+      document.getElementById('expiryDate').textContent = expiryStr;
+      document.getElementById('expiryDate').classList.remove('empty');
+      document.getElementById('statTime').textContent = expiryStr;
+      document.getElementById('statTime').classList.remove('empty');
     }
 
-    // User name in sidebar
-    document.querySelector('.user-name').textContent = m.plan || 'User';
-    document.querySelector('.user-plan').textContent = m.gpu?.split(' ').slice(-1)[0] || '';
-    document.querySelector('.user-avatar').textContent = (m.plan || 'U')[0].toUpperCase();
+    // Sidebar
+    document.getElementById('userPlan').textContent = m.gpu?.split(' ')[1] || 'Active';
   }
 
-  // INIT
   async function init() {
     const { data: { session } } = await sb.auth.getSession();
+    if (!session) { window.location.href = 'grimz-login.html'; return; }
 
-    if (!session) {
-      window.location.href = 'grimz-login.html';
-      return;
-    }
+    const email = session.user.email || 'User';
+    const username = email.split('@')[0];
+    document.getElementById('userName').textContent = username;
+    document.getElementById('userAvatar').textContent = username[0].toUpperCase();
 
-    // Hiện email user
-    const email = session.user.email || session.user.user_metadata?.full_name || 'User';
-    document.querySelector('.user-name').textContent = email.split('@')[0];
-
-    // Lấy máy của user
-    const { data: machine } = await sb.from('machines')
-      .select('*')
-      .eq('user_id', session.user.id)
-      .single();
-
+    const { data: machine } = await sb.from('machines').select('*').eq('user_id', session.user.id).single();
     if (machine) fillMachine(machine);
   }
 
