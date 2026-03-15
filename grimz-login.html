@@ -4,160 +4,224 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Grimz Cloud PC — Đăng nhập</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Exo+2:wght@300;400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-  :root {
-    --bg: #09080f; --bg2: #100e1a; --bg3: #161323;
-    --accent: #7c5cbf; --accent2: #9b7fe8; --accent3: #5a3fa0;
-    --text: #e4e0f0; --muted: #5a5470; --border: rgba(124,92,191,0.15);
-  }
-  * { margin:0; padding:0; box-sizing:border-box; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
-    background:var(--bg); color:var(--text);
-    font-family:'Exo 2',sans-serif; min-height:100vh;
-    display:flex; align-items:center; justify-content:center; overflow:hidden;
+    background: #0a0a0f;
+    color: #e0e0e0;
+    font-family: 'Segoe UI', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
-  body::before {
-    content:''; position:fixed; inset:0;
-    background-image:
-      linear-gradient(rgba(124,92,191,0.04) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(124,92,191,0.04) 1px, transparent 1px);
-    background-size:40px 40px; pointer-events:none;
-  }
-  .glow-1 {
-    position:fixed; width:500px; height:500px; border-radius:50%;
-    background:radial-gradient(circle, rgba(124,92,191,0.1) 0%, transparent 70%);
-    top:-100px; right:-100px; pointer-events:none;
-  }
-  .glow-2 {
-    position:fixed; width:400px; height:400px; border-radius:50%;
-    background:radial-gradient(circle, rgba(90,63,160,0.08) 0%, transparent 70%);
-    bottom:-100px; left:-100px; pointer-events:none;
-  }
-  .card {
-    position:relative; z-index:1;
-    background:var(--bg2); border:1px solid var(--border);
-    padding:2.5rem 2rem; width:100%; max-width:380px;
-    clip-path:polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 0 100%);
-  }
-  .card::before {
-    content:''; position:absolute; top:0; left:0; right:0; height:2px;
-    background:linear-gradient(90deg, var(--accent3), var(--accent2));
+  .container {
+    width: 100%;
+    max-width: 420px;
+    padding: 20px;
   }
   .logo {
-    font-family:'Rajdhani',sans-serif; font-size:1.3rem; font-weight:700;
-    letter-spacing:0.15em; text-transform:uppercase; color:var(--accent2);
-    text-align:center; margin-bottom:0.3rem;
-    text-shadow:0 0 20px rgba(124,92,191,0.5);
+    text-align: center;
+    margin-bottom: 32px;
   }
-  .subtitle {
-    font-family:'Share Tech Mono',monospace; font-size:0.65rem;
-    color:var(--muted); text-align:center; letter-spacing:0.15em;
-    text-transform:uppercase; margin-bottom:2rem;
+  .logo h1 {
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    color: #fff;
   }
-  .divider {
-    height:1px; background:var(--border); margin:1.75rem 0; position:relative;
+  .logo span { color: #7c3aed; }
+  .card {
+    background: #13131a;
+    border: 1px solid #1e1e2e;
+    border-radius: 12px;
+    padding: 32px;
   }
-  .divider span {
-    position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
-    background:var(--bg2); padding:0 0.75rem;
-    font-family:'Share Tech Mono',monospace; font-size:0.65rem;
-    color:var(--muted); letter-spacing:0.1em; text-transform:uppercase;
+  .tabs {
+    display: flex;
+    margin-bottom: 28px;
+    border-bottom: 1px solid #1e1e2e;
   }
-  .btn-oauth {
-    display:flex; align-items:center; justify-content:center; gap:0.75rem;
-    width:100%; padding:0.85rem; border:1px solid var(--border);
-    background:var(--bg3); color:var(--text);
-    font-family:'Exo 2',sans-serif; font-size:0.9rem; font-weight:500;
-    cursor:pointer; transition:all 0.2s; margin-bottom:0.75rem;
+  .tab {
+    flex: 1;
+    padding: 10px;
+    text-align: center;
+    cursor: pointer;
+    font-size: 14px;
+    color: #666;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
   }
-  .btn-oauth:hover { border-color:var(--accent); background:rgba(124,92,191,0.08); transform:translateY(-1px); }
-  .btn-discord { border-color:rgba(88,101,242,0.3); }
-  .btn-discord:hover { border-color:#5865F2 !important; background:rgba(88,101,242,0.1) !important; }
-  .btn-google:hover { border-color:#EA4335 !important; background:rgba(234,67,53,0.06) !important; }
-  .back-link {
-    display:block; text-align:center; margin-top:1.5rem;
-    font-family:'Share Tech Mono',monospace; font-size:0.68rem;
-    color:var(--muted); text-decoration:none; letter-spacing:0.1em; transition:color 0.2s;
+  .tab.active {
+    color: #7c3aed;
+    border-bottom-color: #7c3aed;
   }
-  .back-link:hover { color:var(--accent2); }
-  .notice {
-    margin-top:1.5rem; padding:0.75rem; border:1px solid var(--border);
-    background:rgba(124,92,191,0.05); font-size:0.75rem; color:var(--muted);
-    line-height:1.6; text-align:center; font-weight:300;
+  .form-group {
+    margin-bottom: 16px;
   }
-  .error-msg {
-    display:none; margin-top:1rem; padding:0.65rem 0.75rem;
-    border:1px solid rgba(255,80,80,0.3); background:rgba(255,80,80,0.06);
-    color:#ff8080; font-size:0.78rem; font-family:'Share Tech Mono',monospace;
-    letter-spacing:0.05em; text-align:center;
+  label {
+    display: block;
+    font-size: 12px;
+    color: #888;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
   }
-  .loading { opacity:0.6; pointer-events:none; }
+  input {
+    width: 100%;
+    padding: 12px 14px;
+    background: #0a0a0f;
+    border: 1px solid #1e1e2e;
+    border-radius: 8px;
+    color: #e0e0e0;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  input:focus { border-color: #7c3aed; }
+  .btn {
+    width: 100%;
+    padding: 13px;
+    background: #7c3aed;
+    border: none;
+    border-radius: 8px;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 8px;
+    transition: background 0.2s;
+  }
+  .btn:hover { background: #6d28d9; }
+  .btn:disabled { background: #3d1f7a; cursor: not-allowed; }
+  .msg {
+    margin-top: 14px;
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    display: none;
+  }
+  .msg.error { background: #2d0f0f; color: #f87171; border: 1px solid #7f1d1d; display: block; }
+  .msg.success { background: #0f2d1a; color: #4ade80; border: 1px solid #14532d; display: block; }
+  .back {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 13px;
+    color: #555;
+  }
+  .back a { color: #7c3aed; text-decoration: none; }
 </style>
 </head>
 <body>
-<div class="glow-1"></div>
-<div class="glow-2"></div>
-
-<div class="card">
-  <div class="logo">Grimz Cloud PC</div>
-  <div class="subtitle">// Đăng nhập vào tài khoản</div>
-
-  <button class="btn-oauth btn-discord" onclick="loginDiscord()">
-    <svg width="18" height="14" viewBox="0 0 71 55" fill="#5865F2"><path d="M60.1 4.9A58.5 58.5 0 0 0 45.4.9a40 40 0 0 0-1.8 3.6 54 54 0 0 0-16.2 0A38.4 38.4 0 0 0 25.6.9 58.4 58.4 0 0 0 10.9 5C1.6 18.7-1 32 .3 45a58.7 58.7 0 0 0 17.9 9 44 44 0 0 0 3.8-6.2 38.3 38.3 0 0 1-6-2.9l1.4-1.1a41.9 41.9 0 0 0 35.7 0l1.5 1.1a38.2 38.2 0 0 1-6 2.9 43.6 43.6 0 0 0 3.8 6.2 58.5 58.5 0 0 0 17.9-9C71.8 30 68.2 16.8 60.1 4.9ZM23.7 37.3c-3.5 0-6.4-3.2-6.4-7.1s2.8-7.2 6.4-7.2 6.5 3.2 6.4 7.2c0 3.9-2.8 7.1-6.4 7.1Zm23.6 0c-3.5 0-6.4-3.2-6.4-7.1s2.8-7.2 6.4-7.2 6.5 3.2 6.4 7.2c0 3.9-2.8 7.1-6.4 7.1Z"/></svg>
-    Đăng nhập bằng Discord
-  </button>
-
-  <button class="btn-oauth btn-google" onclick="loginGoogle()">
-    <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9 3.2l6.7-6.7C35.7 2.5 30.2 0 24 0 14.7 0 6.7 5.4 2.9 13.3l7.8 6c1.8-5.4 6.9-9.8 13.3-9.8z"/><path fill="#4285F4" d="M46.6 24.5c0-1.6-.1-3.1-.4-4.5H24v8.5h12.7c-.6 3-2.3 5.5-4.8 7.2l7.6 5.9c4.4-4.1 7.1-10.1 7.1-17.1z"/><path fill="#FBBC05" d="M10.7 28.6A14.8 14.8 0 0 1 9.5 24c0-1.6.3-3.2.8-4.6l-7.8-6A23.9 23.9 0 0 0 0 24c0 3.9.9 7.5 2.6 10.7l8.1-6.1z"/><path fill="#34A853" d="M24 48c6.2 0 11.4-2 15.2-5.5l-7.6-5.9c-2 1.4-4.7 2.2-7.6 2.2-6.3 0-11.7-4.3-13.6-10.1l-8.1 6.1C6.5 42.5 14.6 48 24 48z"/></svg>
-    Đăng nhập bằng Google
-  </button>
-
-  <div class="error-msg" id="error-msg"></div>
-
-  <div class="notice">
-    Chỉ tài khoản đã mua dịch vụ mới truy cập được dashboard.<br>
-    Mua qua Discord trước nhé.
+<div class="container">
+  <div class="logo">
+    <h1>GRIMZ <span>CLOUD PC</span></h1>
   </div>
+  <div class="card">
+    <div class="tabs">
+      <div class="tab active" onclick="switchTab('login')">Đăng nhập</div>
+      <div class="tab" onclick="switchTab('register')">Đăng ký</div>
+    </div>
 
-  <a href="index.html" class="back-link">← Quay lại trang chủ</a>
+    <!-- Login -->
+    <div id="loginForm">
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="loginEmail" placeholder="email@example.com">
+      </div>
+      <div class="form-group">
+        <label>Mật khẩu</label>
+        <input type="password" id="loginPassword" placeholder="••••••••">
+      </div>
+      <button class="btn" onclick="login()">Đăng nhập</button>
+      <div class="msg" id="loginMsg"></div>
+    </div>
+
+    <!-- Register -->
+    <div id="registerForm" style="display:none">
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="regEmail" placeholder="email@example.com">
+      </div>
+      <div class="form-group">
+        <label>Mật khẩu</label>
+        <input type="password" id="regPassword" placeholder="Tối thiểu 6 ký tự">
+      </div>
+      <div class="form-group">
+        <label>Nhập lại mật khẩu</label>
+        <input type="password" id="regPassword2" placeholder="••••••••">
+      </div>
+      <button class="btn" onclick="register()">Tạo tài khoản</button>
+      <div class="msg" id="regMsg"></div>
+    </div>
+  </div>
+  <div class="back"><a href="index.html">← Trang chủ</a></div>
 </div>
 
 <script>
   const SUPABASE_URL = 'https://vlwevojqfomophsdwsqd.supabase.co';
-  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZsd2V2b2pxZm9tb3Boc2R3c3FkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM1NzE2NDgsImV4cCI6MjA4OTE0NzY0OH0.6NECwQqKKeZH2fIgqp8SkmA6kPAqtsc5dlhEdGVFgBE';
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZsd2V2b2pxZm9tb3Boc2R3c3FkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM1NzE2NDgsImV4cCI6MjA4OTE0NzY0OH0.6NECwQqKKeZH2fIgqp8SkmA6kPAqtsc5dlhEdGVFgBE';
+  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-  const { createClient } = supabase;
-  const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-  // Nếu đã login rồi thì redirect thẳng vào dashboard
-  sb.auth.getSession().then(({ data }) => {
+  // Auto redirect if already logged in
+  supabase.auth.getSession().then(({ data }) => {
     if (data.session) window.location.href = 'grimz-dashboard.html';
   });
 
-  function showError(msg) {
-    const el = document.getElementById('error-msg');
-    el.textContent = msg; el.style.display = 'block';
+  function switchTab(tab) {
+    document.querySelectorAll('.tab').forEach((t, i) => {
+      t.classList.toggle('active', (tab === 'login' && i === 0) || (tab === 'register' && i === 1));
+    });
+    document.getElementById('loginForm').style.display = tab === 'login' ? 'block' : 'none';
+    document.getElementById('registerForm').style.display = tab === 'register' ? 'block' : 'none';
   }
 
-  async function loginDiscord() {
-    document.querySelector('.btn-discord').classList.add('loading');
-    const { error } = await sb.auth.signInWithOAuth({
-      provider: 'discord',
-      options: { redirectTo: window.location.origin + '/grimz-dashboard.html' }
-    });
-    if (error) showError(error.message);
+  async function login() {
+    const email = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPassword').value;
+    const msg = document.getElementById('loginMsg');
+    msg.className = 'msg';
+
+    if (!email || !password) { msg.className = 'msg error'; msg.textContent = 'Vui lòng điền đầy đủ thông tin.'; return; }
+
+    const btn = document.querySelector('#loginForm .btn');
+    btn.disabled = true; btn.textContent = 'Đang đăng nhập...';
+
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) {
+      msg.className = 'msg error';
+      msg.textContent = 'Email hoặc mật khẩu không đúng.';
+      btn.disabled = false; btn.textContent = 'Đăng nhập';
+    } else {
+      window.location.href = 'grimz-dashboard.html';
+    }
   }
 
-  async function loginGoogle() {
-    document.querySelector('.btn-google').classList.add('loading');
-    const { error } = await sb.auth.signInWithOAuth({
-      provider: 'google',
-      options: { redirectTo: window.location.origin + '/grimz-dashboard.html' }
-    });
-    if (error) showError(error.message);
+  async function register() {
+    const email = document.getElementById('regEmail').value.trim();
+    const password = document.getElementById('regPassword').value;
+    const password2 = document.getElementById('regPassword2').value;
+    const msg = document.getElementById('regMsg');
+    msg.className = 'msg';
+
+    if (!email || !password) { msg.className = 'msg error'; msg.textContent = 'Vui lòng điền đầy đủ thông tin.'; return; }
+    if (password.length < 6) { msg.className = 'msg error'; msg.textContent = 'Mật khẩu tối thiểu 6 ký tự.'; return; }
+    if (password !== password2) { msg.className = 'msg error'; msg.textContent = 'Mật khẩu không khớp.'; return; }
+
+    const btn = document.querySelector('#registerForm .btn');
+    btn.disabled = true; btn.textContent = 'Đang tạo tài khoản...';
+
+    const { error } = await supabase.auth.signUp({ email, password });
+    if (error) {
+      msg.className = 'msg error';
+      msg.textContent = 'Lỗi: ' + error.message;
+      btn.disabled = false; btn.textContent = 'Tạo tài khoản';
+    } else {
+      msg.className = 'msg success';
+      msg.textContent = 'Tạo tài khoản thành công! Vui lòng xác nhận email rồi đăng nhập.';
+      btn.disabled = false; btn.textContent = 'Tạo tài khoản';
+    }
   }
 </script>
 </body>
