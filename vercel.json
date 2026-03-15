@@ -1,0 +1,9 @@
+{
+  "rewrites": [
+    { "source": "/privacy", "destination": "/privacy.html" },
+    { "source": "/terms", "destination": "/terms.html" },
+    { "source": "/dashboard", "destination": "/grimz-dashboard.html" },
+    { "source": "/login", "destination": "/grimz-login.html" },
+    { "source": "/admin", "destination": "/grimz-admin.html" }
+  ]
+}
