@@ -314,6 +314,7 @@
 
   @media(max-width:768px) { .sidebar{display:none;} .main{margin-left:0;} }
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
@@ -639,21 +640,19 @@
 <div class="toast" id="toast">✓ Đã copy</div>
 
 <script>
+  const SUPABASE_URL = 'https://vlwevojqfomophsdwsqd.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZsd2V2b2pxZm9tb3Boc2R3c3FkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM1NzE2NDgsImV4cCI6MjA4OTE0NzY0OH0.6NECwQqKKeZH2fIgqp8SkmA6kPAqtsc5dlhEdGVFgBE';
+  const { createClient } = supabase;
+  const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
   // Clock
   setInterval(() => {
     document.getElementById('clock').textContent =
       new Date().toLocaleTimeString('vi-VN', {hour12:false});
   }, 1000);
 
-  // Page titles
-  const titles = {
-    dashboard: 'Dashboard',
-    machine: 'Máy của tôi',
-    time: 'Thời gian',
-    connect: 'Hướng dẫn kết nối',
-    support: 'Hỗ trợ'
-  };
-
+  // Page nav
+  const titles = { dashboard:'Dashboard', machine:'Máy của tôi', time:'Thời gian', connect:'Hướng dẫn kết nối', support:'Hỗ trợ' };
   function goTo(id, btn) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
@@ -662,7 +661,6 @@
     document.getElementById('page-title').textContent = titles[id] || '';
   }
 
-  // Connect tabs
   function switchTab(id, btn) {
     document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
@@ -670,7 +668,6 @@
     btn.classList.add('active');
   }
 
-  // Copy
   function copyText(text) {
     navigator.clipboard.writeText(text).then(() => {
       const t = document.getElementById('toast');
@@ -678,6 +675,126 @@
       setTimeout(() => t.classList.remove('show'), 2000);
     });
   }
+
+  // Countdown
+  let countdownInterval = null;
+  function startCountdown(expiry) {
+    if (countdownInterval) clearInterval(countdownInterval);
+    function update() {
+      const diff = Math.max(0, new Date(expiry) - new Date());
+      const d = Math.floor(diff/86400000);
+      const h = Math.floor((diff%86400000)/3600000);
+      const m = Math.floor((diff%3600000)/60000);
+      const s = Math.floor((diff%60000)/1000);
+      document.querySelectorAll('.cd-num').forEach((el, i) => {
+        el.textContent = [d,h,m,s][i].toString().padStart(2,'0');
+      });
+    }
+    update();
+    countdownInterval = setInterval(update, 1000);
+  }
+
+  // Fill machine data vào UI
+  function fillMachine(m) {
+    if (!m) return;
+
+    // Dashboard + Machine page specs
+    const specs = [
+      { label:'Địa chỉ IP', val: m.ip, cls:'mono' },
+      { label:'GPU', val: m.gpu },
+      { label:'RAM', val: m.ram },
+      { label:'CPU', val: m.cpu },
+      { label:'Storage', val: m.storage },
+      { label:'OS', val: m.os },
+    ];
+
+    // Update tất cả spec-item trong cả 2 page
+    document.querySelectorAll('.spec-item').forEach(el => {
+      const lbl = el.querySelector('.spec-label')?.textContent?.trim();
+      const match = specs.find(s => s.label === lbl);
+      if (match) {
+        const valEl = el.querySelector('.spec-val');
+        if (valEl) {
+          valEl.textContent = match.val || '—';
+          valEl.classList.remove('empty');
+          if (match.cls) valEl.classList.add(match.cls);
+        }
+      }
+    });
+
+    // Machine name
+    document.querySelectorAll('.spec-val').forEach(el => {
+      if (el.textContent === '—' && el.closest('.card-top-line')) {
+        // skip
+      }
+    });
+
+    // Badge online
+    document.querySelectorAll('.badge-offline').forEach(b => {
+      b.className = 'badge badge-online';
+      b.textContent = 'Đang chạy';
+    });
+
+    // Plan
+    document.querySelectorAll('.stat-val').forEach(el => {
+      if (el.classList.contains('empty') && el.closest('.stat-card')) {
+        const lbl = el.closest('.stat-card')?.querySelector('.stat-label')?.textContent;
+        if (lbl?.includes('Trạng thái')) {
+          el.textContent = 'ACTIVE';
+          el.classList.remove('empty');
+          el.style.color = 'var(--green)';
+          el.nextElementSibling.textContent = m.plan || '';
+        }
+      }
+    });
+
+    // Expiry countdown
+    if (m.expiry) {
+      startCountdown(m.expiry);
+      const expiryDate = new Date(m.expiry).toLocaleDateString('vi-VN');
+      document.querySelectorAll('.progress-labels span').forEach((el, i) => {
+        if (i === 1) el.textContent = 'Hết hạn: ' + expiryDate;
+      });
+
+      // Time page
+      document.querySelectorAll('.spec-val.empty').forEach(el => {
+        const lbl = el.closest('div')?.previousElementSibling?.textContent;
+        if (lbl?.includes('Ngày hết hạn')) {
+          el.textContent = expiryDate;
+          el.classList.remove('empty');
+        }
+      });
+    }
+
+    // User name in sidebar
+    document.querySelector('.user-name').textContent = m.plan || 'User';
+    document.querySelector('.user-plan').textContent = m.gpu?.split(' ').slice(-1)[0] || '';
+    document.querySelector('.user-avatar').textContent = (m.plan || 'U')[0].toUpperCase();
+  }
+
+  // INIT
+  async function init() {
+    const { data: { session } } = await sb.auth.getSession();
+
+    if (!session) {
+      window.location.href = 'grimz-login.html';
+      return;
+    }
+
+    // Hiện email user
+    const email = session.user.email || session.user.user_metadata?.full_name || 'User';
+    document.querySelector('.user-name').textContent = email.split('@')[0];
+
+    // Lấy máy của user
+    const { data: machine } = await sb.from('machines')
+      .select('*')
+      .eq('user_id', session.user.id)
+      .single();
+
+    if (machine) fillMachine(machine);
+  }
+
+  init();
 </script>
 </body>
 </html>
