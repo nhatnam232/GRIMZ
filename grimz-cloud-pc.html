@@ -49,7 +49,8 @@
   .hero-desc strong { color:var(--text); font-weight:500; }
   .hero-btns { display:flex; gap:1rem; flex-wrap:wrap; align-items:center; }
   .btn-primary { display:inline-flex; align-items:center; gap:0.6rem; background:var(--accent); color:var(--bg); padding:0.85rem 2rem; font-family:'Rajdhani',sans-serif; font-size:1rem; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; text-decoration:none; border:none; cursor:pointer; transition:all 0.2s; clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,0 100%); }
-  .btn-primary:hover { background:var(--accent2); box-shadow:var(--glow); transform:translateY(-2px); }
+  .btn-primary { transition:all 0.2s cubic-bezier(0.34,1.56,0.64,1); }
+  .btn-primary:hover { background:var(--accent2); box-shadow:var(--glow); transform:translateY(-3px) scale(1.02); }
   .btn-secondary { display:inline-flex; align-items:center; gap:0.6rem; border:1px solid var(--border); color:var(--text); padding:0.85rem 2rem; font-family:'Rajdhani',sans-serif; font-size:1rem; font-weight:600; letter-spacing:0.12em; text-transform:uppercase; text-decoration:none; cursor:pointer; transition:all 0.2s; background:transparent; clip-path:polygon(10px 0,100% 0,100% 100%,0 100%,0 10px); }
   .btn-secondary:hover { border-color:var(--accent2); color:var(--accent2); }
 
@@ -84,7 +85,7 @@
   .plan-card.featured { border-color:var(--accent); background:rgba(124,92,191,0.03); }
   .plan-card.featured::after { content:'PHỔ BIẾN NHẤT'; position:absolute; top:-1px; right:2rem; background:var(--accent); color:var(--bg); font-family:'Share Tech Mono',monospace; font-size:0.65rem; letter-spacing:0.15em; padding:0.2rem 0.6rem; }
   .plan-card.soon { opacity:0.7; }
-  .plan-card:hover { transform:translateY(-4px); box-shadow:0 20px 40px rgba(0,0,0,0.3); }
+  .plan-card:hover { transform:translateY(-6px); box-shadow:0 20px 40px rgba(0,0,0,0.4), 0 0 20px rgba(124,92,191,0.1); }
   .plan-name { font-family:'Rajdhani',sans-serif; font-size:0.8rem; font-weight:600; letter-spacing:0.2em; text-transform:uppercase; color:var(--muted); margin-bottom:0.75rem; }
   .plan-price { font-family:'Rajdhani',sans-serif; font-size:2.8rem; font-weight:700; color:var(--accent); line-height:1; margin-bottom:0.3rem; }
   .plan-price span { font-size:1rem; color:var(--muted); font-weight:400; }
@@ -134,7 +135,8 @@
   .cta-section p { color:var(--muted); margin-bottom:2.5rem; font-size:1rem; position:relative; z-index:1; font-weight:300; }
   .cta-section .hero-btns { justify-content:center; position:relative; z-index:1; }
   .discord-btn { display:inline-flex; align-items:center; gap:0.75rem; background:#5865F2; color:white; padding:0.85rem 2rem; font-family:'Rajdhani',sans-serif; font-size:1rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; text-decoration:none; transition:all 0.2s; clip-path:polygon(10px 0,100% 0,100% 100%,0 100%,0 10px); }
-  .discord-btn:hover { background:#4752c4; transform:translateY(-2px); box-shadow:0 10px 30px rgba(88,101,242,0.4); }
+  .discord-btn { transition:all 0.2s cubic-bezier(0.34,1.56,0.64,1); }
+  .discord-btn:hover { background:#4752c4; transform:translateY(-3px) scale(1.02); box-shadow:0 10px 30px rgba(88,101,242,0.4); }
 
   /* BACK TO TOP */
   .back-top { position:fixed; bottom:2rem; right:2rem; width:40px; height:40px; background:var(--accent); color:#fff; border:none; cursor:pointer; display:none; align-items:center; justify-content:center; font-size:1.2rem; z-index:200; clip-path:polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,0 100%); transition:all 0.2s; }

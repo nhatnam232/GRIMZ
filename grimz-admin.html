@@ -155,7 +155,7 @@
       </div>
     </div>
     <div style="margin-top:1.25rem;">
-      <button class="btn btn-primary" onclick="assignMachine()">Gán máy</button>
+      <button class="btn btn-primary" id="assign-btn" onclick="assignMachine()">Gán máy</button>
     </div>
     <div class="msg msg-ok" id="msg-ok" style="display:none;">✓ Gán máy thành công!</div>
     <div class="msg msg-err" id="msg-err" style="display:none;"></div>
@@ -330,6 +330,9 @@
     if (!validateIp(ip)) { showMsg('err', 'IP không đúng định dạng'); return; }
     if (!hours || hours <= 0) { showMsg('err', 'Chưa điền số giờ'); return; }
 
+    const btn = document.getElementById('assign-btn');
+    btn.disabled = true; btn.textContent = 'Đang gán...';
+
     const expiry = new Date(Date.now() + hours * 3600000).toISOString();
     const payload = {
       ip, gpu: document.getElementById('f-gpu').value,
@@ -348,8 +351,9 @@
       ({ error } = await sb.from('machines').insert({ user_id: userId, ...payload }));
     }
 
-    if (error) { showMsg('err', error.message); return; }
+    if (error) { showMsg('err', error.message); btn.disabled=false; btn.textContent='Gán máy'; return; }
     showMsg('ok');
+    btn.disabled=false; btn.textContent='Gán máy';
     document.getElementById('f-userid').value = '';
     document.getElementById('f-ip').value = '';
     document.getElementById('f-hours').value = '';
@@ -388,10 +392,24 @@
     const base = currentExpiry > new Date() ? currentExpiry : new Date();
     const newExpiry = new Date(base.getTime() + hours * 3600000).toISOString();
 
+    const confirmBtn = document.querySelector('#extend-modal .btn-primary');
+    confirmBtn.disabled = true; confirmBtn.textContent = 'Đang gia hạn...';
     const { error } = await sb.from('machines').update({ expiry: newExpiry }).eq('id', id);
+    confirmBtn.disabled = false; confirmBtn.textContent = 'Xác nhận';
     if (error) { alert('Lỗi: ' + error.message); return; }
     closeExtend();
+    showToast('✓ Gia hạn thành công!');
     loadData();
+  }
+
+  // Toast
+  const toastEl = document.createElement('div');
+  toastEl.style.cssText = 'position:fixed;bottom:2rem;right:2rem;background:#161323;border:1px solid rgba(124,92,191,0.5);color:#9b7fe8;font-family:"Share Tech Mono",monospace;font-size:0.75rem;padding:0.6rem 1.25rem;z-index:999;opacity:0;transform:translateY(10px);transition:all 0.3s;pointer-events:none;letter-spacing:0.08em;';
+  document.body.appendChild(toastEl);
+  function showToast(msg) {
+    toastEl.textContent = msg;
+    toastEl.style.opacity = '1'; toastEl.style.transform = 'translateY(0)';
+    setTimeout(() => { toastEl.style.opacity = '0'; toastEl.style.transform = 'translateY(10px)'; }, 2500);
   }
 
   function showMsg(type, text) {

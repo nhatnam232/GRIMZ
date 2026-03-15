@@ -72,7 +72,8 @@
   .badge-offline { background:rgba(90,84,112,0.2); border:1px solid var(--border); color:var(--muted); }
 
   .stats-row { display:grid; grid-template-columns:repeat(3,1fr); gap:1.25rem; }
-  .stat-card { background:var(--bg2); border:1px solid var(--border); padding:1.25rem 1.5rem; }
+  .stat-card { background:var(--bg2); border:1px solid var(--border); padding:1.25rem 1.5rem; transition:border-color 0.3s, transform 0.2s; }
+  .stat-card:hover { border-color:rgba(124,92,191,0.35); transform:translateY(-2px); }
   .stat-label { font-family:'Share Tech Mono',monospace; font-size:0.6rem; color:var(--muted); letter-spacing:0.15em; text-transform:uppercase; margin-bottom:0.5rem; }
   .stat-val { font-family:'Rajdhani',sans-serif; font-size:1.8rem; font-weight:700; color:var(--accent2); line-height:1; }
   .stat-val.empty { color:var(--muted); font-size:1rem; font-style:italic; }
@@ -109,6 +110,8 @@
   .support-title { font-family:'Rajdhani',sans-serif; font-size:1rem; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; }
   .support-desc { font-size:0.825rem; color:var(--muted); font-weight:300; line-height:1.6; flex:1; }
   .btn { display:inline-flex; align-items:center; gap:0.5rem; padding:0.65rem 1.25rem; font-family:'Rajdhani',sans-serif; font-size:0.875rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; text-decoration:none; cursor:pointer; border:none; transition:all 0.2s; align-self:flex-start; clip-path:polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 0 100%); }
+  @keyframes btnPop { 0%{transform:scale(1)} 50%{transform:scale(0.96)} 100%{transform:scale(1)} }
+  .nav-item:active { animation:btnPop 0.15s ease; }
   .btn-discord { background:#5865F2; color:white; }
   .btn-discord:hover { background:#4752c4; transform:translateY(-1px); }
   .btn-outline { background:transparent; border:1px solid var(--border); color:var(--text); clip-path:none; }
@@ -116,6 +119,8 @@
 
   .empty-state { text-align:center; padding:3rem 1rem; font-family:'Share Tech Mono',monospace; font-size:0.75rem; color:var(--muted); letter-spacing:0.12em; line-height:2; }
 
+  .copy-ip { background:none; border:1px solid var(--border); color:var(--accent2); font-size:0.65rem; padding:0.15rem 0.4rem; cursor:pointer; font-family:'Share Tech Mono',monospace; margin-left:0.4rem; transition:all 0.2s; vertical-align:middle; }
+  .copy-ip:hover { background:rgba(124,92,191,0.15); border-color:var(--accent); }
   .toast { position:fixed; bottom:2rem; right:2rem; background:var(--bg3); border:1px solid var(--accent); color:var(--accent2); font-family:'Share Tech Mono',monospace; font-size:0.75rem; letter-spacing:0.1em; padding:0.6rem 1.25rem; z-index:999; opacity:0; transform:translateY(10px); transition:all 0.3s; pointer-events:none; }
   .toast.show { opacity:1; transform:translateY(0); }
 
@@ -402,7 +407,8 @@
 
   function fillMachine(m) {
     // Dashboard
-    document.getElementById('machineIp').textContent = m.ip || '—';
+    const ipEl = document.getElementById('machineIp');
+    ipEl.innerHTML = (m.ip || '—') + (m.ip ? '<button class="copy-ip" onclick="copyIp(\'' + m.ip + '\')">📋</button>' : '');
     document.getElementById('machineGpu').textContent = m.gpu || '—';
     document.getElementById('machineRam').textContent = m.ram || '—';
     document.getElementById('machineCpu').textContent = m.cpu || '—';
@@ -452,13 +458,20 @@
     document.getElementById('userPlan').textContent = m.plan || 'Active';
   }
 
+  function showToast(msg, duration) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), duration || 2000);
+  }
+
   function copyUuid() {
     const uuid = document.getElementById('userUuid').textContent;
-    navigator.clipboard.writeText(uuid).then(() => {
-      const t = document.getElementById('toast');
-      t.classList.add('show');
-      setTimeout(() => t.classList.remove('show'), 2000);
-    });
+    navigator.clipboard.writeText(uuid).then(() => showToast('✓ Đã copy User ID', 2000));
+  }
+
+  function copyIp(ip) {
+    navigator.clipboard.writeText(ip).then(() => showToast('✓ Đã copy IP: ' + ip, 2000));
   }
 
   async function init() {
@@ -473,6 +486,33 @@
 
     const { data: machine } = await sb.from('machines').select('*').eq('user_id', session.user.id).single();
     if (machine) fillMachine(machine);
+
+    // Realtime: tự cập nhật khi admin gán/sửa máy
+    sb.channel('machines-realtime')
+      .on('postgres_changes', {
+        event: '*', schema: 'public', table: 'machines',
+        filter: 'user_id=eq.' + session.user.id
+      }, payload => {
+        if (payload.eventType === 'INSERT' || payload.eventType === 'UPDATE') {
+          fillMachine(payload.new);
+          showToast('🖥️ Máy của bạn đã được cập nhật!', 4000);
+        } else if (payload.eventType === 'DELETE') {
+          showToast('⚠️ Máy của bạn đã bị thu hồi.', 5000);
+          location.reload();
+        }
+      })
+      .subscribe();
+
+    // Cảnh báo sắp hết hạn
+    if (machine?.expiry) {
+      const diff = new Date(machine.expiry) - new Date();
+      const hours = diff / 3600000;
+      if (hours > 0 && hours <= 2) {
+        setTimeout(() => showToast('⏰ Máy của bạn còn dưới 2 giờ! Hãy gia hạn sớm.', 6000), 3000);
+      } else if (hours > 0 && hours <= 24) {
+        setTimeout(() => showToast('⏰ Máy của bạn còn dưới 24 giờ.', 5000), 3000);
+      }
+    }
   }
 
   init();
