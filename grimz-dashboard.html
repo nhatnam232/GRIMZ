@@ -207,6 +207,20 @@
   body.light-theme .badge-offline { background:rgba(124,92,191,0.08); }
   body.light-theme .toast { background:#fff; box-shadow:0 4px 12px rgba(0,0,0,0.1); }
 
+
+  /* ===== PAGE TRANSITIONS ===== */
+  .page { animation:none; }
+  .page.active { display:flex; animation:pageIn 0.25s ease forwards; }
+  @keyframes pageIn {
+    from { opacity:0; transform:translateY(8px); }
+    to   { opacity:1; transform:translateY(0); }
+  }
+  .page.page-out { animation:pageOut 0.15s ease forwards; }
+  @keyframes pageOut {
+    from { opacity:1; }
+    to   { opacity:0; }
+  }
+
   /* ===== MOBILE ===== */
   .hamburger { display:none; background:none; border:none; color:var(--accent2); width:40px; height:40px; align-items:center; justify-content:center; font-size:1.3rem; cursor:pointer; flex-shrink:0; }
   .sidebar-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:49; }
@@ -472,7 +486,18 @@
     let p=0; const pi=setInterval(()=>{ p=Math.min(100,p+Math.random()*7+2); kFill.style.width=p+'%'; if(p>=40&&p<60)nextSub(); if(p>=100)clearInterval(pi); },100);
     setTimeout(()=>{ kMain.classList.remove('glitch'); kMain.classList.add('glitch-heavy'); nextSub(); },1500);
     setTimeout(()=>{ kMain.classList.remove('glitch-heavy'); kMain.style.textShadow='0 0 40px rgba(124,92,191,1)'; kFill.style.width='100%'; nextSub(); setTimeout(()=>kLogo.style.opacity='1',300); },2500);
-    setTimeout(()=>{ clearInterval(rain); loader.classList.add('fade-out'); setTimeout(()=>loader.style.display='none',600); },3500);
+    // Show GRIMZ logo prominently for 3s before fade
+    setTimeout(()=>{
+      kMain.style.opacity='0.2';
+      kMain.style.transition='opacity 0.5s';
+      kSub.style.opacity='0';
+      kBar.style.opacity='0';
+      kLogo.style.fontSize='2.2rem';
+      kLogo.style.letterSpacing='0.35em';
+      kLogo.style.textShadow='0 0 40px rgba(124,92,191,0.8), 0 0 80px rgba(124,92,191,0.3)';
+      kLogo.style.transition='all 0.6s ease';
+    }, 3000);
+    setTimeout(()=>{ clearInterval(rain); loader.classList.add('fade-out'); setTimeout(()=>loader.style.display='none',600); },6200);
   })();
 
 
@@ -506,11 +531,20 @@
   function goTo(id,btn){
     document.getElementById('sidebar').classList.remove('open');
     document.getElementById('sidebar-overlay').classList.remove('open');
-    document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-    document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
-    document.getElementById('page-'+id).classList.add('active');
-    if(btn) btn.classList.add('active');
-    document.getElementById('page-title').textContent=titles[id]||'';
+    const current = document.querySelector('.page.active');
+    if(current && current.id !== 'page-'+id){
+      current.classList.add('page-out');
+      setTimeout(()=>{
+        document.querySelectorAll('.page').forEach(p=>{ p.classList.remove('active'); p.classList.remove('page-out'); });
+        document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+        document.getElementById('page-'+id).classList.add('active');
+        if(btn) btn.classList.add('active');
+        document.getElementById('page-title').textContent=titles[id]||'';
+      }, 150);
+    } else {
+      document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+      if(btn) btn.classList.add('active');
+    }
   }
 
   function switchTab(id,btn){
