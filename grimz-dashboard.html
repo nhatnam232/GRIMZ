@@ -11,7 +11,7 @@
     --bg:#09080f; --bg2:#100e1a; --bg3:#161323; --bg4:#1c1830;
     --accent:#7c5cbf; --accent2:#9b7fe8; --accent3:#5a3fa0;
     --green:#4ade80; --red:#f87171; --yellow:#fbbf24;
-    --text:#e4e0f0; --muted:#5a5470; --border:rgba(124,92,191,0.15);
+    --text:#e4e0f0; --muted:#8a84a0; --border:rgba(124,92,191,0.15);
   }
   * { margin:0; padding:0; box-sizing:border-box; }
   body { background:var(--bg); color:var(--text); font-family:'Exo 2',sans-serif; min-height:100vh; display:flex; overflow-x:hidden; }
@@ -53,18 +53,18 @@
   .logo-text { font-family:'Rajdhani',sans-serif; font-size:1.15rem; font-weight:700; letter-spacing:0.15em; text-transform:uppercase; color:var(--accent2); text-shadow:0 0 16px rgba(124,92,191,0.4); }
   .logo-sub { font-family:'Share Tech Mono',monospace; font-size:0.6rem; color:var(--muted); letter-spacing:0.2em; text-transform:uppercase; margin-top:0.2rem; }
   .sidebar-user { padding:1.25rem 1.5rem; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:0.75rem; }
-  .user-avatar { width:42px; height:42px; background:linear-gradient(135deg,var(--accent),var(--accent2)); display:flex; align-items:center; justify-content:center; font-family:'Rajdhani',sans-serif; font-weight:700; font-size:1.1rem; color:var(--bg); flex-shrink:0; clip-path:polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,0 100%); border:1px solid rgba(124,92,191,0.3); }
+  .user-avatar { width:48px; height:48px; background:linear-gradient(135deg,var(--accent),var(--accent2)); display:flex; align-items:center; justify-content:center; font-family:'Rajdhani',sans-serif; font-weight:700; font-size:1.1rem; color:var(--bg); flex-shrink:0; clip-path:polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,0 100%); border:1px solid rgba(124,92,191,0.3); }
   .user-name { font-size:0.875rem; font-weight:600; color:var(--text); }
   .user-plan { font-family:'Share Tech Mono',monospace; font-size:0.65rem; color:var(--accent2); letter-spacing:0.1em; }
   .sidebar-nav { flex:1; padding:1rem 0; display:flex; flex-direction:column; gap:0.1rem; overflow-y:auto; }
   .nav-section { padding:0.75rem 1.5rem 0.3rem; font-family:'Share Tech Mono',monospace; font-size:0.6rem; color:var(--muted); letter-spacing:0.2em; text-transform:uppercase; }
-  .nav-item { display:flex; align-items:center; gap:0.75rem; padding:0.65rem 1.5rem; font-size:0.825rem; font-weight:500; color:var(--muted); cursor:pointer; transition:all 0.2s; text-decoration:none; border-left:2px solid transparent; background:none; border-right:none; border-top:none; border-bottom:none; width:100%; text-align:left; font-family:'Exo 2',sans-serif; }
-  .nav-item:hover { color:var(--text); background:rgba(255,255,255,0.03); }
+  .nav-item { display:flex; align-items:center; gap:1rem; padding:0.75rem 1.5rem; font-size:0.875rem; font-weight:500; color:var(--muted); cursor:pointer; transition:all 0.2s; text-decoration:none; border-left:2px solid transparent; background:none; border-right:none; border-top:none; border-bottom:none; width:100%; text-align:left; font-family:'Exo 2',sans-serif; }
+  .nav-item:hover { color:var(--text); background:rgba(124,92,191,0.06); box-shadow:inset 0 0 12px rgba(124,92,191,0.05); }
   .nav-item:hover .nav-icon { transform:rotate(12deg) scale(1.2); }
   .nav-item.active { color:var(--accent2); background:rgba(124,92,191,0.08); border-left-color:var(--accent2); }
   .nav-item.danger { color:var(--red); }
   .nav-item.danger:hover { background:rgba(248,113,113,0.07); }
-  .nav-icon { font-size:1rem; width:18px; text-align:center; display:inline-block; transition:transform 0.3s; }
+  .nav-icon { font-size:1.15rem; width:22px; text-align:center; display:inline-block; transition:transform 0.3s; }
   .sidebar-bottom { padding:1rem 1.5rem; border-top:1px solid var(--border); }
   .status-dot { display:flex; align-items:center; gap:0.5rem; font-family:'Share Tech Mono',monospace; font-size:0.65rem; color:var(--green); letter-spacing:0.1em; }
   .status-dot::before { content:''; width:6px; height:6px; border-radius:50%; background:var(--green); box-shadow:0 0 8px var(--green); animation:blink 1.5s infinite; }
@@ -95,11 +95,11 @@
 
   /* ===== SPEC LIST (2 col fixed) ===== */
   .spec-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:0; }
-  .spec-row { display:flex; justify-content:space-between; align-items:center; padding:0.55rem 0.75rem; border-bottom:1px solid rgba(124,92,191,0.08); gap:0.5rem; }
+  .spec-row { display:flex; justify-content:space-between; align-items:center; padding:0.6rem 0.75rem; border-bottom:1px solid rgba(124,92,191,0.08); gap:0.75rem; min-height:36px; }
   .spec-row:nth-child(odd) { background:rgba(124,92,191,0.02); }
   .spec-row:hover { background:rgba(124,92,191,0.06); }
   .spec-label { font-family:'Share Tech Mono',monospace; font-size:0.6rem; color:var(--muted); letter-spacing:0.12em; text-transform:uppercase; flex-shrink:0; }
-  .spec-val { font-family:'Rajdhani',sans-serif; font-size:0.95rem; font-weight:600; color:var(--text); text-align:right; word-break:break-all; }
+  .spec-val { font-family:'Rajdhani',sans-serif; font-size:0.95rem; font-weight:600; color:var(--text); text-align:right; word-break:break-word; overflow-wrap:anywhere; max-width:60%; }
   .spec-val.empty { color:var(--muted); font-style:italic; font-size:0.82rem; }
   @media(max-width:500px) { .spec-grid { grid-template-columns:1fr; } }
 
@@ -180,6 +180,33 @@
   ::-webkit-scrollbar-track { background:var(--bg); }
   ::-webkit-scrollbar-thumb { background:var(--bg4); }
 
+
+  /* ===== THEME SWITCHER ===== */
+  .theme-toggle { display:flex; align-items:center; gap:0.6rem; width:100%; padding:0.6rem 0; background:none; border:none; cursor:pointer; margin-top:0.75rem; }
+  .theme-track { width:36px; height:20px; background:var(--bg4); border:1px solid var(--border); border-radius:10px; position:relative; transition:background 0.3s; flex-shrink:0; }
+  .theme-thumb { width:14px; height:14px; background:var(--muted); border-radius:50%; position:absolute; top:2px; left:2px; transition:all 0.3s; }
+  body.light-theme .theme-track { background:rgba(124,92,191,0.3); border-color:var(--accent); }
+  body.light-theme .theme-thumb { background:var(--accent2); transform:translateX(16px); }
+  .theme-label { font-family:'Share Tech Mono',monospace; font-size:0.62rem; color:var(--muted); letter-spacing:0.15em; text-transform:uppercase; transition:color 0.3s; }
+  .theme-icon { font-size:0.85rem; }
+
+  /* ===== LIGHT THEME ===== */
+  body.light-theme {
+    --bg:#f0eef8; --bg2:#ffffff; --bg3:#e8e5f5; --bg4:#d8d4ec;
+    --text:#1a1530; --muted:#6b6585; --border:rgba(124,92,191,0.2);
+  }
+  body.light-theme body::before { opacity:0.5; }
+  body.light-theme .sidebar { background:#fff; box-shadow:2px 0 12px rgba(124,92,191,0.1); }
+  body.light-theme .topbar { background:rgba(240,238,248,0.95); }
+  body.light-theme .card { background:#fff; box-shadow:0 2px 8px rgba(124,92,191,0.06); }
+  body.light-theme .stat-card { background:#fff; box-shadow:0 2px 8px rgba(124,92,191,0.06); }
+  body.light-theme .support-card { background:#fff; }
+  body.light-theme .spec-row:nth-child(odd) { background:rgba(124,92,191,0.04); }
+  body.light-theme .cd-num { background:var(--bg3); color:var(--accent); }
+  body.light-theme ::-webkit-scrollbar-track { background:var(--bg3); }
+  body.light-theme .badge-offline { background:rgba(124,92,191,0.08); }
+  body.light-theme .toast { background:#fff; box-shadow:0 4px 12px rgba(0,0,0,0.1); }
+
   /* ===== MOBILE ===== */
   .hamburger { display:none; position:fixed; top:12px; left:12px; z-index:200; background:var(--bg2); border:1px solid var(--border); color:var(--accent2); width:40px; height:40px; align-items:center; justify-content:center; font-size:1.2rem; cursor:pointer; }
   .sidebar-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:49; }
@@ -192,6 +219,15 @@
     .stats-row{grid-template-columns:1fr;}
     .support-grid{grid-template-columns:1fr;}
     .spec-grid{grid-template-columns:1fr;}
+    .spec-row{flex-direction:column;align-items:flex-start;gap:0.15rem;padding:0.65rem 0.75rem;}
+    .spec-val{text-align:left;font-size:1rem;max-width:100%;}
+    .spec-label{font-size:0.7rem;}
+    .stat-val{font-size:1.5rem;}
+    .card-label{font-size:0.68rem;}
+    .badge{font-size:0.7rem;}
+    .cd-num{font-size:1.1rem;min-width:32px;}
+    .page{padding:1rem;}
+    .card{padding:1.25rem;}
   }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -233,7 +269,13 @@
     <a class="nav-item" href="index.html"><span class="nav-icon">↩</span> Trang chủ</a>
     <button class="nav-item danger" onclick="doLogout()"><span class="nav-icon">🚪</span> Đăng xuất</button>
   </nav>
-  <div class="sidebar-bottom"><div class="status-dot">SERVER ONLINE</div></div>
+  <div class="sidebar-bottom">
+    <div class="status-dot">SERVER ONLINE</div>
+    <button class="theme-toggle" onclick="toggleTheme()" title="Đổi theme">
+      <div class="theme-track"><div class="theme-thumb"></div></div>
+      <span class="theme-label"><span class="theme-icon">🌙</span> Theme</span>
+    </button>
+  </div>
 </aside>
 
 <div class="main">
@@ -399,7 +441,7 @@
   </div>
 </div>
 
-<div class="toast" id="toast">✓ Đã copy</div>
+<div class="toast" id="toast" onclick="this.classList.remove('show')">✓ Đã copy <span style="margin-left:0.5rem;opacity:0.6;cursor:pointer;">✕</span></div>
 
 <script>
   // ===== KANJI LOADER =====
@@ -432,6 +474,14 @@
     setTimeout(()=>{ kMain.classList.remove('glitch-heavy'); kMain.style.textShadow='0 0 40px rgba(124,92,191,1)'; kFill.style.width='100%'; nextSub(); setTimeout(()=>kLogo.style.opacity='1',300); },2500);
     setTimeout(()=>{ clearInterval(rain); loader.classList.add('fade-out'); setTimeout(()=>loader.style.display='none',600); },3500);
   })();
+
+
+  // ===== THEME =====
+  function toggleTheme(){
+    document.body.classList.toggle('light-theme');
+    localStorage.setItem('grimz_theme', document.body.classList.contains('light-theme') ? 'light' : 'dark');
+  }
+  if(localStorage.getItem('grimz_theme') === 'light') document.body.classList.add('light-theme');
 
   // ===== MAIN =====
   function toggleSidebar(){
