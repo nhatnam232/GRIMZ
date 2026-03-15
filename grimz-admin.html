@@ -63,6 +63,7 @@
   .copy-btn:hover { border-color:var(--accent); }
   .ip-err { font-family:'Share Tech Mono',monospace; font-size:0.62rem; color:var(--red); display:none; margin-top:0.2rem; }
 </style>
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 </head>
 <body>
 
@@ -73,6 +74,7 @@
     <div style="font-family:'Rajdhani',sans-serif;font-size:1.1rem;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--accent2);text-align:center;margin-bottom:0.3rem;">Grimz Admin</div>
     <div style="font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:var(--muted);text-align:center;letter-spacing:0.15em;margin-bottom:1.5rem;">// Nhập mật khẩu để tiếp tục</div>
     <input type="password" id="admin-pw" placeholder="Mật khẩu..." onkeydown="if(event.key==='Enter')checkPw()" style="width:100%;background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:0.7rem 0.75rem;font-family:'Exo 2',sans-serif;font-size:0.875rem;outline:none;margin-bottom:0.75rem;">
+    <div class="cf-turnstile" data-sitekey="0x4AAAAAACrS3npj6qFvSu2W" data-theme="dark" style="margin-bottom:0.75rem;"></div>
     <button onclick="checkPw()" style="width:100%;background:var(--accent);color:#fff;padding:0.7rem;font-family:'Rajdhani',sans-serif;font-size:0.9rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;border:none;cursor:pointer;">Đăng nhập</button>
     <div id="pw-err" style="display:none;margin-top:0.75rem;font-family:'Share Tech Mono',monospace;font-size:0.68rem;color:#f87171;text-align:center;letter-spacing:0.08em;">Sai mật khẩu</div>
   </div>
@@ -220,6 +222,8 @@
   const ADMIN_HASH = 'e8231ca8edc2ae39f8d32ee9366a1f6f5c0338fa10a7aa810727943932b9de95';
 
   async function checkPw() {
+    const token = document.querySelector('[name="cf-turnstile-response"]')?.value;
+    if (!token) { document.getElementById('pw-err').style.display='block'; document.getElementById('pw-err').textContent='Vui lòng xác minh bạn không phải bot.'; return; }
     const pw = document.getElementById('admin-pw').value;
     const hash = await hashPw(pw);
     if (hash === ADMIN_HASH) {
