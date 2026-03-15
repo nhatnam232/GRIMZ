@@ -222,6 +222,11 @@
       <div style="font-size:0.72rem;color:var(--muted);margin-top:0.5rem;font-weight:300;">Gửi ID này cho staff khi tạo ticket để được gán máy.</div>
     </div>
 
+    <div class="card" id="firstLoginNotice" style="padding:1.25rem 1.5rem;background:rgba(124,92,191,0.07);border:1px solid rgba(124,92,191,0.3);margin-bottom:0;">
+      <div style="font-family:'Share Tech Mono',monospace;font-size:0.7rem;color:var(--accent2);letter-spacing:0.15em;margin-bottom:0.4rem;">// HƯỚNG DẪN</div>
+      <div style="font-size:0.9rem;color:var(--text);font-weight:500;margin-bottom:0.3rem;">Liên hệ Admin để được gán máy!</div>
+      <div style="font-size:0.8rem;color:var(--muted);font-weight:300;">Copy <strong style="color:var(--accent2);">User ID</strong> bên dưới → gửi cho staff qua Discord ticket → staff sẽ gán máy cho bạn.</div>
+    </div>
     <div class="card" id="noBuyCard" style="text-align:center;padding:2rem;">
       <div class="empty-state">Chưa có máy nào được gán cho tài khoản này.<br>Mua dịch vụ qua Discord để bắt đầu.</div>
       <a href="https://discord.gg/Ct4Gw7GwJJ" target="_blank" class="btn btn-discord" style="margin:0 auto;">
@@ -377,6 +382,7 @@
   }
 
   let countdownInterval = null;
+  let statInterval = null;
   function startCountdown(expiry) {
     if (countdownInterval) clearInterval(countdownInterval);
     function update() {
@@ -409,6 +415,7 @@
     document.getElementById('statPlan').classList.remove('empty');
     document.getElementById('statPlan').style.color = 'var(--green)';
     document.getElementById('noBuyCard').style.display = 'none';
+    document.getElementById('firstLoginNotice').style.display = 'none';
 
     // Machine page
     document.getElementById('m2Ip').textContent = m.ip || '—';
@@ -437,11 +444,12 @@
         document.getElementById('statTime').textContent = txt;
       }
       updateStatTime();
-      setInterval(updateStatTime, 1000);
+      if (statInterval) clearInterval(statInterval);
+      statInterval = setInterval(updateStatTime, 1000);
     }
 
     // Sidebar
-    document.getElementById('userPlan').textContent = m.gpu?.split(' ')[1] || 'Active';
+    document.getElementById('userPlan').textContent = m.plan || 'Active';
   }
 
   function copyUuid() {

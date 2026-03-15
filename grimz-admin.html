@@ -120,7 +120,7 @@
         <label>Storage</label>
         <select id="f-storage">
           <option value="2 x 1TB HDD">2 x 1TB HDD (RTX 3060/4060)</option>
-          <option value="512GB SSD NVMe + 2TB HDD">512GB SSD NVMe + 2TB HDD (RTX 4070)</option>
+          <option value="2TB SSD NVMe + 2TB HDD">2TB SSD NVMe + 2TB HDD (RTX 4070)</option>
         </select>
       </div>
       <div class="form-group">
@@ -183,7 +183,8 @@
   <div id="extend-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:200;align-items:center;justify-content:center;">
     <div style="background:var(--bg2);border:1px solid var(--border);padding:2rem;max-width:360px;width:90%;position:relative;">
       <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--accent3),var(--accent2));"></div>
-      <div style="font-family:'Rajdhani',sans-serif;font-size:1rem;font-weight:700;text-transform:uppercase;margin-bottom:1rem;">Gia hạn máy</div>
+      <div style="font-family:'Rajdhani',sans-serif;font-size:1rem;font-weight:700;text-transform:uppercase;margin-bottom:0.5rem;">Gia hạn máy</div>
+      <div id="current-expiry-display" style="font-family:'Share Tech Mono',monospace;font-size:0.68rem;color:var(--accent2);margin-bottom:1rem;letter-spacing:0.08em;">—</div>
       <input type="hidden" id="extend-id">
       <label style="font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:var(--muted);letter-spacing:0.15em;text-transform:uppercase;">Thêm số giờ</label>
       <input type="number" id="extend-hours" placeholder="Số giờ cần thêm..." min="1" style="width:100%;background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:0.65rem 0.75rem;font-family:'Exo 2',sans-serif;font-size:0.875rem;outline:none;margin-top:0.4rem;margin-bottom:0.5rem;">
@@ -254,6 +255,28 @@
   }
 
   document.getElementById('f-hours').addEventListener('input', updateExpiryPreview);
+
+  // Auto-select storage based on GPU
+  document.getElementById('f-gpu').addEventListener('change', function() {
+    const storage = document.getElementById('f-storage');
+    if (this.value.includes('4070')) {
+      storage.value = '2TB SSD NVMe + 2TB HDD';
+    } else {
+      storage.value = '2 x 1TB HDD';
+    }
+    // Also auto-select CPU
+    const cpu = document.getElementById('f-cpu');
+    if (this.value.includes('4070')) {
+      cpu.value = 'Intel Core i7';
+    } else {
+      cpu.value = 'Intel Core i5-10400F';
+    }
+    // Auto-select plan
+    const plan = document.getElementById('f-plan');
+    if (this.value.includes('4070')) plan.value = 'RTX 4070';
+    else if (this.value.includes('4060')) plan.value = 'RTX 4060';
+    else plan.value = 'RTX 3060';
+  });
 
   // Validate IP
   function validateIp(ip) {
@@ -344,6 +367,10 @@
   function openExtend(id, currentExpiry) {
     document.getElementById('extend-id').value = id;
     document.getElementById('extend-hours').value = '';
+    const expStr = currentExpiry && currentExpiry !== 'null'
+      ? new Date(currentExpiry).toLocaleString('vi-VN',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'})
+      : '—';
+    document.getElementById('current-expiry-display').textContent = 'Hết hạn hiện tại: ' + expStr;
     document.getElementById('extend-modal').style.display = 'flex';
   }
 
