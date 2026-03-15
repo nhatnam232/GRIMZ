@@ -16,11 +16,7 @@
   }
   * { margin:0; padding:0; box-sizing:border-box; }
   body { background:var(--bg); color:var(--text); font-family:'Exo 2',sans-serif; min-height:100vh; padding:2rem; }
-  body::before {
-    content:''; position:fixed; inset:0;
-    background-image: linear-gradient(rgba(124,92,191,0.03) 1px,transparent 1px), linear-gradient(90deg,rgba(124,92,191,0.03) 1px,transparent 1px);
-    background-size:40px 40px; pointer-events:none; z-index:0;
-  }
+  body::before { content:''; position:fixed; inset:0; background-image:linear-gradient(rgba(124,92,191,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(124,92,191,0.03) 1px,transparent 1px); background-size:40px 40px; pointer-events:none; z-index:0; }
   .wrap { position:relative; z-index:1; max-width:900px; margin:0 auto; }
   .topbar { display:flex; align-items:center; justify-content:space-between; margin-bottom:2rem; }
   .logo { font-family:'Rajdhani',sans-serif; font-size:1.2rem; font-weight:700; letter-spacing:0.15em; text-transform:uppercase; color:var(--accent2); }
@@ -32,41 +28,28 @@
   .form-group { display:flex; flex-direction:column; gap:0.4rem; }
   .form-group.full { grid-column:1/-1; }
   label { font-family:'Share Tech Mono',monospace; font-size:0.62rem; color:var(--muted); letter-spacing:0.15em; text-transform:uppercase; }
-  input, select {
-    background:var(--bg3); border:1px solid var(--border); color:var(--text);
-    padding:0.65rem 0.75rem; font-family:'Exo 2',sans-serif; font-size:0.875rem;
-    outline:none; transition:border-color 0.2s; width:100%;
-  }
+  input, select { background:var(--bg3); border:1px solid var(--border); color:var(--text); padding:0.65rem 0.75rem; font-family:'Exo 2',sans-serif; font-size:0.875rem; outline:none; transition:border-color 0.2s; width:100%; }
   input:focus, select:focus { border-color:var(--accent); }
   input::placeholder { color:var(--muted); }
   select option { background:var(--bg3); }
-  .btn {
-    display:inline-flex; align-items:center; gap:0.5rem;
-    padding:0.7rem 1.5rem; font-family:'Rajdhani',sans-serif;
-    font-size:0.9rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase;
-    cursor:pointer; border:none; transition:all 0.2s;
-    clip-path:polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,0 100%);
-  }
+  .hours-row { display:flex; gap:0.5rem; align-items:center; }
+  .hours-row input { flex:1; }
+  .hours-hint { font-family:'Share Tech Mono',monospace; font-size:0.65rem; color:var(--accent2); margin-top:0.3rem; }
+  .quick-hours { display:flex; gap:0.5rem; flex-wrap:wrap; margin-top:0.5rem; }
+  .qh { padding:0.3rem 0.75rem; background:var(--bg3); border:1px solid var(--border); color:var(--muted); font-family:'Share Tech Mono',monospace; font-size:0.68rem; cursor:pointer; transition:all 0.2s; }
+  .qh:hover { border-color:var(--accent); color:var(--accent2); }
+  .btn { display:inline-flex; align-items:center; gap:0.5rem; padding:0.7rem 1.5rem; font-family:'Rajdhani',sans-serif; font-size:0.9rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; cursor:pointer; border:none; transition:all 0.2s; clip-path:polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,0 100%); }
   .btn-primary { background:var(--accent); color:#fff; }
   .btn-primary:hover { background:var(--accent2); transform:translateY(-1px); }
   .btn-danger { background:rgba(248,113,113,0.15); color:var(--red); border:1px solid rgba(248,113,113,0.3); clip-path:none; padding:0.4rem 0.75rem; font-size:0.75rem; }
   .btn-danger:hover { background:rgba(248,113,113,0.25); }
   .divider { height:1px; background:var(--border); margin:1.25rem 0; }
-  /* USERS TABLE */
   .table-wrap { overflow-x:auto; }
   table { width:100%; border-collapse:collapse; }
-  th {
-    font-family:'Share Tech Mono',monospace; font-size:0.6rem; color:var(--muted);
-    letter-spacing:0.12em; text-transform:uppercase; text-align:left;
-    padding:0.6rem 0.75rem; border-bottom:1px solid var(--border);
-  }
+  th { font-family:'Share Tech Mono',monospace; font-size:0.6rem; color:var(--muted); letter-spacing:0.12em; text-transform:uppercase; text-align:left; padding:0.6rem 0.75rem; border-bottom:1px solid var(--border); }
   td { padding:0.75rem; font-size:0.825rem; border-bottom:1px solid rgba(124,92,191,0.07); vertical-align:middle; }
   tr:hover td { background:rgba(124,92,191,0.04); }
-  .badge {
-    display:inline-flex; align-items:center; gap:0.3rem;
-    padding:0.2rem 0.6rem; font-family:'Share Tech Mono',monospace;
-    font-size:0.6rem; letter-spacing:0.1em; text-transform:uppercase;
-  }
+  .badge { display:inline-flex; align-items:center; gap:0.3rem; padding:0.2rem 0.6rem; font-family:'Share Tech Mono',monospace; font-size:0.6rem; letter-spacing:0.1em; text-transform:uppercase; }
   .badge-active { background:rgba(74,222,128,0.1); border:1px solid rgba(74,222,128,0.2); color:var(--green); }
   .badge-none { background:var(--bg3); border:1px solid var(--border); color:var(--muted); }
   .mono { font-family:'Share Tech Mono',monospace; font-size:0.78rem; color:var(--accent2); }
@@ -74,16 +57,18 @@
   .msg-ok { background:rgba(74,222,128,0.08); border:1px solid rgba(74,222,128,0.2); color:var(--green); }
   .msg-err { background:rgba(248,113,113,0.08); border:1px solid rgba(248,113,113,0.2); color:var(--red); }
   .empty { text-align:center; padding:2rem; font-family:'Share Tech Mono',monospace; font-size:0.72rem; color:var(--muted); letter-spacing:0.1em; }
+  .copy-btn { background:var(--bg3); border:1px solid var(--border); color:var(--accent2); font-family:'Share Tech Mono',monospace; font-size:0.65rem; padding:0.2rem 0.5rem; cursor:pointer; transition:all 0.2s; }
+  .copy-btn:hover { border-color:var(--accent); }
 </style>
 </head>
 <body>
+
 <div id="lock-screen" style="position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:9999;">
   <div style="background:var(--bg2);border:1px solid var(--border);padding:2.5rem 2rem;width:100%;max-width:340px;position:relative;clip-path:polygon(0 0,calc(100% - 16px) 0,100% 16px,100% 100%,0 100%);">
     <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--accent3),var(--accent2));"></div>
     <div style="font-family:'Rajdhani',sans-serif;font-size:1.1rem;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--accent2);text-align:center;margin-bottom:0.3rem;">Grimz Admin</div>
     <div style="font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:var(--muted);text-align:center;letter-spacing:0.15em;margin-bottom:1.5rem;">// Nhập mật khẩu để tiếp tục</div>
-    <input type="password" id="admin-pw" placeholder="Mật khẩu..." onkeydown="if(event.key==='Enter')checkPw()"
-      style="width:100%;background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:0.7rem 0.75rem;font-family:'Exo 2',sans-serif;font-size:0.875rem;outline:none;margin-bottom:0.75rem;">
+    <input type="password" id="admin-pw" placeholder="Mật khẩu..." onkeydown="if(event.key==='Enter')checkPw()" style="width:100%;background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:0.7rem 0.75rem;font-family:'Exo 2',sans-serif;font-size:0.875rem;outline:none;margin-bottom:0.75rem;">
     <button onclick="checkPw()" style="width:100%;background:var(--accent);color:#fff;padding:0.7rem;font-family:'Rajdhani',sans-serif;font-size:0.9rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;border:none;cursor:pointer;">Đăng nhập</button>
     <div id="pw-err" style="display:none;margin-top:0.75rem;font-family:'Share Tech Mono',monospace;font-size:0.68rem;color:#f87171;text-align:center;letter-spacing:0.08em;">Sai mật khẩu</div>
   </div>
@@ -100,8 +85,8 @@
     <div class="card-title">Gán máy cho user</div>
     <div class="form-grid">
       <div class="form-group full">
-        <label>User ID (lấy từ bảng Users bên dưới)</label>
-        <input type="text" id="f-userid" placeholder="uuid của user...">
+        <label>User ID</label>
+        <input type="text" id="f-userid" placeholder="Paste UUID từ bảng bên dưới...">
       </div>
       <div class="form-group">
         <label>Địa chỉ IP</label>
@@ -138,8 +123,21 @@
         </select>
       </div>
       <div class="form-group">
-        <label>Ngày hết hạn</label>
-        <input type="datetime-local" id="f-expiry">
+        <label>Thời hạn thuê</label>
+        <div class="hours-row">
+          <input type="number" id="f-hours" placeholder="Số giờ..." min="1">
+        </div>
+        <div class="quick-hours">
+          <span class="qh" onclick="setHours(1)">1h</span>
+          <span class="qh" onclick="setHours(3)">3h</span>
+          <span class="qh" onclick="setHours(5)">5h</span>
+          <span class="qh" onclick="setHours(10)">10h</span>
+          <span class="qh" onclick="setHours(24)">1 ngày</span>
+          <span class="qh" onclick="setHours(72)">3 ngày</span>
+          <span class="qh" onclick="setHours(168)">1 tuần</span>
+          <span class="qh" onclick="setHours(720)">1 tháng</span>
+        </div>
+        <div class="hours-hint" id="expiry-preview">—</div>
       </div>
       <div class="form-group full">
         <label>Gói</label>
@@ -155,27 +153,6 @@
     </div>
     <div class="msg msg-ok" id="msg-ok">✓ Gán máy thành công!</div>
     <div class="msg msg-err" id="msg-err"></div>
-  </div>
-
-  <!-- DANH SÁCH USERS -->
-  <div class="card">
-    <div class="card-title">Danh sách users đã đăng ký</div>
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>Email</th>
-            <th>User ID</th>
-            <th>Đăng ký lúc</th>
-            <th>Máy</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody id="users-table">
-          <tr><td colspan="5" class="empty">Đang tải...</td></tr>
-        </tbody>
-      </table>
-    </div>
   </div>
 
   <!-- DANH SÁCH MACHINES -->
@@ -199,109 +176,177 @@
       </table>
     </div>
   </div>
+
+  <!-- DANH SÁCH USERS -->
+  <div class="card">
+    <div class="card-title">Users đã đăng ký (chưa có máy)</div>
+    <p style="font-size:0.8rem;color:var(--muted);margin-bottom:1rem;font-weight:300;">Click <strong style="color:var(--accent2);">Copy ID</strong> để tự điền vào form gán máy bên trên.</p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>User ID</th>
+            <th>Trạng thái</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="users-table">
+          <tr><td colspan="3" class="empty">Đang tải...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
 </div>
 
 <script>
-  const SUPABASE_URL = 'https://vlwevojqfomophsdwsqd.supabase.co';
-  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZsd2V2b2pxZm9tb3Boc2R3c3FkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM1NzE2NDgsImV4cCI6MjA4OTE0NzY0OH0.6NECwQqKKeZH2fIgqp8SkmA6kPAqtsc5dlhEdGVFgBE';
-  const { createClient } = supabase;
-  const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  const sb = window.supabase.createClient(
+    'https://vlwevojqfomophsdwsqd.supabase.co',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZsd2V2b2pxZm9tb3Boc2R3c3FkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM1NzE2NDgsImV4cCI6MjA4OTE0NzY0OH0.6NECwQqKKeZH2fIgqp8SkmA6kPAqtsc5dlhEdGVFgBE'
+  );
 
-  async function loadUsers() {
-    const { data, error } = await sb.auth.admin?.listUsers?.() || { data: null };
-    // admin API không dùng được từ client, dùng bảng machines thay thế
-    const { data: machines } = await sb.from('machines').select('*');
-    
-    const tbody = document.getElementById('machines-table');
-    if (!machines || machines.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="6" class="empty">Chưa có máy nào</td></tr>';
-      return;
-    }
-    tbody.innerHTML = machines.map(m => `
-      <tr>
-        <td class="mono" style="font-size:0.65rem">${m.user_id?.slice(0,16)}...</td>
-        <td class="mono">${m.ip || '—'}</td>
-        <td>${m.gpu || '—'}</td>
-        <td>${m.plan || '—'}</td>
-        <td style="font-size:0.78rem">${m.expiry ? new Date(m.expiry).toLocaleDateString('vi-VN') : '—'}</td>
-        <td><button class="btn btn-danger" onclick="deleteMachine('${m.id}')">Xóa</button></td>
-      </tr>
-    `).join('');
-
-    // users table - điền user_id để admin copy
-    const utbody = document.getElementById('users-table');
-    utbody.innerHTML = machines.map(m => `
-      <tr>
-        <td>—</td>
-        <td class="mono" style="font-size:0.65rem;cursor:pointer;" onclick="copyUID('${m.user_id}')" title="Click để copy">${m.user_id?.slice(0,20)}... 📋</td>
-        <td>—</td>
-        <td><span class="badge badge-active">Có máy</span></td>
-        <td></td>
-      </tr>
-    `).join('');
+  function setHours(h) {
+    document.getElementById('f-hours').value = h;
+    updateExpiryPreview();
   }
 
-  function copyUID(uid) {
-    navigator.clipboard.writeText(uid);
-    alert('Đã copy: ' + uid);
+  function updateExpiryPreview() {
+    const h = parseFloat(document.getElementById('f-hours').value);
+    if (!h || h <= 0) { document.getElementById('expiry-preview').textContent = '—'; return; }
+    const expiry = new Date(Date.now() + h * 3600000);
+    document.getElementById('expiry-preview').textContent =
+      '→ Hết hạn: ' + expiry.toLocaleString('vi-VN', {day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('f-hours').addEventListener('input', updateExpiryPreview);
+  });
+
+  async function loadData() {
+    const { data: machines } = await sb.from('machines').select('*');
+
+    // Machines table
+    const mtbody = document.getElementById('machines-table');
+    if (!machines || machines.length === 0) {
+      mtbody.innerHTML = '<tr><td colspan="6" class="empty">Chưa có máy nào</td></tr>';
+    } else {
+      const machineUserIds = new Set(machines.map(m => m.user_id));
+      mtbody.innerHTML = machines.map(m => `
+        <tr>
+          <td><button class="copy-btn" onclick="fillUserId('${m.user_id}')">${m.user_id?.slice(0,12)}... 📋</button></td>
+          <td class="mono">${m.ip || '—'}</td>
+          <td>${m.gpu?.replace('NVIDIA ','') || '—'}</td>
+          <td>${m.plan || '—'}</td>
+          <td style="font-size:0.78rem">${m.expiry ? new Date(m.expiry).toLocaleString('vi-VN',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}) : '—'}</td>
+          <td><button class="btn btn-danger" onclick="deleteMachine('${m.id}')">Xóa</button></td>
+        </tr>
+      `).join('');
+
+      // Users without machine
+      const utbody = document.getElementById('users-table');
+      utbody.innerHTML = machines.map(m => `
+        <tr>
+          <td class="mono" style="font-size:0.7rem">${m.user_id}</td>
+          <td><span class="badge badge-active">Có máy</span></td>
+          <td><button class="copy-btn" onclick="fillUserId('${m.user_id}')">Copy ID</button></td>
+        </tr>
+      `).join('');
+    }
+
+    // Show users from auth - we show a note
+    const utbody = document.getElementById('users-table');
+    if (!machines || machines.length === 0) {
+      utbody.innerHTML = '<tr><td colspan="3" class="empty">Chưa có user nào đăng ký, hoặc paste UUID từ Discord notification vào form trên.</td></tr>';
+    }
+  }
+
+  function fillUserId(uid) {
+    document.getElementById('f-userid').value = uid;
+    window.scrollTo({top:0, behavior:'smooth'});
   }
 
   async function assignMachine() {
     const userId = document.getElementById('f-userid').value.trim();
     const ip = document.getElementById('f-ip').value.trim();
-    const expiry = document.getElementById('f-expiry').value;
+    const hours = parseFloat(document.getElementById('f-hours').value);
 
-    if (!userId || !ip || !expiry) {
-      showMsg('err', 'Vui lòng điền đủ User ID, IP và ngày hết hạn');
-      return;
+    if (!userId) { showMsg('err', 'Chưa điền User ID'); return; }
+    if (!ip) { showMsg('err', 'Chưa điền địa chỉ IP'); return; }
+    if (!hours || hours <= 0) { showMsg('err', 'Chưa điền số giờ'); return; }
+
+    const expiry = new Date(Date.now() + hours * 3600000).toISOString();
+
+    // Check if user already has machine -> update instead
+    const { data: existing } = await sb.from('machines').select('id').eq('user_id', userId).single();
+
+    let error;
+    if (existing) {
+      ({ error } = await sb.from('machines').update({
+        ip,
+        gpu: document.getElementById('f-gpu').value,
+        cpu: document.getElementById('f-cpu').value,
+        ram: document.getElementById('f-ram').value,
+        storage: document.getElementById('f-storage').value,
+        os: document.getElementById('f-os').value,
+        expiry,
+        plan: document.getElementById('f-plan').value,
+      }).eq('user_id', userId));
+    } else {
+      ({ error } = await sb.from('machines').insert({
+        user_id: userId,
+        ip,
+        gpu: document.getElementById('f-gpu').value,
+        cpu: document.getElementById('f-cpu').value,
+        ram: document.getElementById('f-ram').value,
+        storage: document.getElementById('f-storage').value,
+        os: document.getElementById('f-os').value,
+        expiry,
+        plan: document.getElementById('f-plan').value,
+      }));
     }
-
-    const { error } = await sb.from('machines').insert({
-      user_id: userId,
-      ip,
-      gpu: document.getElementById('f-gpu').value,
-      cpu: document.getElementById('f-cpu').value,
-      ram: document.getElementById('f-ram').value,
-      storage: document.getElementById('f-storage').value,
-      os: document.getElementById('f-os').value,
-      expiry: new Date(expiry).toISOString(),
-      plan: document.getElementById('f-plan').value,
-    });
 
     if (error) { showMsg('err', error.message); return; }
     showMsg('ok');
-    loadUsers();
+    document.getElementById('f-userid').value = '';
+    document.getElementById('f-ip').value = '';
+    document.getElementById('f-hours').value = '';
+    document.getElementById('expiry-preview').textContent = '—';
+    loadData();
   }
 
   async function deleteMachine(id) {
     if (!confirm('Xóa máy này?')) return;
     await sb.from('machines').delete().eq('id', id);
-    loadUsers();
+    loadData();
   }
 
   function showMsg(type, text) {
     document.getElementById('msg-ok').style.display = 'none';
     document.getElementById('msg-err').style.display = 'none';
-    if (type === 'ok') { document.getElementById('msg-ok').style.display = 'block'; }
-    else { const el = document.getElementById('msg-err'); el.textContent = '✗ ' + text; el.style.display = 'block'; }
+    if (type === 'ok') {
+      document.getElementById('msg-ok').style.display = 'block';
+      setTimeout(() => document.getElementById('msg-ok').style.display = 'none', 3000);
+    } else {
+      const el = document.getElementById('msg-err');
+      el.textContent = '✗ ' + text;
+      el.style.display = 'block';
+    }
   }
-
-  loadUsers();
 
   function checkPw() {
     const pw = document.getElementById('admin-pw').value;
     if (pw === 'grimz928328@@123400--!') {
       document.getElementById('lock-screen').style.display = 'none';
       sessionStorage.setItem('grimz-admin', '1');
+      loadData();
     } else {
       document.getElementById('pw-err').style.display = 'block';
       document.getElementById('admin-pw').value = '';
     }
   }
 
-  // Nếu đã unlock trong session này thì bỏ qua
   if (sessionStorage.getItem('grimz-admin') === '1') {
     document.getElementById('lock-screen').style.display = 'none';
+    loadData();
   }
 </script>
 </body>
