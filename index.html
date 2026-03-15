@@ -35,6 +35,36 @@
   .logo { font-family:'Rajdhani',sans-serif; font-size:1.6rem; font-weight:700; letter-spacing:0.2em; text-transform:uppercase; color:#7c5cbf; text-shadow:0 0 24px rgba(124,92,191,0.5); margin-bottom:2.5rem; }
   .logo span { color:#9b7fe8; }
 
+  /* Language switcher */
+  .lang-switcher {
+    position: fixed;
+    top: 70px;
+    right: 20px;
+    z-index: 1000;
+    display: flex;
+    gap: 5px;
+  }
+  .lang-btn {
+    background: rgba(9,8,15,0.9);
+    border: 1px solid rgba(124,92,191,0.3);
+    color: #5a5470;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.65rem;
+    padding: 0.25rem 0.6rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    clip-path: polygon(4px 0,100% 0,100% calc(100% - 4px),calc(100% - 4px) 100%,0 100%,0 4px);
+  }
+  .lang-btn.active {
+    background: #7c5cbf;
+    color: #fff;
+    border-color: #9b7fe8;
+  }
+  .lang-btn:hover {
+    border-color: #9b7fe8;
+    color: #9b7fe8;
+  }
+
   .status-tag {
     display:inline-flex; align-items:center; gap:0.5rem;
     font-family:'Share Tech Mono',monospace; font-size:0.72rem;
@@ -91,24 +121,31 @@
 <div class="glow1"></div>
 <div class="glow2"></div>
 
+<!-- Language Switcher -->
+<div class="lang-switcher">
+  <button class="lang-btn active" data-lang="vi">VI</button>
+  <button class="lang-btn" data-lang="en">EN</button>
+  <button class="lang-btn" data-lang="id">ID</button>
+</div>
+
 <div class="wrap">
   <div class="logo">GRIMZ <span>CLOUD</span> PC</div>
 
-  <div class="status-tag">Đang triển khai</div>
+  <div class="status-tag" data-i18n="status">Đang triển khai</div>
 
   <h1>
-    <span class="line1">Sắp ra mắt</span>
-    <span class="line2">23.03.2026</span>
+    <span class="line1" data-i18n="hero.line1">Sắp ra mắt</span>
+    <span class="line2" data-i18n="hero.line2">23.03.2026</span>
   </h1>
 
-  <p class="desc">
+  <p class="desc" data-i18n="hero.desc">
     Grimz Cloud PC đang trong quá trình triển khai.<br>
     <strong>Cloud gaming tốc độ cao · Server Singapore · RTX 3060+</strong><br>
     Vào Discord để nhận thông báo khi ra mắt.
   </p>
 
   <div class="countdown-wrap">
-    <div class="countdown-label">// Ra mắt sau</div>
+    <div class="countdown-label" data-i18n="countdownLabel">// Ra mắt sau</div>
     <div class="countdown">
       <div class="cd-unit"><span class="cd-num" id="cd-d">00</span><span class="cd-label">Ngày</span></div>
       <span class="cd-sep">:</span>
@@ -122,7 +159,7 @@
 
   <div class="progress-wrap">
     <div class="progress-labels">
-      <span>Tiến độ triển khai</span>
+      <span data-i18n="progressLabel">Tiến độ triển khai</span>
       <span id="progress-pct">0%</span>
     </div>
     <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
@@ -130,10 +167,10 @@
 
   <a href="https://discord.gg/Ct4Gw7GwJJ" target="_blank" rel="noopener" class="discord-btn">
     <svg width="20" height="16" viewBox="0 0 71 55" fill="currentColor"><path d="M60.1 4.9A58.5 58.5 0 0 0 45.4.9a40 40 0 0 0-1.8 3.6 54 54 0 0 0-16.2 0A38.4 38.4 0 0 0 25.6.9 58.4 58.4 0 0 0 10.9 5C1.6 18.7-1 32 .3 45a58.7 58.7 0 0 0 17.9 9 44 44 0 0 0 3.8-6.2 38.3 38.3 0 0 1-6-2.9l1.4-1.1a41.9 41.9 0 0 0 35.7 0l1.5 1.1a38.2 38.2 0 0 1-6 2.9 43.6 43.6 0 0 0 3.8 6.2 58.5 58.5 0 0 0 17.9-9C71.8 30 68.2 16.8 60.1 4.9ZM23.7 37.3c-3.5 0-6.4-3.2-6.4-7.1s2.8-7.2 6.4-7.2 6.5 3.2 6.4 7.2c0 3.9-2.8 7.1-6.4 7.1Zm23.6 0c-3.5 0-6.4-3.2-6.4-7.1s2.8-7.2 6.4-7.2 6.5 3.2 6.4 7.2c0 3.9-2.8 7.1-6.4 7.1Z"/></svg>
-    Tham gia Discord
+    <span data-i18n="discordButton">Tham gia Discord</span>
   </a>
 
-  <div class="footer-note">© <span id="yr"></span> GRIMZ CLOUD PC · VIETNAM</div>
+  <div class="footer-note" data-i18n="footerNote">© GRIMZ CLOUD PC · VIETNAM</div>
 </div>
 
 <script>
@@ -178,6 +215,73 @@
 
   tick();
   setInterval(tick, 1000);
+
+  // ===== I18N =====
+  const translations = {
+    vi: {
+      'status': 'Đang triển khai',
+      'hero.line1': 'Sắp ra mắt',
+      'hero.line2': '23.03.2026',
+      'hero.desc': 'Grimz Cloud PC đang trong quá trình triển khai.<br><strong>Cloud gaming tốc độ cao · Server Singapore · RTX 3060+</strong><br>Vào Discord để nhận thông báo khi ra mắt.',
+      'countdownLabel': '// Ra mắt sau',
+      'progressLabel': 'Tiến độ triển khai',
+      'discordButton': 'Tham gia Discord',
+      'footerNote': '© GRIMZ CLOUD PC · VIETNAM'
+    },
+    en: {
+      'status': 'Coming Soon',
+      'hero.line1': 'Launching',
+      'hero.line2': 'March 23, 2026',
+      'hero.desc': 'Grimz Cloud PC is under development.<br><strong>High-speed cloud gaming · Singapore Server · RTX 3060+</strong><br>Join Discord to get notified when we launch.',
+      'countdownLabel': '// Launching in',
+      'progressLabel': 'Development progress',
+      'discordButton': 'Join Discord',
+      'footerNote': '© GRIMZ CLOUD PC · VIETNAM'
+    },
+    id: {
+      'status': 'Segera Hadir',
+      'hero.line1': 'Akan Diluncurkan',
+      'hero.line2': '23 Maret 2026',
+      'hero.desc': 'Grimz Cloud PC sedang dalam pengembangan.<br><strong>Cloud gaming kecepatan tinggi · Server Singapura · RTX 3060+</strong><br>Bergabunglah dengan Discord untuk mendapatkan notifikasi saat diluncurkan.',
+      'countdownLabel': '// Peluncuran dalam',
+      'progressLabel': 'Kemajuan pengembangan',
+      'discordButton': 'Bergabung dengan Discord',
+      'footerNote': '© GRIMZ CLOUD PC · VIETNAM'
+    }
+  };
+
+  let currentLang = localStorage.getItem('lang') || 'vi';
+
+  function setLang(lang) {
+    currentLang = lang;
+    localStorage.setItem('lang', lang);
+    // Cập nhật active class cho nút
+    document.querySelectorAll('.lang-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.lang === lang);
+    });
+
+    // Dịch các phần tử có data-i18n (đơn giản)
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const key = el.getAttribute('data-i18n');
+      if (translations[lang] && translations[lang][key]) {
+        // Với nút Discord, chỉ thay text bên trong span, giữ nguyên icon
+        if (el.tagName === 'SPAN' && el.closest('.discord-btn')) {
+          el.textContent = translations[lang][key];
+        } else {
+          // Các phần tử khác: thay innerHTML để giữ cấu trúc (ví dụ desc có <br> và <strong>)
+          el.innerHTML = translations[lang][key];
+        }
+      }
+    });
+  }
+
+  // Gán sự kiện cho các nút
+  document.querySelectorAll('.lang-btn').forEach(btn => {
+    btn.addEventListener('click', () => setLang(btn.dataset.lang));
+  });
+
+  // Áp dụng ngôn ngữ đã lưu
+  setLang(currentLang);
 </script>
 </body>
 </html>
