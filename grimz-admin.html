@@ -22,6 +22,29 @@
   body::after { content:''; position:fixed; top:-50%; left:-50%; width:200%; height:200%; background:radial-gradient(ellipse at 30% 40%,rgba(124,92,191,0.05) 0%,transparent 45%); animation:rotateBg 30s linear infinite; pointer-events:none; z-index:0; }
   @keyframes rotateBg { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
 
+
+  /* ===== ADMIN LOADER ===== */
+  #admin-loader { position:fixed; inset:0; background:#09080f; z-index:10000; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:0; }
+  #admin-loader.fade-out { animation:loaderOut 0.5s ease forwards; }
+  @keyframes loaderOut { to { opacity:0; pointer-events:none; } }
+  .al-tag { font-family:'JetBrains Mono',monospace; font-size:0.65rem; color:#5a2020; letter-spacing:0.25em; text-transform:uppercase; margin-bottom:2rem; }
+  .al-title { font-family:'Rajdhani',sans-serif; font-size:clamp(2rem,7vw,3.5rem); font-weight:700; text-transform:uppercase; letter-spacing:0.2em; color:transparent; -webkit-text-stroke:1px #7f1d1d; margin-bottom:0.5rem; text-align:center; }
+  .al-title.lit { color:#f87171; -webkit-text-stroke:0; text-shadow:0 0 30px rgba(248,113,113,0.6),0 0 60px rgba(248,113,113,0.3); animation:alFlicker 0.08s 4; }
+  @keyframes alFlicker { 0%,100%{opacity:1} 50%{opacity:0.3} }
+  .al-sub { font-family:'JetBrains Mono',monospace; font-size:0.82rem; color:#5a5470; letter-spacing:0.2em; margin-bottom:2.5rem; min-height:1.4em; text-align:center; }
+  .al-sub.green { color:#f87171; font-size:0.9rem; letter-spacing:0.25em; }
+  .al-bar-wrap { width:min(320px,80vw); height:3px; background:rgba(248,113,113,0.12); position:relative; }
+  .al-bar-fill { height:100%; background:linear-gradient(90deg,#7f1d1d,#f87171); width:0%; transition:width 0.3s linear; box-shadow:0 0 8px rgba(248,113,113,0.5); }
+  .al-pct { font-family:'JetBrains Mono',monospace; font-size:0.75rem; color:#f87171; letter-spacing:0.15em; margin-top:0.75rem; }
+  .al-dots { display:flex; gap:0.4rem; margin-top:2rem; }
+  .al-dot { width:4px; height:4px; border-radius:50%; background:#3a3458; animation:alDot 1.2s infinite; }
+  .al-dot:nth-child(2) { animation-delay:0.2s; }
+  .al-dot:nth-child(3) { animation-delay:0.4s; }
+  @keyframes alDot { 0%,100%{background:#3a3458} 50%{background:#7c5cbf} }
+
+  /* ===== RATE LIMIT NOTICE ===== */
+  #rate-limit-msg { display:none; font-family:'JetBrains Mono',monospace; font-size:0.68rem; color:var(--red); text-align:center; letter-spacing:0.08em; margin-top:0.75rem; }
+
   /* ===== LIGHT THEME ===== */
   body.light {
     --bg:#f0eef8; --bg2:#ffffff; --bg3:#e8e5f5; --bg4:#d8d4ec;
@@ -177,6 +200,17 @@
 </head>
 <body>
 
+
+<!-- ADMIN LOADER -->
+<div id="admin-loader">
+  <div class="al-tag">// grimz system · restricted access</div>
+  <div class="al-title" id="al-title">Grimz Administrator Panel</div>
+  <div class="al-sub" id="al-sub">Đang khởi tạo...</div>
+  <div class="al-bar-wrap"><div class="al-bar-fill" id="al-fill"></div></div>
+  <div class="al-pct" id="al-pct">0%</div>
+  <div class="al-dots"><div class="al-dot"></div><div class="al-dot"></div><div class="al-dot"></div></div>
+</div>
+
 <!-- LOCK SCREEN -->
 <div id="lock-screen" style="position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:9999;">
   <div style="background:var(--bg2);border:1px solid var(--border);padding:2.5rem 2rem;width:100%;max-width:340px;position:relative;clip-path:polygon(0 0,calc(100% - 16px) 0,100% 16px,100% 100%,0 100%);">
@@ -187,6 +221,7 @@
     <div style="display:flex;justify-content:center;margin-bottom:0.75rem;"><div class="cf-turnstile" data-sitekey="0x4AAAAAACrS3npj6qFvSu2W" data-theme="dark"></div></div>
     <button onclick="checkPw()" style="width:100%;background:var(--accent);color:#fff;padding:0.7rem;font-family:'Rajdhani',sans-serif;font-size:0.9rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;border:none;cursor:pointer;transition:background 0.2s;">Đăng nhập</button>
     <div id="pw-err" style="display:none;margin-top:0.75rem;font-family:'JetBrains Mono',monospace;font-size:0.68rem;color:#f87171;text-align:center;letter-spacing:0.08em;">Sai mật khẩu</div>
+    <div id="rate-limit-msg"></div>
   </div>
 </div>
 
@@ -378,6 +413,124 @@
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZsd2V2b2pxZm9tb3Boc2R3c3FkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM1NzE2NDgsImV4cCI6MjA4OTE0NzY0OH0.6NECwQqKKeZH2fIgqp8SkmA6kPAqtsc5dlhEdGVFgBE'
   );
 
+
+  // ===== ADMIN LOADER =====
+  (function(){
+    const loader = document.getElementById('admin-loader');
+    const fill   = document.getElementById('al-fill');
+    const pct    = document.getElementById('al-pct');
+    const sub    = document.getElementById('al-sub');
+    const title  = document.getElementById('al-title');
+
+    // Smooth progress over 5 seconds
+    const steps = [
+      { at:800,  p:8,   msg:'Đang tải module...' },
+      { at:1400, p:18,  msg:'Khởi tạo Supabase...' },
+      { at:2000, p:32,  msg:'Xác thực phiên...' },
+      { at:2700, p:50,  msg:'Tải dữ liệu hệ thống...' },
+      { at:3400, p:67,  msg:'Kiểm tra quyền truy cập...' },
+      { at:4100, p:82,  msg:'Chuẩn bị giao diện...' },
+      { at:4700, p:95,  msg:'Hoàn tất...' },
+      { at:5200, p:100, msg:null },
+    ];
+    steps.forEach(({at, p, msg}) => {
+      setTimeout(() => {
+        fill.style.width = p + '%';
+        pct.textContent = p + '%';
+        if(msg) sub.textContent = msg;
+        if(p === 100) {
+          setTimeout(() => {
+            sub.textContent = '// ACCESS GRANTED';
+            sub.classList.add('green');
+            title.classList.add('lit');
+          }, 300);
+          setTimeout(() => {
+            loader.classList.add('fade-out');
+            setTimeout(() => loader.style.display = 'none', 500);
+          }, 2000);
+        }
+      }, at);
+    });
+  })();
+
+  // ===== RATE LIMITING =====
+  const RL_KEY = 'grimz_admin_fails';
+  const RL_TIME = 'grimz_admin_locktime';
+  const MAX_FAILS = 5;
+  const LOCK_DURATION = 10 * 60 * 1000; // 10 min
+
+  function checkRateLimit() {
+    const lockTime = parseInt(localStorage.getItem(RL_TIME) || '0');
+    if(lockTime && Date.now() < lockTime) {
+      const remaining = Math.ceil((lockTime - Date.now()) / 60000);
+      showRateLimitMsg(`Quá nhiều lần thử. Vui lòng đợi ${remaining} phút.`);
+      return false;
+    }
+    if(lockTime && Date.now() >= lockTime) {
+      localStorage.removeItem(RL_KEY);
+      localStorage.removeItem(RL_TIME);
+      document.getElementById('rate-limit-msg').style.display = 'none';
+    }
+    return true;
+  }
+
+  function recordFail() {
+    const fails = parseInt(localStorage.getItem(RL_KEY) || '0') + 1;
+    localStorage.setItem(RL_KEY, fails);
+    if(fails >= MAX_FAILS) {
+      localStorage.setItem(RL_TIME, Date.now() + LOCK_DURATION);
+      showRateLimitMsg('Đã bị khóa 10 phút do nhập sai quá nhiều lần.');
+    } else {
+      showPwErr(`Sai mật khẩu (${fails}/${MAX_FAILS})`);
+    }
+  }
+
+  function showRateLimitMsg(msg) {
+    const el = document.getElementById('rate-limit-msg');
+    el.textContent = msg;
+    el.style.display = 'block';
+    document.getElementById('pw-err').style.display = 'none';
+    const pwInput = document.getElementById('admin-pw');
+    const loginBtn = pwInput.nextElementSibling?.nextElementSibling;
+    pwInput.disabled = true;
+    if(loginBtn) loginBtn.disabled = true;
+    // Re-check every 30s
+    setTimeout(checkRateLimit, 30000);
+  }
+
+  // ===== SESSION TIMEOUT (20 min) =====
+  const SESSION_TIMEOUT = 20 * 60 * 1000;
+  let lastActivity = Date.now();
+  let sessionTimer = null;
+
+  function resetActivity() { lastActivity = Date.now(); }
+  ['click','keydown','mousemove','touchstart'].forEach(e => document.addEventListener(e, resetActivity, {passive:true}));
+
+  function startSessionTimer() {
+    if(sessionTimer) clearInterval(sessionTimer);
+    sessionTimer = setInterval(() => {
+      if(Date.now() - lastActivity > SESSION_TIMEOUT) {
+        clearInterval(sessionTimer);
+        sessionStorage.removeItem('grimz-admin');
+        showToast('⏰ Phiên đã hết hạn, vui lòng đăng nhập lại.', 'warn', 5000);
+        setTimeout(() => {
+          document.getElementById('lock-screen').style.display = 'flex';
+          document.getElementById('admin-pw').disabled = false;
+          document.getElementById('admin-pw').value = '';
+        }, 1500);
+      }
+    }, 30000);
+  }
+
+  // ===== AUDIT LOG =====
+  const AUDIT_KEY = 'grimz_audit_log';
+  function auditLog(action, detail) {
+    const logs = JSON.parse(localStorage.getItem(AUDIT_KEY) || '[]');
+    logs.unshift({ action, detail, time: new Date().toISOString() });
+    if(logs.length > 50) logs.splice(50);
+    localStorage.setItem(AUDIT_KEY, JSON.stringify(logs));
+  }
+
   // ===== THEME =====
   function toggleTheme(){
     document.body.classList.toggle('light');
@@ -392,23 +545,30 @@
     return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
   }
   async function checkPw(){
+    if(!checkRateLimit()) return;
     const token = document.querySelector('[name="cf-turnstile-response"]')?.value;
     if(!token){ showPwErr('Vui lòng xác minh bạn không phải bot.'); return; }
     const pw = document.getElementById('admin-pw').value;
     const hash = await hashPw(pw);
     if(hash === ADMIN_HASH){
+      localStorage.removeItem(RL_KEY);
+      localStorage.removeItem(RL_TIME);
       document.getElementById('lock-screen').style.display='none';
       sessionStorage.setItem('grimz-admin', hash);
+      auditLog('LOGIN', 'Admin đăng nhập thành công');
+      startSessionTimer();
       loadData();
     } else {
-      showPwErr('Sai mật khẩu');
+      recordFail();
       document.getElementById('admin-pw').value='';
     }
   }
   function showPwErr(msg){ const e=document.getElementById('pw-err'); e.style.display='block'; e.textContent=msg; }
   (function checkSession(){
+    checkRateLimit();
     if(sessionStorage.getItem('grimz-admin') === ADMIN_HASH){
       document.getElementById('lock-screen').style.display='none';
+      startSessionTimer();
       loadData();
     }
   })();
@@ -526,7 +686,7 @@
     else { ({error}=await sb.from('machines').insert({user_id:userId,...payload})); }
     btn.disabled=false; btn.innerHTML='<i class="fas fa-check"></i> Xác nhận gán';
     if(error){ showMsg('err',error.message); return; }
-    showMsg('ok');
+    auditLog('ASSIGN', 'Gán máy cho user '+userId+' IP:'+ip); showMsg('ok');
     clearForm();
     loadData();
   }
@@ -535,7 +695,7 @@
   async function deleteMachine(id){
     if(!confirm('Xóa máy này? (Không ghi lịch sử)')) return;
     await sb.from('machines').delete().eq('id',id);
-    showToast('✓ Đã xóa','success');
+    auditLog('DELETE', 'Xóa máy ID '+id); showToast('✓ Đã xóa','success');
     loadData();
   }
 
@@ -561,7 +721,7 @@
     btn.disabled=false; btn.innerHTML='<i class="fas fa-check"></i> Xác nhận';
     if(error){ showToast('✗ Lỗi: '+error.message,'error'); return; }
     closeExtend();
-    showToast('✓ Gia hạn thành công!','success');
+    auditLog('EXTEND', 'Gia hạn máy ID '+id+' thêm '+hours+'h'); showToast('✓ Gia hạn thành công!','success');
     loadData();
   }
 
@@ -592,7 +752,7 @@
     await sb.from('machines').delete().eq('id',id);
     btn.disabled=false; btn.innerHTML='<i class="fas fa-ban"></i> Xác nhận thu hồi';
     closeRevoke();
-    showToast('✓ Thu hồi & ghi lịch sử ('+totalHours+'h)','success');
+    auditLog('REVOKE', 'Thu hồi máy user '+userId+' ('+totalHours+'h)'); showToast('✓ Thu hồi & ghi lịch sử ('+totalHours+'h)','success');
     loadData();
   }
 
