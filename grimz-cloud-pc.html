@@ -160,6 +160,45 @@
   .fade-up { opacity:0; transform:translateY(20px); transition:opacity 0.6s ease,transform 0.6s ease; }
   .fade-up.visible { opacity:1; transform:translateY(0); }
 
+
+  /* Custom Cursor */
+  * { cursor: none !important; }
+  .cursor { position:fixed; width:12px; height:12px; background:var(--accent); border-radius:50%; pointer-events:none; z-index:99999; transform:translate(-50%,-50%); transition:width 0.15s, height 0.15s, background 0.15s; box-shadow:0 0 10px var(--accent), 0 0 20px rgba(124,92,191,0.4); }
+  .cursor-ring { position:fixed; width:32px; height:32px; border:1px solid rgba(124,92,191,0.5); border-radius:50%; pointer-events:none; z-index:99998; transform:translate(-50%,-50%); transition:all 0.08s ease-out; }
+  .cursor.clicking { width:6px; height:6px; background:var(--accent2); }
+  .cursor-ring.clicking { width:20px; height:20px; border-color:var(--accent2); }
+  a:hover ~ .cursor, button:hover ~ .cursor { width:20px; height:20px; }
+
+  /* Mouse Glow */
+  .mouse-glow { position:fixed; width:400px; height:400px; border-radius:50%; background:radial-gradient(circle, rgba(124,92,191,0.06) 0%, transparent 70%); pointer-events:none; z-index:0; transform:translate(-50%,-50%); transition:left 0.1s ease-out, top 0.1s ease-out; }
+
+  /* Typing cursor blink */
+  .typing-cursor { display:inline-block; width:2px; height:1em; background:var(--accent); margin-left:2px; animation:blink 0.8s infinite; vertical-align:middle; }
+
+  /* Pricing Toggle */
+  .price-toggle { display:flex; align-items:center; gap:0; border:1px solid var(--border); width:fit-content; margin-bottom:2rem; }
+  .price-toggle-btn { padding:0.4rem 1.2rem; font-family:'Share Tech Mono',monospace; font-size:0.7rem; letter-spacing:0.1em; color:var(--muted); cursor:pointer; background:transparent; border:none; text-transform:uppercase; transition:all 0.2s; }
+  .price-toggle-btn.active { background:var(--accent); color:#fff; }
+
+  /* Ping test */
+  .ping-section { background:var(--bg2); border:1px solid var(--border); padding:1.5rem; margin-top:1.5rem; display:flex; align-items:center; gap:1.5rem; flex-wrap:wrap; }
+  .ping-btn { display:inline-flex; align-items:center; gap:0.5rem; background:transparent; border:1px solid var(--accent); color:var(--accent); padding:0.5rem 1.2rem; font-family:'Rajdhani',sans-serif; font-size:0.9rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; cursor:pointer; transition:all 0.2s; }
+  .ping-btn:hover { background:var(--accent); color:var(--bg); }
+  .ping-result { font-family:'Share Tech Mono',monospace; font-size:1.1rem; color:var(--accent2); }
+  .ping-bar { display:flex; gap:3px; align-items:flex-end; height:24px; }
+  .ping-bar-item { width:6px; background:var(--accent3); border-radius:1px; transition:height 0.3s, background 0.3s; }
+
+  /* Discord counter */
+  .discord-counter { display:inline-flex; align-items:center; gap:0.5rem; font-family:'Share Tech Mono',monospace; font-size:0.72rem; color:var(--muted); letter-spacing:0.1em; }
+  .discord-counter .dot { width:8px; height:8px; border-radius:50%; background:#4ade80; box-shadow:0 0 6px #4ade80; animation:blink 2s infinite; }
+
+  /* Confetti canvas */
+  #confetti-canvas { position:fixed; inset:0; pointer-events:none; z-index:9998; }
+
+  /* Typing sound toggle */
+  .sound-toggle { position:fixed; bottom:5rem; right:2rem; width:36px; height:36px; background:var(--bg2); border:1px solid var(--border); color:var(--muted); font-size:1rem; cursor:pointer; display:flex; align-items:center; justify-content:center; z-index:200; transition:all 0.2s; }
+  .sound-toggle:hover { border-color:var(--accent); color:var(--accent2); }
+
   /* RESPONSIVE */
   @media(max-width:768px) {
     nav ul { display:none; }
@@ -173,6 +212,11 @@
 <body>
 
 <div class="scanline"></div>
+<canvas id="confetti-canvas"></canvas>
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+<div class="mouse-glow" id="mouseGlow"></div>
+<button class="sound-toggle" id="soundToggle" title="Bật/tắt âm thanh">🔇</button>
 <button class="back-top" id="backTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
 
 <!-- NAV -->
@@ -203,7 +247,7 @@
     </h1>
     <p class="hero-desc">
       Chơi game trên bất kỳ thiết bị nào, không cần PC mạnh.<br>
-      <strong>RTX 3060, 32GB RAM, Windows 10/11</strong>, ping &lt;30ms, giá 3.000đ/giờ.
+      <span id="typing-text"></span><span class="typing-cursor"></span>
     </p>
     <div class="hero-btns">
       <a href="https://discord.gg/Ct4Gw7GwJJ" target="_blank" rel="noopener" class="btn-primary">
@@ -221,6 +265,28 @@
   <div class="stat"><div class="stat-num">24/7</div><div class="stat-label">Hỗ trợ online</div></div>
   <div class="stat"><div class="stat-num">GPU</div><div class="stat-label">Dedicated card đồ họa</div></div>
   <div class="stat"><div class="stat-num">Win11</div><div class="stat-label">Windows VM thực sự</div></div>
+</div>
+
+<!-- PING + DISCORD -->
+<div class="ping-section" style="position:relative;z-index:1;">
+  <div>
+    <div style="font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:var(--muted);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:0.5rem;">// Test ping tới server</div>
+    <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap;">
+      <button class="ping-btn" onclick="testPing()">⚡ Đo Ping</button>
+      <div class="ping-result" id="ping-result">—</div>
+      <div class="ping-bar" id="ping-bar">
+        <div class="ping-bar-item" style="height:4px"></div>
+        <div class="ping-bar-item" style="height:4px"></div>
+        <div class="ping-bar-item" style="height:4px"></div>
+        <div class="ping-bar-item" style="height:4px"></div>
+        <div class="ping-bar-item" style="height:4px"></div>
+      </div>
+    </div>
+  </div>
+  <div style="margin-left:auto;">
+    <div style="font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:var(--muted);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:0.5rem;">// Discord community</div>
+    <div class="discord-counter"><span class="dot"></span><span id="discord-count">Đang tải...</span></div>
+  </div>
 </div>
 
 <!-- FEATURES -->
@@ -243,6 +309,11 @@
   <div class="section-tag">// CẤU HÌNH & GIÁ</div>
   <h2 class="section-title">Cấu hình & <span>Giá thuê</span></h2>
   <p class="section-sub">Tính tiền theo giờ thực tế sử dụng, không cần đặt cọc.</p>
+  <div class="price-toggle">
+    <button class="price-toggle-btn active" onclick="setPriceMode('hour',this)">Giờ</button>
+    <button class="price-toggle-btn" onclick="setPriceMode('day',this)">Ngày (8h)</button>
+    <button class="price-toggle-btn" onclick="setPriceMode('week',this)">Tuần</button>
+  </div>
   <div class="plans-grid">
 
     <!-- RTX 3060 -->
@@ -430,6 +501,201 @@
     });
   }, { threshold: 0.1 });
   document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+
+
+  // ===== CUSTOM CURSOR =====
+  const cursor = document.getElementById('cursor');
+  const cursorRing = document.getElementById('cursorRing');
+  const mouseGlow = document.getElementById('mouseGlow');
+  document.addEventListener('mousemove', e => {
+    cursor.style.left = e.clientX + 'px';
+    cursor.style.top = e.clientY + 'px';
+    cursorRing.style.left = e.clientX + 'px';
+    cursorRing.style.top = e.clientY + 'px';
+    mouseGlow.style.left = e.clientX + 'px';
+    mouseGlow.style.top = e.clientY + 'px';
+  });
+  document.addEventListener('mousedown', () => { cursor.classList.add('clicking'); cursorRing.classList.add('clicking'); });
+  document.addEventListener('mouseup', () => { cursor.classList.remove('clicking'); cursorRing.classList.remove('clicking'); });
+
+  // ===== TYPING EFFECT =====
+  const typingLines = [
+    'RTX 3060, 32GB RAM, Windows 10/11',
+    'Ping <30ms từ Việt Nam',
+    'Giá chỉ 3.000đ/giờ',
+    'Kết nối qua Parsec hoặc Moonlight',
+    'Hỗ trợ 24/7 qua Discord'
+  ];
+  let tIdx = 0, tChar = 0, tDeleting = false;
+  const tEl = document.getElementById('typing-text');
+  function typeLoop() {
+    if (!tEl) return;
+    const cur = typingLines[tIdx];
+    tEl.textContent = tDeleting ? cur.slice(0, --tChar) : cur.slice(0, ++tChar);
+    if (!tDeleting && tChar === cur.length) { tDeleting = true; setTimeout(typeLoop, 1800); return; }
+    if (tDeleting && tChar === 0) { tDeleting = false; tIdx = (tIdx + 1) % typingLines.length; }
+    setTimeout(typeLoop, tDeleting ? 35 : 75);
+  }
+  typeLoop();
+
+  // ===== PRICING TOGGLE =====
+  const prices = {
+    '3060': { hour: '3.000', day: '20.000', week: '120.000' },
+    '4060': { hour: '5.000', day: '35.000', week: '200.000' },
+    '4070': { hour: '6.000', day: '42.000', week: '250.000' },
+  };
+  const units = { hour: 'đ/giờ', day: 'đ/ngày', week: 'đ/tuần' };
+  let priceMode = 'hour';
+  function setPriceMode(mode, btn) {
+    priceMode = mode;
+    document.querySelectorAll('.price-toggle-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.plan-price').forEach(el => {
+      const card = el.closest('.plan-card');
+      if (!card) return;
+      const name = card.querySelector('.plan-name')?.textContent?.trim();
+      const key = name?.includes('4070') ? '4070' : name?.includes('4060') ? '4060' : '3060';
+      const span = el.querySelector('span');
+      if (span) { el.childNodes[0].textContent = prices[key][mode]; span.textContent = ' ' + units[mode]; }
+    });
+  }
+
+  // ===== PING TEST =====
+  async function testPing() {
+    const btn = document.querySelector('.ping-btn');
+    const result = document.getElementById('ping-result');
+    const bars = document.querySelectorAll('.ping-bar-item');
+    btn.textContent = '⏳ Đang đo...'; btn.disabled = true;
+    result.textContent = '—';
+    const pings = [];
+    for (let i = 0; i < 5; i++) {
+      const t = Date.now();
+      try { await fetch('https://vlwevojqfomophsdwsqd.supabase.co/rest/v1/', { method:'HEAD', cache:'no-store' }); }
+      catch {}
+      pings.push(Date.now() - t);
+      await new Promise(r => setTimeout(r, 200));
+    }
+    const avg = Math.round(pings.reduce((a,b) => a+b) / pings.length);
+    result.textContent = avg + 'ms';
+    result.style.color = avg < 50 ? '#4ade80' : avg < 100 ? '#fbbf24' : '#f87171';
+    const max = Math.max(...pings);
+    bars.forEach((b, i) => {
+      const h = Math.max(4, Math.round((pings[i] / max) * 24));
+      b.style.height = h + 'px';
+      b.style.background = pings[i] < 50 ? '#4ade80' : pings[i] < 100 ? '#fbbf24' : '#f87171';
+    });
+    btn.textContent = '⚡ Đo lại'; btn.disabled = false;
+  }
+
+  // ===== DISCORD MEMBER COUNT =====
+  async function fetchDiscordCount() {
+    try {
+      const res = await fetch('https://discord.com/api/v9/invites/Ct4Gw7GwJJ?with_counts=true');
+      const data = await res.json();
+      const count = data.approximate_member_count || 0;
+      document.getElementById('discord-count').textContent = count.toLocaleString() + ' thành viên';
+    } catch {
+      document.getElementById('discord-count').textContent = 'Tham gia Discord';
+    }
+  }
+  fetchDiscordCount();
+
+  // ===== CONFETTI =====
+  const canvas = document.getElementById('confetti-canvas');
+  const ctx = canvas.getContext('2d');
+  canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+  window.addEventListener('resize', () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; });
+  let confettiParticles = [];
+  function spawnConfetti() {
+    for (let i = 0; i < 80; i++) {
+      confettiParticles.push({
+        x: Math.random() * canvas.width, y: -10,
+        w: Math.random() * 8 + 4, h: Math.random() * 4 + 2,
+        color: ['#7c5cbf','#9b7fe8','#4ade80','#fbbf24','#f87171'][Math.floor(Math.random()*5)],
+        vx: (Math.random()-0.5)*4, vy: Math.random()*3+2,
+        rot: Math.random()*360, rotV: (Math.random()-0.5)*8,
+        life: 1
+      });
+    }
+  }
+  function animateConfetti() {
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    confettiParticles = confettiParticles.filter(p => p.life > 0);
+    confettiParticles.forEach(p => {
+      p.x += p.vx; p.y += p.vy; p.rot += p.rotV; p.life -= 0.008;
+      ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.rot * Math.PI/180);
+      ctx.globalAlpha = p.life; ctx.fillStyle = p.color;
+      ctx.fillRect(-p.w/2, -p.h/2, p.w, p.h);
+      ctx.restore();
+    });
+    requestAnimationFrame(animateConfetti);
+  }
+  animateConfetti();
+  // Trigger confetti on Discord button click
+  document.querySelectorAll('.btn-primary, .discord-btn').forEach(btn => {
+    btn.addEventListener('click', spawnConfetti);
+  });
+
+  // ===== TYPING SOUND =====
+  let soundEnabled = false;
+  const soundToggle = document.getElementById('soundToggle');
+  soundToggle.addEventListener('click', () => {
+    soundEnabled = !soundEnabled;
+    soundToggle.textContent = soundEnabled ? '🔊' : '🔇';
+  });
+  function playKeySound() {
+    if (!soundEnabled) return;
+    try {
+      const ctx2 = new (window.AudioContext || window.webkitAudioContext)();
+      const o = ctx2.createOscillator(); const g = ctx2.createGain();
+      o.connect(g); g.connect(ctx2.destination);
+      o.frequency.value = 800 + Math.random() * 200;
+      o.type = 'square';
+      g.gain.setValueAtTime(0.03, ctx2.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001, ctx2.currentTime + 0.05);
+      o.start(); o.stop(ctx2.currentTime + 0.05);
+    } catch {}
+  }
+  document.addEventListener('keydown', playKeySound);
+
+  // ===== PWA MANIFEST =====
+  const manifest = {
+    name: 'Grimz Cloud PC',
+    short_name: 'Grimz',
+    start_url: '/',
+    display: 'standalone',
+    background_color: '#09080f',
+    theme_color: '#7c5cbf',
+    icons: [{ src: '/favicon.ico', sizes: '64x64', type: 'image/x-icon' }]
+  };
+  const blob = new Blob([JSON.stringify(manifest)], {type:'application/json'});
+  const mLink = document.createElement('link');
+  mLink.rel = 'manifest'; mLink.href = URL.createObjectURL(blob);
+  document.head.appendChild(mLink);
+
+  // ===== ANIMATED FAVICON =====
+  (function() {
+    const fc = document.createElement('canvas');
+    fc.width = 32; fc.height = 32;
+    const fx = fc.getContext('2d');
+    let angle = 0;
+    function drawFavicon() {
+      fx.clearRect(0,0,32,32);
+      fx.fillStyle = '#09080f'; fx.fillRect(0,0,32,32);
+      fx.save(); fx.translate(16,16); fx.rotate(angle);
+      const grad = fx.createRadialGradient(0,0,2,0,0,12);
+      grad.addColorStop(0,'#9b7fe8'); grad.addColorStop(1,'#5a3fa0');
+      fx.fillStyle = grad;
+      fx.beginPath(); fx.moveTo(0,-12);
+      for(let i=0;i<6;i++) { fx.lineTo(Math.cos((i*2*Math.PI/6)-Math.PI/2)*12, Math.sin((i*2*Math.PI/6)-Math.PI/2)*12); }
+      fx.closePath(); fx.fill(); fx.restore();
+      angle += 0.03;
+      const link = document.querySelector("link[rel*='icon']") || document.createElement('link');
+      link.type = 'image/x-icon'; link.rel = 'shortcut icon'; link.href = fc.toDataURL();
+      document.head.appendChild(link);
+    }
+    setInterval(drawFavicon, 50);
+  })();
 
   // FAQ toggle
   function toggleFaq(btn) {
