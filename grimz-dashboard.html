@@ -1109,10 +1109,10 @@
     nameEl.classList.add('has-machine');
     document.getElementById('machineStatus').className='badge badge-online';
     document.getElementById('machineStatus').textContent='Đang chạy';
-    const connBtn=document.getElementById('show-conn-btn'); if(connBtn) connBtn.style.display='inline-flex';
+    const connBtn=document.getElementById('show-conn-btn'); if(connBtn && m.plan!=='G-ADMIN') connBtn.style.display='inline-flex';
     document.getElementById('statPlan').textContent=m.plan||'ACTIVE';
     document.getElementById('statPlan').classList.remove('empty');
-    document.getElementById('statPlan').style.color='var(--green)';
+    document.getElementById('statPlan').style.color = m.plan==='G-ADMIN' ? 'var(--red)' : 'var(--green)';
     document.getElementById('noBuyCard').style.display='none';
     document.getElementById('firstLoginNotice').style.display='none';
 
@@ -1154,6 +1154,7 @@
     initSupportChat(session.user.id);
     const email=session.user.email||'User';
     const username=email.split('@')[0];
+    const IS_ADMIN = email === 'kobitnx223@gmail.com';
     // Check for saved display name
     const savedName = localStorage.getItem('grimz_display_name_'+session.user.id);
     document.getElementById('userName').textContent=savedName||username;
@@ -1166,7 +1167,14 @@
     document.getElementById('userUuid').textContent=session.user.id;
 
     const{data:machine}=await sb.from('machines').select('*').eq('user_id',session.user.id).single();
-    if(machine) fillMachine(machine);
+    if(IS_ADMIN && !machine) {
+      // Admin fake machine - infinite, top spec
+      fillMachine({
+        ip:'—', gpu:'NVIDIA RTX 4090 24GB', cpu:'Intel Core i9-13900K',
+        ram:'128GB DDR5', storage:'4TB SSD NVMe', os:'Windows 11',
+        expiry:'2099-12-31T00:00:00Z', plan:'G-ADMIN', password:null
+      });
+    } else if(machine) fillMachine(machine);
 
     const machineChannel = sb.channel('machines-realtime-'+session.user.id)
       .on('postgres_changes',{event:'INSERT',schema:'public',table:'machines',filter:'user_id=eq.'+session.user.id},payload=>{
