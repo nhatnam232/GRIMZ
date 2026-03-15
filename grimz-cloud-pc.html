@@ -234,6 +234,22 @@
   .cookie-decline { background:transparent; color:var(--muted); border:1px solid var(--border); padding:0.5rem 1rem; font-family:'Rajdhani',sans-serif; font-size:0.875rem; font-weight:600; letter-spacing:0.1em; text-transform:uppercase; cursor:pointer; transition:all 0.2s; }
   .cookie-decline:hover { border-color:var(--muted); color:var(--text); }
 
+
+  /* Lang Switcher */
+  .lang-switcher { position:relative; }
+  .lang-trigger { display:flex; align-items:center; gap:0.4rem; padding:0.35rem 0.75rem; background:rgba(9,8,15,0.85); border:1px solid rgba(124,92,191,0.25); color:var(--accent2); font-family:'Share Tech Mono',monospace; font-size:0.65rem; letter-spacing:0.1em; text-transform:uppercase; cursor:pointer; transition:all 0.2s; backdrop-filter:blur(10px); user-select:none; height:32px; }
+  .lang-trigger:hover { border-color:var(--accent); background:rgba(124,92,191,0.1); }
+  .lang-trigger .arr { font-size:0.45rem; transition:transform 0.2s; margin-left:2px; }
+  .lang-trigger.open .arr { transform:rotate(180deg); }
+  .lang-dropdown { position:absolute; top:calc(100% + 6px); right:0; background:rgba(9,8,15,0.97); border:1px solid rgba(124,92,191,0.25); backdrop-filter:blur(12px); min-width:170px; display:none; flex-direction:column; z-index:300; max-height:320px; overflow-y:auto; }
+  .lang-dropdown.open { display:flex; }
+  .lang-opt { display:flex; align-items:center; gap:0.6rem; padding:0.55rem 0.85rem; font-family:'Share Tech Mono',monospace; font-size:0.62rem; letter-spacing:0.08em; color:#8a84a0; cursor:pointer; transition:all 0.15s; border:none; background:none; width:100%; text-align:left; }
+  .lang-opt:hover { background:rgba(124,92,191,0.08); color:var(--accent2); }
+  .lang-opt.sel { color:var(--accent2); background:rgba(124,92,191,0.1); }
+  .lang-opt.sel::after { content:'✓'; margin-left:auto; color:var(--accent); font-size:0.7rem; }
+  .lang-opt-flag { font-size:0.95rem; line-height:1; }
+  .lang-sep { height:1px; background:rgba(124,92,191,0.1); }
+
   /* RESPONSIVE */
   @media(max-width:768px) {
     nav ul { display:none; }
@@ -299,6 +315,34 @@
     <li><a href="#how">Cách mua</a></li>
   </ul>
   <div style="display:flex;gap:0.75rem;align-items:center;">
+    <div class="lang-switcher" id="langSwitcher">
+      <div class="lang-trigger" id="langTrigger" onclick="toggleLang()">
+        <span id="curFlag">🇻🇳</span>
+        <span id="curCode">VI</span>
+        <span class="arr">▼</span>
+      </div>
+      <div class="lang-dropdown" id="langDropdown">
+        <button class="lang-opt sel" id="lbtn-vi" onclick="pickLang('vi')"><span class="lang-opt-flag">🇻🇳</span>Tiếng Việt</button>
+        <div class="lang-sep"></div>
+        <button class="lang-opt" id="lbtn-en" onclick="pickLang('en')"><span class="lang-opt-flag">🇬🇧</span>English</button>
+        <div class="lang-sep"></div>
+        <button class="lang-opt" id="lbtn-id" onclick="pickLang('id')"><span class="lang-opt-flag">🇮🇩</span>Indonesia</button>
+        <div class="lang-sep"></div>
+        <button class="lang-opt" id="lbtn-th" onclick="pickLang('th')"><span class="lang-opt-flag">🇹🇭</span>ภาษาไทย</button>
+        <div class="lang-sep"></div>
+        <button class="lang-opt" id="lbtn-my" onclick="pickLang('my')"><span class="lang-opt-flag">🇲🇾</span>Bahasa Melayu</button>
+        <div class="lang-sep"></div>
+        <button class="lang-opt" id="lbtn-ph" onclick="pickLang('ph')"><span class="lang-opt-flag">🇵🇭</span>Filipino</button>
+        <div class="lang-sep"></div>
+        <button class="lang-opt" id="lbtn-jp" onclick="pickLang('jp')"><span class="lang-opt-flag">🇯🇵</span>日本語</button>
+        <div class="lang-sep"></div>
+        <button class="lang-opt" id="lbtn-kr" onclick="pickLang('kr')"><span class="lang-opt-flag">🇰🇷</span>한국어</button>
+        <div class="lang-sep"></div>
+        <button class="lang-opt" id="lbtn-zh" onclick="pickLang('zh')"><span class="lang-opt-flag">🇨🇳</span>中文</button>
+        <div class="lang-sep"></div>
+        <button class="lang-opt" id="lbtn-ru" onclick="pickLang('ru')"><span class="lang-opt-flag">🇷🇺</span>Русский</button>
+      </div>
+    </div>
     <a href="grimz-login.html" class="nav-cta" style="border-color:var(--border);color:var(--muted) !important;">Dashboard</a>
     <a href="https://discord.gg/Ct4Gw7GwJJ" target="_blank" rel="noopener" class="nav-cta">Mua ngay</a>
   </div>
@@ -362,23 +406,23 @@
 <!-- FEATURES -->
 <section id="features">
   <div class="section-tag">// WHY GRIMZ</div>
-  <h2 class="section-title">Tại sao chọn <span>Grimz</span>?</h2>
-  <p class="section-sub">Dịch vụ cloud PC gaming, server Singapore.</p>
+  <h2 class="section-title"><span data-i18n="why_title_1">Tại sao chọn</span> <span>Grimz</span>?</h2>
+  <p class="section-sub" data-i18n="why_sub">Dịch vụ cloud PC gaming, server Singapore.</p>
   <div class="features-grid">
-    <div class="feature-card fade-up"><span class="feature-icon">⚡</span><div class="feature-title">Ping siêu thấp</div><p class="feature-desc">Server đặt tại Singapore, ping dưới 30ms từ Việt Nam. Kết nối ổn định, ít giật lag.</p></div>
-    <div class="feature-card fade-up"><span class="feature-icon">🎮</span><div class="feature-title">GPU cao cấp</div><p class="feature-desc">RTX 3060, 4060, 4070 dedicated. Chạy được hầu hết game hiện tại ở mức cài đặt cao.</p></div>
-    <div class="feature-card fade-up"><span class="feature-icon">🖥️</span><div class="feature-title">Windows VM thực</div><p class="feature-desc">Windows 10/11, cài được phần mềm bình thường, có quyền admin.</p></div>
-    <div class="feature-card fade-up"><span class="feature-icon">💸</span><div class="feature-title">Giá phải chăng</div><p class="feature-desc">3.000đ/giờ, tính theo giờ thực tế dùng. Không cần đăng ký gói dài hạn.</p></div>
-    <div class="feature-card fade-up"><span class="feature-icon">🛡️</span><div class="feature-title">Hỗ trợ 24/7</div><p class="feature-desc">Hỗ trợ qua Discord ticket. Phản hồi trong vài phút.</p></div>
-    <div class="feature-card fade-up"><span class="feature-icon">🔧</span><div class="feature-title">Dễ sử dụng</div><p class="feature-desc">Kết nối qua Parsec hoặc Moonlight. Chạy được trên laptop yếu, điện thoại, TV box.</p></div>
+    <div class="feature-card fade-up"><span class="feature-icon">⚡</span><div class="feature-title"><span data-i18n="feat1">Ping siêu thấp</span></div><p class="feature-desc">Server đặt tại Singapore, ping dưới 30ms từ Việt Nam. Kết nối ổn định, ít giật lag.</p></div>
+    <div class="feature-card fade-up"><span class="feature-icon">🎮</span><div class="feature-title"><span data-i18n="feat2">GPU cao cấp</span></div><p class="feature-desc">RTX 3060, 4060, 4070 dedicated. Chạy được hầu hết game hiện tại ở mức cài đặt cao.</p></div>
+    <div class="feature-card fade-up"><span class="feature-icon">🖥️</span><div class="feature-title"><span data-i18n="feat3">Windows VM thực</span></div><p class="feature-desc">Windows 10/11, cài được phần mềm bình thường, có quyền admin.</p></div>
+    <div class="feature-card fade-up"><span class="feature-icon">💸</span><div class="feature-title"><span data-i18n="feat4">Giá phải chăng</span></div><p class="feature-desc">3.000đ/giờ, tính theo giờ thực tế dùng. Không cần đăng ký gói dài hạn.</p></div>
+    <div class="feature-card fade-up"><span class="feature-icon">🛡️</span><div class="feature-title"><span data-i18n="feat5">Hỗ trợ 24/7</span></div><p class="feature-desc">Hỗ trợ qua Discord ticket. Phản hồi trong vài phút.</p></div>
+    <div class="feature-card fade-up"><span class="feature-icon">🔧</span><div class="feature-title"><span data-i18n="feat6">Dễ sử dụng</span></div><p class="feature-desc">Kết nối qua Parsec hoặc Moonlight. Chạy được trên laptop yếu, điện thoại, TV box.</p></div>
   </div>
 </section>
 
 <!-- PRICING -->
 <section id="pricing">
   <div class="section-tag">// CẤU HÌNH & GIÁ</div>
-  <h2 class="section-title">Cấu hình & <span>Giá thuê</span></h2>
-  <p class="section-sub">Tính tiền theo giờ thực tế sử dụng, không cần đặt cọc.</p>
+  <h2 class="section-title"><span data-i18n="price_title">Cấu hình &amp;</span> <span data-i18n="price_title2">Giá thuê</span></h2>
+  <p class="section-sub" data-i18n="price_sub">Tính tiền theo giờ thực tế sử dụng, không cần đặt cọc.</p>
   <div class="price-toggle">
     <button class="price-toggle-btn active" onclick="setPriceMode('hour',this)">Giờ</button>
     <button class="price-toggle-btn" onclick="setPriceMode('day',this)">Ngày (8h)</button>
@@ -402,7 +446,7 @@
           <li>Hỗ trợ 24/7</li>
         </ul>
       </div>
-      <a href="https://discord.gg/Ct4Gw7GwJJ" target="_blank" rel="noopener" class="plan-btn">Thuê qua Discord →</a>
+      <a href="https://discord.gg/Ct4Gw7GwJJ" target="_blank" rel="noopener" class="plan-btn"><span data-i18n="rent_btn">Thuê qua Discord →</span></a>
     </div>
 
     <!-- RTX 4060 -->
@@ -423,7 +467,7 @@
           <li>Hỗ trợ 24/7</li>
         </ul>
       </div>
-      <a href="https://discord.gg/Ct4Gw7GwJJ" target="_blank" rel="noopener" class="plan-btn">Thuê qua Discord →</a>
+      <a href="https://discord.gg/Ct4Gw7GwJJ" target="_blank" rel="noopener" class="plan-btn"><span data-i18n="rent_btn">Thuê qua Discord →</span></a>
     </div>
 
     <!-- RTX 4070 -->
@@ -444,7 +488,7 @@
           <li>Hỗ trợ 24/7</li>
         </ul>
       </div>
-      <a href="https://discord.gg/Ct4Gw7GwJJ" target="_blank" rel="noopener" class="plan-btn">Thuê qua Discord →</a>
+      <a href="https://discord.gg/Ct4Gw7GwJJ" target="_blank" rel="noopener" class="plan-btn"><span data-i18n="rent_btn">Thuê qua Discord →</span></a>
     </div>
 
   </div>
@@ -453,8 +497,8 @@
 <!-- HOW -->
 <section id="how">
   <div class="section-tag">// CÁCH MUA</div>
-  <h2 class="section-title">Chỉ <span>3 bước</span> để bắt đầu</h2>
-  <p class="section-sub">Mua và bắt đầu sử dụng trong vài phút.</p>
+  <h2 class="section-title"><span data-i18n="steps_title">Chỉ</span> <span>3 bước</span> <span data-i18n="steps_title2">để bắt đầu</span></h2>
+  <p class="section-sub" data-i18n="steps_sub">Mua và bắt đầu sử dụng trong vài phút.</p>
   <div class="steps">
     <div class="step fade-up"><div class="step-num">01</div><div class="step-title">Vào Discord</div><p class="step-desc">Vào Discord server của Grimz Cloud PC.</p></div>
     <div class="step fade-up"><div class="step-num">02</div><div class="step-title">Tạo Ticket</div><p class="step-desc">Tạo ticket, cho staff biết muốn thuê bao nhiêu giờ, thanh toán qua chuyển khoản hoặc MoMo.</p></div>
@@ -465,7 +509,7 @@
 <!-- FAQ -->
 <section id="faq">
   <div class="section-tag">// FAQ</div>
-  <h2 class="section-title">Câu hỏi <span>thường gặp</span></h2>
+  <h2 class="section-title"><span data-i18n="faq_title">Câu hỏi</span> <span data-i18n="faq_title2">thường gặp</span></h2>
   <p class="section-sub">Giải đáp nhanh các thắc mắc phổ biến.</p>
   <div class="faq-list fade-up">
     <div class="faq-item">
@@ -502,7 +546,7 @@
 <!-- TESTIMONIALS -->
 <section id="reviews">
   <div class="section-tag">// ĐÁNH GIÁ</div>
-  <h2 class="section-title">Khách hàng <span>nói gì</span></h2>
+  <h2 class="section-title"><span data-i18n="review_title">Khách hàng</span> <span data-i18n="review_title2">nói gì</span></h2>
   <p class="section-sub">Phản hồi từ cộng đồng Discord của Grimz.</p>
   <div class="testimonials-grid">
     <div class="testimonial-card fade-up">
@@ -522,8 +566,8 @@
 
 <!-- CTA -->
 <section class="cta-section">
-  <h2>Muốn thử <span>Grimz Cloud PC</span>?</h2>
-  <p>Vào Discord để đặt máy hoặc hỏi thêm thông tin.</p>
+  <h2><span data-i18n="cta_title">Muốn thử</span> <span>Grimz Cloud PC</span>?</h2>
+  <p data-i18n="cta_sub">Vào Discord để đặt máy hoặc hỏi thêm thông tin.</p>
   <div class="hero-btns">
     <a href="https://discord.gg/Ct4Gw7GwJJ" target="_blank" rel="noopener" class="discord-btn">
       <svg width="22" height="17" viewBox="0 0 71 55" fill="currentColor"><path d="M60.1 4.9A58.5 58.5 0 0 0 45.4.9a40 40 0 0 0-1.8 3.6 54 54 0 0 0-16.2 0A38.4 38.4 0 0 0 25.6.9 58.4 58.4 0 0 0 10.9 5C1.6 18.7-1 32 .3 45a58.7 58.7 0 0 0 17.9 9 44 44 0 0 0 3.8-6.2 38.3 38.3 0 0 1-6-2.9l1.4-1.1a41.9 41.9 0 0 0 35.7 0l1.5 1.1a38.2 38.2 0 0 1-6 2.9 43.6 43.6 0 0 0 3.8 6.2 58.5 58.5 0 0 0 17.9-9C71.8 30 68.2 16.8 60.1 4.9ZM23.7 37.3c-3.5 0-6.4-3.2-6.4-7.1s2.8-7.2 6.4-7.2 6.5 3.2 6.4 7.2c0 3.9-2.8 7.1-6.4 7.1Zm23.6 0c-3.5 0-6.4-3.2-6.4-7.1s2.8-7.2 6.4-7.2 6.5 3.2 6.4 7.2c0 3.9-2.8 7.1-6.4 7.1Z"/></svg>
@@ -545,6 +589,230 @@
 </footer>
 
 <script>
+
+  // ===== LANG SWITCHER =====
+  const LANGS = {
+    vi: { flag:'🇻🇳', code:'VI', country:['VN'] },
+    en: { flag:'🇬🇧', code:'EN', country:[] },
+    id: { flag:'🇮🇩', code:'ID', country:['ID'] },
+    th: { flag:'🇹🇭', code:'TH', country:['TH'] },
+    my: { flag:'🇲🇾', code:'MY', country:['MY'] },
+    ph: { flag:'🇵🇭', code:'PH', country:['PH'] },
+    jp: { flag:'🇯🇵', code:'JP', country:['JP'] },
+    kr: { flag:'🇰🇷', code:'KR', country:['KR'] },
+    zh: { flag:'🇨🇳', code:'ZH', country:['CN','TW','HK'] },
+    ru: { flag:'🇷🇺', code:'RU', country:['RU'] },
+  };
+
+  const T = {
+    vi: {
+      why_title_1:'Tại sao chọn', why_sub:'Dịch vụ cloud PC gaming, server Singapore.',
+      price_title:'Cấu hình &', price_title2:'Giá thuê', price_sub:'Tính tiền theo giờ thực tế sử dụng, không cần đặt cọc.',
+      steps_title:'Chỉ', steps_title2:'để bắt đầu', steps_sub:'Mua và bắt đầu sử dụng trong vài phút.',
+      faq_title:'Câu hỏi', faq_title2:'thường gặp',
+      review_title:'Khách hàng', review_title2:'nói gì',
+      join_discord:'Tham gia Discord', join_discord_now:'Tham gia Discord ngay', view_price:'Xem bảng giá',
+      cta_title:'Muốn thử', cta_sub:'Vào Discord để đặt máy hoặc hỏi thêm thông tin.',
+      feat1:'Ping siêu thấp', feat2:'GPU cao cấp', feat3:'Windows VM thực', feat4:'Giá phải chăng', feat5:'Hỗ trợ 24/7', feat6:'Dễ sử dụng',
+      rent_btn:'Thuê qua Discord →',
+      cookie_text:'Chúng tôi dùng cookie để duy trì đăng nhập và cải thiện trải nghiệm.',
+      cookie_accept:'Đồng ý', cookie_decline:'Từ chối',
+    },
+    en: {
+      why_title_1:'Why choose', why_sub:'Cloud PC gaming service, Singapore server.',
+      price_title:'Specs &', price_title2:'Pricing', price_sub:'Pay only for hours used, no deposit required.',
+      steps_title:'Just', steps_title2:'to get started', steps_sub:'Purchase and start playing in minutes.',
+      faq_title:'Frequently', faq_title2:'Asked Questions',
+      review_title:'What', review_title2:'customers say',
+      join_discord:'Join Discord', join_discord_now:'Join Discord Now', view_price:'View Pricing',
+      cta_title:'Want to try', cta_sub:'Join Discord to order or ask for more info.',
+      feat1:'Ultra Low Ping', feat2:'High-end GPU', feat3:'Real Windows VM', feat4:'Affordable Price', feat5:'24/7 Support', feat6:'Easy to Use',
+      rent_btn:'Rent via Discord →',
+      cookie_text:'We use cookies to maintain login and improve your experience.',
+      cookie_accept:'Accept', cookie_decline:'Decline',
+    },
+    id: {
+      why_title_1:'Mengapa memilih', why_sub:'Layanan cloud PC gaming, server Singapura.',
+      price_title:'Spesifikasi &', price_title2:'Harga', price_sub:'Bayar sesuai jam penggunaan, tanpa deposit.',
+      steps_title:'Hanya', steps_title2:'untuk memulai', steps_sub:'Beli dan mulai bermain dalam hitungan menit.',
+      faq_title:'Pertanyaan', faq_title2:'yang sering ditanyakan',
+      review_title:'Apa kata', review_title2:'pelanggan',
+      join_discord:'Bergabung Discord', join_discord_now:'Bergabung Discord Sekarang', view_price:'Lihat Harga',
+      cta_title:'Ingin mencoba', cta_sub:'Bergabung Discord untuk memesan atau bertanya.',
+      feat1:'Ping Ultra Rendah', feat2:'GPU Kelas Atas', feat3:'Windows VM Nyata', feat4:'Harga Terjangkau', feat5:'Dukungan 24/7', feat6:'Mudah Digunakan',
+      rent_btn:'Sewa via Discord →',
+      cookie_text:'Kami menggunakan cookie untuk mempertahankan login dan meningkatkan pengalaman.',
+      cookie_accept:'Setuju', cookie_decline:'Tolak',
+    },
+    th: {
+      why_title_1:'ทำไมต้องเลือก', why_sub:'บริการ Cloud PC Gaming เซิร์ฟเวอร์สิงคโปร์',
+      price_title:'สเปค &', price_title2:'ราคา', price_sub:'จ่ายตามชั่วโมงที่ใช้จริง ไม่มีมัดจำ',
+      steps_title:'เพียง', steps_title2:'เพื่อเริ่มต้น', steps_sub:'ซื้อและเริ่มเล่นได้ภายในไม่กี่นาที',
+      faq_title:'คำถาม', faq_title2:'ที่พบบ่อย',
+      review_title:'สิ่งที่', review_title2:'ลูกค้าพูด',
+      join_discord:'เข้าร่วม Discord', join_discord_now:'เข้าร่วม Discord เลย', view_price:'ดูราคา',
+      cta_title:'อยากลองใช้', cta_sub:'เข้าร่วม Discord เพื่อสั่งซื้อหรือสอบถามข้อมูล',
+      feat1:'Ping ต่ำมาก', feat2:'GPU ระดับสูง', feat3:'Windows VM จริง', feat4:'ราคาประหยัด', feat5:'ซัพพอร์ต 24/7', feat6:'ใช้งานง่าย',
+      rent_btn:'เช่าผ่าน Discord →',
+      cookie_text:'เราใช้คุกกี้เพื่อรักษาการเข้าสู่ระบบและปรับปรุงประสบการณ์',
+      cookie_accept:'ยอมรับ', cookie_decline:'ปฏิเสธ',
+    },
+    my: {
+      why_title_1:'Mengapa pilih', why_sub:'Perkhidmatan Cloud PC gaming, pelayan Singapura.',
+      price_title:'Spesifikasi &', price_title2:'Harga', price_sub:'Bayar mengikut jam penggunaan, tiada deposit.',
+      steps_title:'Hanya', steps_title2:'untuk bermula', steps_sub:'Beli dan mula bermain dalam beberapa minit.',
+      faq_title:'Soalan', faq_title2:'Lazim',
+      review_title:'Apa kata', review_title2:'pelanggan',
+      join_discord:'Sertai Discord', join_discord_now:'Sertai Discord Sekarang', view_price:'Lihat Harga',
+      cta_title:'Mahu cuba', cta_sub:'Sertai Discord untuk membuat pesanan atau bertanya.',
+      feat1:'Ping Ultra Rendah', feat2:'GPU Kelas Tinggi', feat3:'Windows VM Sebenar', feat4:'Harga Berpatutan', feat5:'Sokongan 24/7', feat6:'Mudah Digunakan',
+      rent_btn:'Sewa melalui Discord →',
+      cookie_text:'Kami menggunakan kuki untuk mengekalkan log masuk dan meningkatkan pengalaman.',
+      cookie_accept:'Terima', cookie_decline:'Tolak',
+    },
+    ph: {
+      why_title_1:'Bakit piliin ang', why_sub:'Cloud PC gaming service, server Singapore.',
+      price_title:'Specs &', price_title2:'Presyo', price_sub:'Magbayad lamang sa oras na ginamit, walang deposito.',
+      steps_title:'Tatlong hakbang', steps_title2:'para magsimula', steps_sub:'Bumili at magsimulang maglaro sa ilang minuto.',
+      faq_title:'Mga Madalas', faq_title2:'Itanong',
+      review_title:'Sinasabi ng', review_title2:'mga customer',
+      join_discord:'Sumali sa Discord', join_discord_now:'Sumali sa Discord Ngayon', view_price:'Tingnan ang Presyo',
+      cta_title:'Gusto mong subukan ang', cta_sub:'Sumali sa Discord para mag-order o magtanong.',
+      feat1:'Ultra Mababang Ping', feat2:'High-end GPU', feat3:'Tunay na Windows VM', feat4:'Abot-kayang Presyo', feat5:'24/7 Support', feat6:'Madaling Gamitin',
+      rent_btn:'Magrenta via Discord →',
+      cookie_text:'Gumagamit kami ng cookies para mapanatili ang login at mapabuti ang karanasan.',
+      cookie_accept:'Tanggapin', cookie_decline:'Tanggihan',
+    },
+    jp: {
+      why_title_1:'なぜ選ぶ', why_sub:'クラウドPCゲーミングサービス、シンガポールサーバー',
+      price_title:'スペック &', price_title2:'料金', price_sub:'使用した時間分だけ支払い、デポジット不要',
+      steps_title:'たった', steps_title2:'ステップで始められる', steps_sub:'数分で購入してプレイ開始',
+      faq_title:'よくある', faq_title2:'質問',
+      review_title:'お客様の', review_title2:'声',
+      join_discord:'Discordに参加', join_discord_now:'今すぐDiscordに参加', view_price:'料金を見る',
+      cta_title:'試してみたい', cta_sub:'Discordに参加して注文や質問をどうぞ',
+      feat1:'超低遅延Ping', feat2:'ハイエンドGPU', feat3:'本物のWindows VM', feat4:'お手頃価格', feat5:'24/7サポート', feat6:'使いやすい',
+      rent_btn:'Discordで借りる →',
+      cookie_text:'ログイン維持とエクスペリエンス向上のためCookieを使用します',
+      cookie_accept:'同意する', cookie_decline:'拒否',
+    },
+    kr: {
+      why_title_1:'왜 선택하나요', why_sub:'클라우드 PC 게이밍 서비스, 싱가포르 서버',
+      price_title:'사양 &', price_title2:'가격', price_sub:'사용한 시간만큼만 결제, 보증금 없음',
+      steps_title:'단', steps_title2:'단계로 시작', steps_sub:'구매 후 몇 분 안에 게임 시작',
+      faq_title:'자주 묻는', faq_title2:'질문',
+      review_title:'고객들의', review_title2:'후기',
+      join_discord:'Discord 참여', join_discord_now:'지금 Discord 참여', view_price:'가격 보기',
+      cta_title:'시도해 보고 싶으신가요', cta_sub:'Discord에 참여하여 주문하거나 문의하세요',
+      feat1:'초저지연 핑', feat2:'고사양 GPU', feat3:'실제 Windows VM', feat4:'저렴한 가격', feat5:'24/7 지원', feat6:'사용하기 쉬움',
+      rent_btn:'Discord로 대여 →',
+      cookie_text:'로그인 유지 및 경험 향상을 위해 쿠키를 사용합니다',
+      cookie_accept:'동의', cookie_decline:'거부',
+    },
+    zh: {
+      why_title_1:'为什么选择', why_sub:'云PC游戏服务，新加坡服务器',
+      price_title:'配置 &', price_title2:'价格', price_sub:'按实际使用小时收费，无需押金',
+      steps_title:'只需', steps_title2:'步即可开始', steps_sub:'购买后几分钟内即可开始游戏',
+      faq_title:'常见', faq_title2:'问题',
+      review_title:'客户', review_title2:'评价',
+      join_discord:'加入Discord', join_discord_now:'立即加入Discord', view_price:'查看价格',
+      cta_title:'想试试', cta_sub:'加入Discord下单或咨询更多信息',
+      feat1:'超低延迟', feat2:'高端GPU', feat3:'真实Windows VM', feat4:'价格实惠', feat5:'24/7支持', feat6:'易于使用',
+      rent_btn:'通过Discord租用 →',
+      cookie_text:'我们使用cookie维持登录状态并改善体验',
+      cookie_accept:'同意', cookie_decline:'拒绝',
+    },
+    ru: {
+      why_title_1:'Почему выбирают', why_sub:'Облачный игровой ПК, сервер в Сингапуре',
+      price_title:'Конфигурация &', price_title2:'Цены', price_sub:'Оплата только за использованные часы, без залога',
+      steps_title:'Всего', steps_title2:'шага для начала', steps_sub:'Купите и начните играть за несколько минут',
+      faq_title:'Часто задаваемые', faq_title2:'вопросы',
+      review_title:'Отзывы', review_title2:'клиентов',
+      join_discord:'Присоединиться к Discord', join_discord_now:'Присоединиться сейчас', view_price:'Посмотреть цены',
+      cta_title:'Хотите попробовать', cta_sub:'Присоединяйтесь к Discord для заказа или вопросов',
+      feat1:'Ультранизкий пинг', feat2:'Мощный GPU', feat3:'Настоящая Windows VM', feat4:'Доступные цены', feat5:'Поддержка 24/7', feat6:'Легко использовать',
+      rent_btn:'Арендовать через Discord →',
+      cookie_text:'Мы используем файлы cookie для поддержания входа и улучшения опыта',
+      cookie_accept:'Принять', cookie_decline:'Отклонить',
+    },
+  };
+
+  let activeLang = localStorage.getItem('grimz_lang') || 'vi';
+
+  function applyLang(lang) {
+    const t = T[lang];
+    if (!t) return;
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const k = el.getAttribute('data-i18n');
+      if (t[k] !== undefined) el.innerHTML = t[k];
+    });
+    // Cookie banner
+    const cb = document.getElementById('cookie-text-span');
+    const ca = document.getElementById('cookie-accept-btn');
+    const cd = document.getElementById('cookie-decline-btn');
+    if (cb) cb.innerHTML = t.cookie_text + ' <a href="privacy.html">' + (lang==='vi'?'Chính sách bảo mật':lang==='en'?'Privacy Policy':'Privacy Policy') + '</a>.';
+    if (ca) ca.textContent = t.cookie_accept;
+    if (cd) cd.textContent = t.cookie_decline;
+    document.documentElement.lang = lang;
+  }
+
+  function setActiveLang(lang) {
+    activeLang = lang;
+    localStorage.setItem('grimz_lang', lang);
+    const info = LANGS[lang];
+    document.getElementById('curFlag').textContent = info.flag;
+    document.getElementById('curCode').textContent = info.code;
+    document.querySelectorAll('.lang-opt').forEach(b => b.classList.remove('sel'));
+    const btn = document.getElementById('lbtn-' + lang);
+    if (btn) btn.classList.add('sel');
+    document.getElementById('langTrigger').classList.remove('open');
+    document.getElementById('langDropdown').classList.remove('open');
+    applyLang(lang);
+  }
+
+  function pickLang(lang) {
+    localStorage.setItem('grimz_lang_manual', '1');
+    setActiveLang(lang);
+  }
+
+  function toggleLang() {
+    document.getElementById('langTrigger').classList.toggle('open');
+    document.getElementById('langDropdown').classList.toggle('open');
+  }
+
+  document.addEventListener('click', e => {
+    if (!document.getElementById('langSwitcher').contains(e.target)) {
+      document.getElementById('langTrigger').classList.remove('open');
+      document.getElementById('langDropdown').classList.remove('open');
+    }
+  });
+
+  // Auto detect by IP
+  async function autoDetectLang() {
+    if (localStorage.getItem('grimz_lang_manual')) {
+      setActiveLang(activeLang);
+      return;
+    }
+    try {
+      const res = await fetch('https://ipapi.co/json/', { signal: AbortSignal.timeout(3000) });
+      const data = await res.json();
+      const cc = data.country_code;
+      let lang = 'en';
+      for (const [k, v] of Object.entries(LANGS)) {
+        if (v.country.includes(cc)) { lang = k; break; }
+      }
+      setActiveLang(lang);
+    } catch {
+      setActiveLang(activeLang);
+    }
+  }
+  // Run after DOM ready
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", autoDetectLang);
+  } else {
+    autoDetectLang();
+  }
+
   // Footer year
   document.getElementById('footer-year').textContent = new Date().getFullYear();
 
@@ -840,12 +1108,11 @@
 </script>
 <div class="cookie-banner" id="cookieBanner">
   <div class="cookie-text">
-    Chúng tôi dùng cookie để duy trì đăng nhập và cải thiện trải nghiệm.
-    Xem <a href="privacy.html">Chính sách bảo mật</a> và <a href="terms.html">Điều khoản dịch vụ</a>.
+    <span id="cookie-text-span">Chúng tôi dùng cookie để duy trì đăng nhập và cải thiện trải nghiệm. <a href="privacy.html">Chính sách bảo mật</a>.</span>
   </div>
   <div class="cookie-btns">
-    <button class="cookie-decline" onclick="cookieDecline()">Từ chối</button>
-    <button class="cookie-accept" onclick="cookieAccept()">Đồng ý</button>
+    <button class="cookie-decline" id="cookie-decline-btn" onclick="cookieDecline()">Từ chối</button>
+    <button class="cookie-accept" id="cookie-accept-btn" onclick="cookieAccept()">Đồng ý</button>
   </div>
 </div>
 </body>
