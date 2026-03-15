@@ -17,6 +17,8 @@
   * { margin:0; padding:0; box-sizing:border-box; }
   body { background:var(--bg); color:var(--text); font-family:'Poppins',sans-serif; min-height:100vh; display:flex; overflow-x:hidden; }
   body::before { content:''; position:fixed; inset:0; background-image:linear-gradient(rgba(124,92,191,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(124,92,191,0.03) 1px,transparent 1px); background-size:40px 40px; pointer-events:none; z-index:0; }
+  body::after { content:''; position:fixed; top:-50%; left:-50%; width:200%; height:200%; background:radial-gradient(ellipse at 30% 40%,rgba(124,92,191,0.06) 0%,transparent 45%),radial-gradient(ellipse at 70% 60%,rgba(90,63,160,0.04) 0%,transparent 40%); animation:rotateBg 25s linear infinite; pointer-events:none; z-index:0; }
+  @keyframes rotateBg { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
 
   /* ===== KANJI LOADER ===== */
   #kanji-loader { position:fixed; inset:0; background:#09080f; z-index:9999; display:flex; flex-direction:column; align-items:center; justify-content:center; overflow:hidden; }
@@ -187,6 +189,34 @@
   ::-webkit-scrollbar-thumb { background:var(--bg4); }
 
 
+
+
+  /* ===== HISTORY ===== */
+  .history-item { display:grid; grid-template-columns:1fr auto; gap:0.75rem; padding:0.85rem 1rem; border-bottom:1px solid rgba(124,92,191,0.08); transition:background 0.2s; align-items:center; }
+  .history-item:last-child { border-bottom:none; }
+  .history-item:hover { background:rgba(124,92,191,0.04); }
+  .history-plan { font-family:'Rajdhani',sans-serif; font-size:0.95rem; font-weight:700; color:var(--accent2); letter-spacing:0.05em; }
+  .history-gpu { font-family:'JetBrains Mono',monospace; font-size:0.68rem; color:var(--muted); margin-top:0.15rem; }
+  .history-dates { font-family:'JetBrains Mono',monospace; font-size:0.65rem; color:var(--muted); margin-top:0.25rem; }
+  .history-hours { font-family:'Rajdhani',sans-serif; font-size:1.3rem; font-weight:700; color:var(--text); text-align:right; white-space:nowrap; }
+  .history-hours span { font-size:0.7rem; color:var(--muted); font-family:'JetBrains Mono',monospace; }
+
+  /* ===== PROFILE MODAL ===== */
+  .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:500; display:none; align-items:center; justify-content:center; backdrop-filter:blur(4px); }
+  .modal-overlay.open { display:flex; animation:modalIn 0.2s ease; }
+  @keyframes modalIn { from{opacity:0;transform:scale(0.95)} to{opacity:1;transform:scale(1)} }
+  .modal-box { background:var(--bg2); border:1px solid rgba(124,92,191,0.3); padding:2rem; width:90%; max-width:400px; position:relative; }
+  .modal-box::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:linear-gradient(90deg,var(--accent3),var(--accent2)); }
+  .modal-title { font-family:'Rajdhani',sans-serif; font-size:1.1rem; font-weight:700; text-transform:uppercase; letter-spacing:0.1em; margin-bottom:1.25rem; color:var(--accent2); }
+  .modal-input { width:100%; background:var(--bg); border:1px solid var(--border); color:var(--text); font-family:'Poppins',sans-serif; font-size:0.875rem; padding:0.65rem 0.85rem; outline:none; transition:border-color 0.2s; margin-bottom:1rem; }
+  .modal-input:focus { border-color:var(--accent2); }
+  .modal-input::placeholder { color:var(--muted); }
+  .modal-footer { display:flex; gap:0.75rem; justify-content:flex-end; }
+  .modal-close { position:absolute; top:1rem; right:1rem; background:none; border:none; color:var(--muted); cursor:pointer; font-size:1rem; transition:color 0.2s; }
+  .modal-close:hover { color:var(--text); }
+  .user-edit-btn { background:none; border:none; color:var(--muted); cursor:pointer; font-size:0.7rem; padding:0.1rem 0.25rem; transition:color 0.2s; margin-left:0.3rem; vertical-align:middle; }
+  .user-edit-btn:hover { color:var(--accent2); }
+
   /* ===== THEME SWITCHER ===== */
   .theme-toggle { display:flex; align-items:center; gap:0.6rem; width:100%; padding:0.6rem 0.5rem; background:none; border:none; cursor:pointer; margin-top:0.75rem; border-radius:4px; transition:background 0.2s; }
   .theme-toggle:hover { background:rgba(124,92,191,0.12); transform:translateX(2px); }
@@ -255,8 +285,27 @@
   }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
 <body>
+
+
+<!-- PROFILE MODAL -->
+<div class="modal-overlay" id="profileModal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeProfileModal()"><i class="fas fa-times"></i></button>
+    <div class="modal-title">✏️ Chỉnh sửa profile</div>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:0.62rem;color:var(--muted);letter-spacing:0.12em;margin-bottom:0.75rem;">TÊN HIỂN THỊ</div>
+    <input class="modal-input" id="displayNameInput" type="text" placeholder="Nhập tên hiển thị..." maxlength="32">
+    <div style="font-size:0.75rem;color:var(--muted);margin-bottom:1.25rem;">Tên này chỉ hiển thị trên dashboard của bạn.</div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" style="padding:0.5rem 1rem;font-size:0.8rem;" onclick="closeProfileModal()">Hủy</button>
+      <button class="btn btn-discord" style="padding:0.5rem 1.25rem;font-size:0.8rem;" onclick="saveProfile()">
+        <i class="fas fa-save"></i> Lưu
+      </button>
+    </div>
+  </div>
+</div>
 
 <!-- KANJI LOADER -->
 <div id="kanji-loader">
@@ -276,7 +325,7 @@
   <div class="sidebar-user">
     <div class="user-avatar" id="userAvatar">?</div>
     <div>
-      <div class="user-name" id="userName">—</div>
+      <div class="user-name" id="userName">—<button class="user-edit-btn" onclick="openProfileModal()" title="Chỉnh sửa"><i class="fas fa-pen"></i></button></div>
       <div class="user-plan" id="userPlan">—</div>
     </div>
   </div>
@@ -285,6 +334,7 @@
     <button class="nav-item active" onclick="goTo('dashboard',this)"><span class="nav-icon"><i class="fas fa-th-large"></i></span> Dashboard</button>
     <button class="nav-item" onclick="goTo('machine',this)"><span class="nav-icon"><i class="fas fa-server"></i></span> Máy của tôi</button>
     <button class="nav-item" onclick="goTo('time',this)"><span class="nav-icon"><i class="fas fa-clock"></i></span> Thời gian</button>
+    <button class="nav-item" onclick="goTo('history',this)"><span class="nav-icon"><i class="fas fa-history"></i></span> Lịch sử thuê</button>
     <div class="nav-section">// Support</div>
     <button class="nav-item" onclick="goTo('connect',this)"><span class="nav-icon"><i class="fas fa-plug"></i></span> Hướng dẫn kết nối</button>
     <button class="nav-item" onclick="goTo('support',this)"><span class="nav-icon"><i class="fas fa-headset"></i></span> Hỗ trợ</button>
@@ -424,6 +474,33 @@
     </div>
   </div>
 
+
+  <!-- HISTORY -->
+  <div class="page" id="page-history">
+    <div class="card card-top-line">
+      <div class="card-label">// Thống kê 7 ngày</div>
+      <div class="card-title" style="margin-bottom:1.25rem;">Giờ sử dụng</div>
+      <div style="position:relative;height:180px;">
+        <canvas id="usageChart"></canvas>
+      </div>
+    </div>
+    <div class="card card-top-line">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;">
+        <div>
+          <div class="card-label">// Lịch sử thuê máy</div>
+          <div class="card-title" style="margin-bottom:0;">Các phiên đã dùng</div>
+        </div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:0.65rem;color:var(--muted);" id="historyCount">— phiên</div>
+      </div>
+      <div id="historyList">
+        <div class="empty-state">
+          <div class="empty-robot">📋</div>
+          <div class="empty-text">Chưa có lịch sử thuê.<br>Dữ liệu sẽ hiện sau khi hết hạn máy.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- CONNECT -->
   <div class="page" id="page-connect">
     <div class="card card-top-line">
@@ -511,6 +588,139 @@
   })();
 
 
+
+
+  // ===== HISTORY & CHART =====
+  let chartInstance = null;
+
+  async function loadHistory(userId) {
+    const { data, error } = await sb
+      .from('rental_history')
+      .select('*')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false })
+      .limit(20);
+
+    const list = document.getElementById('historyList');
+    const count = document.getElementById('historyCount');
+
+    if(!data || data.length === 0) {
+      count.textContent = '0 phiên';
+      return;
+    }
+
+    count.textContent = data.length + ' phiên';
+    list.innerHTML = data.map(r => {
+      const start = r.started_at ? new Date(r.started_at).toLocaleString('vi-VN') : '—';
+      const end   = r.ended_at   ? new Date(r.ended_at).toLocaleString('vi-VN')   : '—';
+      const hrs   = r.total_hours ? parseFloat(r.total_hours).toFixed(1) : '—';
+      return `<div class="history-item">
+        <div>
+          <div class="history-plan">${r.plan || 'G-NOVA'}</div>
+          <div class="history-gpu">${r.gpu || '—'}</div>
+          <div class="history-dates">${start} → ${end}</div>
+        </div>
+        <div class="history-hours">${hrs}<span> giờ</span></div>
+      </div>`;
+    }).join('');
+
+    // Build chart data - last 7 days
+    buildChart(data);
+  }
+
+  function buildChart(data) {
+    const days = [];
+    const hours = [];
+    for(let i = 6; i >= 0; i--) {
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      const label = d.toLocaleDateString('vi-VN', { day:'2-digit', month:'2-digit' });
+      days.push(label);
+      // Sum hours for this day
+      const dayStr = d.toISOString().slice(0, 10);
+      const total = data
+        .filter(r => r.started_at && r.started_at.startsWith(dayStr))
+        .reduce((sum, r) => sum + (parseFloat(r.total_hours) || 0), 0);
+      hours.push(parseFloat(total.toFixed(1)));
+    }
+
+    const ctx = document.getElementById('usageChart').getContext('2d');
+    if(chartInstance) chartInstance.destroy();
+
+    chartInstance = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: days,
+        datasets: [{
+          label: 'Giờ sử dụng',
+          data: hours,
+          backgroundColor: 'rgba(124,92,191,0.35)',
+          borderColor: 'rgba(155,127,232,0.8)',
+          borderWidth: 1,
+          borderRadius: 3,
+          hoverBackgroundColor: 'rgba(124,92,191,0.6)',
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            backgroundColor: 'rgba(22,19,35,0.95)',
+            borderColor: 'rgba(124,92,191,0.3)',
+            borderWidth: 1,
+            titleColor: '#9b7fe8',
+            bodyColor: '#e4e0f0',
+            titleFont: { family: 'JetBrains Mono', size: 11 },
+            bodyFont: { family: 'JetBrains Mono', size: 11 },
+            callbacks: { label: ctx => ctx.parsed.y + ' giờ' }
+          }
+        },
+        scales: {
+          x: {
+            grid: { color: 'rgba(124,92,191,0.08)' },
+            ticks: { color: '#8a84a0', font: { family: 'JetBrains Mono', size: 10 } }
+          },
+          y: {
+            grid: { color: 'rgba(124,92,191,0.08)' },
+            ticks: { color: '#8a84a0', font: { family: 'JetBrains Mono', size: 10 }, stepSize: 1 },
+            beginAtZero: true
+          }
+        }
+      }
+    });
+  }
+
+  // ===== PROFILE MODAL =====
+  let currentUserId = null;
+  function openProfileModal(){
+    document.getElementById('displayNameInput').value = document.getElementById('userName').textContent.replace(/\s*$/, '').trim();
+    // Remove edit icon text from value
+    const nameEl = document.getElementById('userName');
+    const rawName = nameEl.childNodes[0]?.textContent?.trim() || '';
+    document.getElementById('displayNameInput').value = rawName;
+    document.getElementById('profileModal').classList.add('open');
+    setTimeout(()=>document.getElementById('displayNameInput').focus(), 100);
+  }
+  function closeProfileModal(){
+    document.getElementById('profileModal').classList.remove('open');
+  }
+  function saveProfile(){
+    const newName = document.getElementById('displayNameInput').value.trim();
+    if(!newName) return;
+    const nameEl = document.getElementById('userName');
+    nameEl.childNodes[0].textContent = newName + ' ';
+    document.getElementById('userAvatar').textContent = newName[0].toUpperCase();
+    if(currentUserId) localStorage.setItem('grimz_display_name_'+currentUserId, newName);
+    closeProfileModal();
+    showToast('✓ Đã cập nhật tên', 2000, 'success');
+  }
+  // Close on overlay click
+  document.getElementById('profileModal').addEventListener('click', function(e){ if(e.target===this) closeProfileModal(); });
+  // Enter to save
+  document.getElementById('displayNameInput')?.addEventListener('keydown', e=>{ if(e.key==='Enter') saveProfile(); });
+
   // ===== THEME =====
   function toggleTheme(){
     document.body.classList.toggle('light-theme');
@@ -544,7 +754,7 @@
     setTimeout(pingLoop,1500+Math.random()*1000);
   })();
 
-  const titles={dashboard:'Dashboard',machine:'Máy của tôi',time:'Thời gian',connect:'Hướng dẫn kết nối',support:'Hỗ trợ'};
+  const titles={dashboard:'Dashboard',machine:'Máy của tôi',time:'Thời gian',history:'Lịch sử thuê',connect:'Hướng dẫn kết nối',support:'Hỗ trợ'};
   function goTo(id,btn){
     document.getElementById('sidebar').classList.remove('open');
     document.getElementById('sidebar-overlay').classList.remove('open');
@@ -661,10 +871,19 @@
   async function init(){
     const{data:{session}}=await sb.auth.getSession();
     if(!session){window.location.href='grimz-login.html';return;}
+    currentUserId=session.user.id;
+    loadHistory(session.user.id);
     const email=session.user.email||'User';
     const username=email.split('@')[0];
-    document.getElementById('userName').textContent=username;
-    document.getElementById('userAvatar').textContent=username[0].toUpperCase();
+    // Check for saved display name
+    const savedName = localStorage.getItem('grimz_display_name_'+session.user.id);
+    document.getElementById('userName').textContent=savedName||username;
+    // Color avatar by email hash
+    let hash=0; for(let i=0;i<email.length;i++) hash=email.charCodeAt(i)+((hash<<5)-hash);
+    const hue=Math.abs(hash%360);
+    const av=document.getElementById('userAvatar');
+    av.textContent=(savedName||username)[0].toUpperCase();
+    av.style.background=`linear-gradient(135deg,hsl(${hue},65%,55%),hsl(${hue+30},75%,35%))`;
     document.getElementById('userUuid').textContent=session.user.id;
 
     const{data:machine}=await sb.from('machines').select('*').eq('user_id',session.user.id).single();

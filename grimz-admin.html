@@ -313,6 +313,7 @@
         <td><span class="badge ${expired ? '' : 'badge-active'}" style="${expired ? 'background:rgba(248,113,113,0.1);border:1px solid rgba(248,113,113,0.2);color:var(--red)' : ''}">${expired ? 'HẾT HẠN' : 'ACTIVE'}</span></td>
         <td style="display:flex;gap:0.4rem;">
           <button class="btn btn-sm btn-extend" onclick="openExtend('${m.id}','${m.expiry}')">+Giờ</button>
+          <button class="btn btn-sm btn-warning" onclick="revokeMachine('${m.id}','${m.user_id}','${m.plan}','${m.gpu}','${m.created_at}','${m.expiry}')">Thu hồi</button>
           <button class="btn btn-sm btn-danger" onclick="deleteMachine('${m.id}')">Xóa</button>
         </td>
       </tr>`;
@@ -365,6 +366,35 @@
     loadData();
   }
 
+  async function revokeMachine(id, userId, plan, gpu, startedAt, expiry) {
+    if (!confirm('Thu hồi máy này?\nDữ liệu sẽ được ghi vào lịch sử thuê của user.')) return;
+
+    // Calculate total hours
+    const started = startedAt && startedAt !== 'null' ? new Date(startedAt) : new Date();
+    const ended   = new Date();
+    const totalHours = parseFloat(((ended - started) / 3600000).toFixed(2));
+
+    // Write to rental_history
+    const { error: histErr } = await sb.from('rental_history').insert({
+      user_id:     userId,
+      plan:        plan || 'G-NOVA',
+      gpu:         gpu  || '—',
+      started_at:  started.toISOString(),
+      ended_at:    ended.toISOString(),
+      total_hours: totalHours
+    });
+
+    if (histErr) {
+      alert('Lỗi ghi lịch sử: ' + histErr.message);
+      return;
+    }
+
+    // Delete machine
+    await sb.from('machines').delete().eq('id', id);
+    showToast('✓ Đã thu hồi & ghi lịch sử (' + totalHours + 'h)', 'success');
+    loadData();
+  }
+
   async function deleteMachine(id) {
     if (!confirm('Xóa máy này?')) return;
     await sb.from('machines').delete().eq('id', id);
@@ -410,7 +440,7 @@
   const toastEl = document.createElement('div');
   toastEl.style.cssText = 'position:fixed;bottom:2rem;right:2rem;background:#161323;border:1px solid rgba(124,92,191,0.5);color:#9b7fe8;font-family:"Share Tech Mono",monospace;font-size:0.75rem;padding:0.6rem 1.25rem;z-index:999;opacity:0;transform:translateY(10px);transition:all 0.3s;pointer-events:none;letter-spacing:0.08em;';
   document.body.appendChild(toastEl);
-  function showToast(msg) {
+  function showToast(msg, type) {
     toastEl.textContent = msg;
     toastEl.style.opacity = '1'; toastEl.style.transform = 'translateY(0)';
     setTimeout(() => { toastEl.style.opacity = '0'; toastEl.style.transform = 'translateY(10px)'; }, 2500);
