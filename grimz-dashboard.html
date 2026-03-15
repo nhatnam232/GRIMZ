@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Grimz Cloud PC — Dashboard</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Exo+2:wght@300;400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@700&family=Rajdhani:wght@400;500;600;700&family=Exo+2:wght@300;400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <style>
   :root {
     --bg:     #09080f;
@@ -139,10 +139,109 @@
     .sidebar-overlay.open{display:block;}
     .stats-row{grid-template-columns:1fr;}
   }
+
+  /* ===== KANJI GLITCH LOADER ===== */
+  #kanji-loader {
+    position:fixed; inset:0; background:#09080f; z-index:9999;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    overflow:hidden;
+  }
+  #kanji-loader.fade-out { animation:loaderFadeOut 0.6s ease forwards; }
+  @keyframes loaderFadeOut { to { opacity:0; pointer-events:none; } }
+
+  /* Rain canvas */
+  #kanji-rain { position:absolute; inset:0; opacity:0.12; }
+
+  /* Main kanji */
+  .k-main {
+    font-family:'Noto Sans JP','MS Gothic',monospace;
+    font-size:clamp(4rem,15vw,8rem); font-weight:700;
+    color:#9b7fe8; letter-spacing:0.3em;
+    position:relative; z-index:2; text-align:center;
+    text-shadow:0 0 30px rgba(124,92,191,0.8);
+    animation:kanjiFadeIn 0.5s ease forwards;
+    opacity:0;
+  }
+  @keyframes kanjiFadeIn { to { opacity:1; } }
+
+  /* Glitch effect */
+  .k-main.glitch {
+    animation:kanjiGlitch 0.1s infinite;
+  }
+  @keyframes kanjiGlitch {
+    0%   { text-shadow:2px 0 #f87171, -2px 0 #4ade80; transform:translate(0); }
+    20%  { text-shadow:-3px 0 #f87171, 3px 0 #4ade80; transform:translate(-2px,1px); }
+    40%  { text-shadow:3px 0 #f87171, -3px 0 #4ade80; transform:translate(2px,-1px); }
+    60%  { text-shadow:-2px 2px #f87171, 2px -2px #4ade80; transform:translate(0,2px); clip-path:polygon(0 30%,100% 30%,100% 50%,0 50%); }
+    80%  { text-shadow:0 0 #f87171, 0 0 #4ade80; transform:translate(1px,0); }
+    100% { text-shadow:2px 0 #f87171, -2px 0 #4ade80; transform:translate(0); clip-path:none; }
+  }
+  .k-main.glitch-heavy {
+    animation:kanjiGlitchHeavy 0.08s infinite;
+  }
+  @keyframes kanjiGlitchHeavy {
+    0%   { text-shadow:4px 0 #f87171,-4px 0 #60a5fa,0 0 #9b7fe8; transform:translate(-3px,0) skewX(-5deg); clip-path:polygon(0 20%,100% 20%,100% 40%,0 40%); }
+    25%  { text-shadow:-4px 0 #f87171,4px 0 #60a5fa; transform:translate(3px,2px) skewX(3deg); clip-path:polygon(0 60%,100% 60%,100% 80%,0 80%); }
+    50%  { text-shadow:0 4px #f87171,0 -4px #60a5fa; transform:translate(0,-2px) skewY(-2deg); clip-path:none; }
+    75%  { text-shadow:-2px -2px #f87171,2px 2px #60a5fa; transform:translate(2px,0); clip-path:polygon(0 0,100% 0,100% 30%,0 30%); }
+    100% { text-shadow:4px 0 #f87171,-4px 0 #60a5fa; transform:translate(0); clip-path:none; }
+  }
+
+  /* Sub text */
+  .k-sub {
+    font-family:'Share Tech Mono',monospace; font-size:0.85rem;
+    color:#5a5470; letter-spacing:0.3em; margin-top:1.5rem;
+    position:relative; z-index:2; opacity:0;
+    transition:opacity 0.5s, color 0.5s;
+  }
+  .k-sub.visible { opacity:1; }
+  .k-sub.active { color:#9b7fe8; text-shadow:0 0 10px rgba(124,92,191,0.5); }
+
+  /* Progress bar */
+  .k-progress { width:200px; height:1px; background:rgba(124,92,191,0.2); margin-top:2rem; position:relative; z-index:2; opacity:0; transition:opacity 0.3s; }
+  .k-progress.visible { opacity:1; }
+  .k-progress-fill { height:100%; background:linear-gradient(90deg,#5a3fa0,#9b7fe8); width:0%; transition:width 0.1s; }
+
+  /* Logo reveal */
+  .k-logo {
+    font-family:'Rajdhani',sans-serif; font-size:1.4rem; font-weight:700;
+    letter-spacing:0.2em; text-transform:uppercase; color:#7c5cbf;
+    text-shadow:0 0 20px rgba(124,92,191,0.5); margin-top:1.5rem;
+    position:relative; z-index:2; opacity:0; transition:opacity 0.5s;
+  }
+  .k-logo span { color:#9b7fe8; }
+  .k-logo.visible { opacity:1; }
+
+  /* Colored toasts */
+  .toast-success { border-color:rgba(74,222,128,0.5); color:#4ade80; }
+  .toast-warn    { border-color:rgba(251,191,36,0.5);  color:#fbbf24; }
+  .toast-error   { border-color:rgba(248,113,113,0.5); color:#f87171; }
+
+  /* Countdown expired */
+  .countdown-expired .cd-num { color:#f87171; text-shadow:0 0 10px rgba(248,113,113,0.5); animation:blink 1s infinite; }
+
+  /* Copy button tooltip */
+  .copy-ip { position:relative; }
+  .copy-ip::after { content:'Copy'; position:absolute; bottom:calc(100% + 4px); left:50%; transform:translateX(-50%) scale(0); background:var(--bg3); border:1px solid var(--border); color:var(--accent2); font-family:'Share Tech Mono',monospace; font-size:0.55rem; padding:0.15rem 0.4rem; white-space:nowrap; transition:transform 0.15s; letter-spacing:0.08em; }
+  .copy-ip:hover::after { transform:translateX(-50%) scale(1); }
+  .copy-ip:hover { transform:scale(1.05); }
+
+  /* Sidebar icon hover */
+  .nav-icon { display:inline-block; transition:transform 0.3s; }
+  .nav-item:hover .nav-icon { transform:rotate(15deg) scale(1.2); }
+
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
+
+<div id="kanji-loader">
+  <canvas id="kanji-rain"></canvas>
+  <div class="k-main" id="k-main">準備中</div>
+  <div class="k-sub" id="k-sub1">接続中...</div>
+  <div class="k-progress" id="k-progress"><div class="k-progress-fill" id="k-progress-fill"></div></div>
+  <div class="k-logo" id="k-logo">GRIMZ <span>CLOUD</span> PC</div>
+</div>
 
 <button class="hamburger" onclick="toggleSidebar()">☰</button>
 <div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleSidebar()"></div>
@@ -396,6 +495,9 @@
       const h = Math.floor((diff%86400000)/3600000);
       const m = Math.floor((diff%3600000)/60000);
       const s = Math.floor((diff%60000)/1000);
+      const expired = diff <= 0;
+      const cdEl = document.querySelector('.countdown');
+      if (cdEl) cdEl.classList.toggle('countdown-expired', expired);
       document.getElementById('cd-d').textContent = String(d).padStart(2,'0');
       document.getElementById('cd-h').textContent = String(h).padStart(2,'0');
       document.getElementById('cd-m').textContent = String(m).padStart(2,'0');
@@ -458,11 +560,11 @@
     document.getElementById('userPlan').textContent = m.plan || 'G-NOVA';
   }
 
-  function showToast(msg, duration) {
+  function showToast(msg, duration, type) {
     const t = document.getElementById('toast');
     t.textContent = msg;
-    t.classList.add('show');
-    setTimeout(() => t.classList.remove('show'), duration || 2000);
+    t.className = 'toast show' + (type ? ' toast-' + type : '');
+    setTimeout(() => { t.classList.remove('show'); }, duration || 2000);
   }
 
   function copyUuid() {
@@ -516,6 +618,95 @@
   }
 
   init();
+
+  // ===== KANJI GLITCH LOADER =====
+  (function() {
+    const loader   = document.getElementById('kanji-loader');
+    const kMain    = document.getElementById('k-main');
+    const kSub1    = document.getElementById('k-sub1');
+    const kProgress= document.getElementById('k-progress');
+    const kFill    = document.getElementById('k-progress-fill');
+    const kLogo    = document.getElementById('k-logo');
+    const canvas   = document.getElementById('kanji-rain');
+    const ctx      = canvas.getContext('2d');
+
+    // Kanji rain
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    const rainChars = '雲雨電光準備中接続起動待機完了力水火風地天神龍剣刀夢影炎氷空海山川星月日闇光霊';
+    const cols = Math.floor(canvas.width / 20);
+    const drops = Array(cols).fill(0).map(() => Math.random() * -50);
+
+    function drawRain() {
+      ctx.fillStyle = 'rgba(9,8,15,0.05)';
+      ctx.fillRect(0,0,canvas.width,canvas.height);
+      ctx.fillStyle = 'rgba(124,92,191,0.6)';
+      ctx.font = '14px monospace';
+      drops.forEach((y, i) => {
+        const char = rainChars[Math.floor(Math.random() * rainChars.length)];
+        ctx.fillText(char, i * 20, y * 20);
+        drops[i] = y > canvas.height / 20 + Math.random() * 10 ? 0 : y + 0.5;
+      });
+    }
+    const rainInterval = setInterval(drawRain, 50);
+
+    // Sub text sequences
+    const subTexts = ['接続中...', '起動中...', '読み込み中...', '待機中...', '完了'];
+    let subIdx = 0;
+
+    function nextSub() {
+      kSub1.classList.remove('active');
+      setTimeout(() => {
+        kSub1.textContent = subTexts[subIdx++ % subTexts.length];
+        kSub1.classList.add('active');
+      }, 200);
+    }
+
+    // Timeline
+    setTimeout(() => { kMain.style.opacity = '1'; }, 100);
+
+    // 0.5s - light glitch
+    setTimeout(() => {
+      kMain.classList.add('glitch');
+      kSub1.classList.add('visible');
+      kProgress.classList.add('visible');
+      nextSub();
+    }, 500);
+
+    // Progress fill
+    let prog = 0;
+    const progInterval = setInterval(() => {
+      prog = Math.min(100, prog + Math.random() * 8 + 2);
+      kFill.style.width = prog + '%';
+      if (prog >= 30 && prog < 50) nextSub();
+      if (prog >= 100) clearInterval(progInterval);
+    }, 120);
+
+    // 1.5s - heavy glitch
+    setTimeout(() => {
+      kMain.classList.remove('glitch');
+      kMain.classList.add('glitch-heavy');
+      nextSub();
+    }, 1500);
+
+    // 2.5s - calm + logo
+    setTimeout(() => {
+      kMain.classList.remove('glitch-heavy');
+      kMain.style.textShadow = '0 0 40px rgba(124,92,191,0.9)';
+      kSub1.textContent = '完了';
+      kSub1.classList.add('active');
+      kFill.style.width = '100%';
+      setTimeout(() => { kLogo.classList.add('visible'); }, 300);
+    }, 2500);
+
+    // 3.5s - fade out
+    setTimeout(() => {
+      clearInterval(rainInterval);
+      loader.classList.add('fade-out');
+      setTimeout(() => { loader.style.display = 'none'; }, 600);
+    }, 3500);
+  })();
+
 </script>
 </body>
 </html>
