@@ -6,6 +6,7 @@
 <title>Grimz Cloud PC — Dashboard</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@700&family=Rajdhani:wght@400;500;600;700&family=Poppins:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
   :root {
     --bg:#09080f; --bg2:#100e1a; --bg3:#161323; --bg4:#1c1830;
@@ -14,7 +15,7 @@
     --text:#e4e0f0; --muted:#8a84a0; --border:rgba(124,92,191,0.15);
   }
   * { margin:0; padding:0; box-sizing:border-box; }
-  body { background:var(--bg); color:var(--text); font-family:'Inter',sans-serif; min-height:100vh; display:flex; overflow-x:hidden; }
+  body { background:var(--bg); color:var(--text); font-family:'Poppins',sans-serif; min-height:100vh; display:flex; overflow-x:hidden; }
   body::before { content:''; position:fixed; inset:0; background-image:linear-gradient(rgba(124,92,191,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(124,92,191,0.03) 1px,transparent 1px); background-size:40px 40px; pointer-events:none; z-index:0; }
 
   /* ===== KANJI LOADER ===== */
@@ -58,16 +59,21 @@
   .user-plan { font-family:'JetBrains Mono',monospace; font-size:0.65rem; color:var(--accent2); letter-spacing:0.1em; }
   .sidebar-nav { flex:1; padding:1rem 0; display:flex; flex-direction:column; gap:0.1rem; overflow-y:auto; }
   .nav-section { padding:0.75rem 1.5rem 0.3rem; font-family:'JetBrains Mono',monospace; font-size:0.6rem; color:var(--muted); letter-spacing:0.2em; text-transform:uppercase; }
-  .nav-item { display:flex; align-items:center; gap:1rem; padding:0.75rem 1.5rem; font-size:0.875rem; font-weight:500; color:var(--muted); cursor:pointer; transition:all 0.2s; text-decoration:none; border-left:2px solid transparent; background:none; border-right:none; border-top:none; border-bottom:none; width:100%; text-align:left; font-family:'Inter',sans-serif; }
-  .nav-item:hover { color:var(--text); background:rgba(124,92,191,0.06); box-shadow:inset 0 0 12px rgba(124,92,191,0.05); }
+  .nav-item { display:flex; align-items:center; gap:1rem; padding:0.75rem 1.5rem; font-size:0.875rem; font-weight:500; color:var(--muted); cursor:pointer; transition:all 0.2s; text-decoration:none; border-left:2px solid transparent; background:none; border-right:none; border-top:none; border-bottom:none; width:100%; text-align:left; font-family:'Poppins',sans-serif; }
+  .nav-item::after { content:''; position:absolute; left:0; top:0; width:100%; height:100%; background:radial-gradient(circle at 20% 50%,rgba(124,92,191,0.18),transparent 70%); opacity:0; transition:opacity 0.3s; pointer-events:none; }
+  .nav-item:hover { color:var(--text); }
+  .nav-item:hover::after { opacity:1; }
   .nav-item:hover .nav-icon { transform:rotate(12deg) scale(1.2); }
-  .nav-item.active { color:var(--accent2); background:rgba(124,92,191,0.08); border-left-color:var(--accent2); }
+  .nav-item.active { color:var(--accent2); background:linear-gradient(90deg,rgba(124,92,191,0.15),transparent); border-left-color:var(--accent2); box-shadow:inset 0 0 12px rgba(124,92,191,0.15); }
   .nav-item.danger { color:var(--red); }
   .nav-item.danger:hover { background:rgba(248,113,113,0.07); }
-  .nav-icon { font-size:1.15rem; width:22px; text-align:center; display:inline-block; transition:transform 0.3s; }
+  .nav-icon { font-size:1rem; width:22px; text-align:center; display:inline-block; transition:all 0.3s; }
+  .nav-item:hover .nav-icon { transform:scale(1.2) rotate(5deg); color:var(--accent2); filter:drop-shadow(0 0 6px var(--accent2)); }
+  .nav-item.active .nav-icon { color:var(--accent2); filter:drop-shadow(0 0 4px var(--accent2)); }
   .sidebar-bottom { padding:1rem 1.5rem; border-top:1px solid var(--border); }
   .status-dot { display:flex; align-items:center; gap:0.5rem; font-family:'JetBrains Mono',monospace; font-size:0.65rem; color:var(--green); letter-spacing:0.1em; }
-  .status-dot::before { content:''; width:6px; height:6px; border-radius:50%; background:var(--green); box-shadow:0 0 8px var(--green); animation:blink 1.5s infinite; }
+  .status-dot::before { content:''; width:7px; height:7px; border-radius:50%; background:var(--green); animation:pulseGlow 1.5s infinite; }
+  @keyframes pulseGlow { 0%{box-shadow:0 0 0 0 rgba(74,222,128,0.7)} 70%{box-shadow:0 0 10px 5px rgba(74,222,128,0)} 100%{box-shadow:0 0 0 0 rgba(74,222,128,0)} }
   @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
 
   /* ===== MAIN ===== */
@@ -99,7 +105,7 @@
   .spec-row:nth-child(odd) { background:rgba(124,92,191,0.02); }
   .spec-row:hover { background:rgba(124,92,191,0.06); }
   .spec-label { font-family:'JetBrains Mono',monospace; font-size:0.6rem; color:var(--muted); letter-spacing:0.12em; text-transform:uppercase; flex-shrink:0; }
-  .spec-val { font-family:'Inter',sans-serif; font-size:0.9rem; font-weight:600; color:var(--text); text-align:right; word-break:break-word; overflow-wrap:anywhere; max-width:60%; letter-spacing:0; }
+  .spec-val { font-family:'Poppins',sans-serif; font-size:0.9rem; font-weight:600; color:var(--text); text-align:right; word-break:break-word; overflow-wrap:anywhere; max-width:60%; letter-spacing:0; }
   .spec-val.empty { color:var(--muted); font-style:italic; font-size:0.82rem; }
   @media(max-width:500px) { .spec-grid { grid-template-columns:1fr; } }
 
@@ -114,7 +120,7 @@
   .stat-card { background:var(--bg2); border:1px solid var(--border); padding:1.25rem 1.5rem; transition:border-color 0.3s,transform 0.2s; }
   .stat-card:hover { border-color:rgba(124,92,191,0.35); transform:translateY(-2px); }
   .stat-label { font-family:'JetBrains Mono',monospace; font-size:0.6rem; color:var(--muted); letter-spacing:0.15em; text-transform:uppercase; margin-bottom:0.5rem; }
-  .stat-val { font-family:'Inter',sans-serif; font-size:1.6rem; font-weight:700; color:var(--accent2); line-height:1; }
+  .stat-val { font-family:'Poppins',sans-serif; font-size:1.6rem; font-weight:700; color:var(--accent2); line-height:1; }
   .stat-val.empty { color:var(--muted); font-size:1rem; font-style:italic; }
   .stat-sub { font-size:0.78rem; color:var(--muted); margin-top:0.35rem; font-weight:400; }
 
@@ -183,8 +189,10 @@
 
   /* ===== THEME SWITCHER ===== */
   .theme-toggle { display:flex; align-items:center; gap:0.6rem; width:100%; padding:0.6rem 0.5rem; background:none; border:none; cursor:pointer; margin-top:0.75rem; border-radius:4px; transition:background 0.2s; }
-  .theme-toggle:hover { background:rgba(124,92,191,0.08); }
+  .theme-toggle:hover { background:rgba(124,92,191,0.12); transform:translateX(2px); }
   .theme-toggle:hover .theme-label { color:var(--accent2); }
+  .theme-toggle { position:relative; }
+  .theme-toggle:hover::after { content:'Đổi theme'; position:absolute; left:calc(100% + 8px); top:50%; transform:translateY(-50%); background:var(--bg3); border:1px solid var(--border); color:var(--accent2); font-family:'JetBrains Mono',monospace; font-size:0.6rem; padding:0.2rem 0.5rem; white-space:nowrap; letter-spacing:0.08em; pointer-events:none; z-index:100; }
   .theme-track { width:36px; height:20px; background:var(--bg4); border:1px solid var(--border); border-radius:10px; position:relative; transition:background 0.3s; flex-shrink:0; }
   .theme-thumb { width:14px; height:14px; background:var(--muted); border-radius:50%; position:absolute; top:2px; left:2px; transition:all 0.3s; }
   body.light-theme .theme-track { background:rgba(124,92,191,0.3); border-color:var(--accent); }
@@ -274,15 +282,15 @@
   </div>
   <nav class="sidebar-nav">
     <div class="nav-section">// Main</div>
-    <button class="nav-item active" onclick="goTo('dashboard',this)"><span class="nav-icon">⬡</span> Dashboard</button>
-    <button class="nav-item" onclick="goTo('machine',this)"><span class="nav-icon">🖥</span> Máy của tôi</button>
-    <button class="nav-item" onclick="goTo('time',this)"><span class="nav-icon">⏱</span> Thời gian</button>
+    <button class="nav-item active" onclick="goTo('dashboard',this)"><span class="nav-icon"><i class="fas fa-th-large"></i></span> Dashboard</button>
+    <button class="nav-item" onclick="goTo('machine',this)"><span class="nav-icon"><i class="fas fa-server"></i></span> Máy của tôi</button>
+    <button class="nav-item" onclick="goTo('time',this)"><span class="nav-icon"><i class="fas fa-clock"></i></span> Thời gian</button>
     <div class="nav-section">// Support</div>
-    <button class="nav-item" onclick="goTo('connect',this)"><span class="nav-icon">🔗</span> Hướng dẫn kết nối</button>
-    <button class="nav-item" onclick="goTo('support',this)"><span class="nav-icon">💬</span> Hỗ trợ</button>
+    <button class="nav-item" onclick="goTo('connect',this)"><span class="nav-icon"><i class="fas fa-plug"></i></span> Hướng dẫn kết nối</button>
+    <button class="nav-item" onclick="goTo('support',this)"><span class="nav-icon"><i class="fas fa-headset"></i></span> Hỗ trợ</button>
     <div class="nav-section">// Account</div>
-    <a class="nav-item" href="index.html"><span class="nav-icon">↩</span> Trang chủ</a>
-    <button class="nav-item danger" onclick="doLogout()"><span class="nav-icon">🚪</span> Đăng xuất</button>
+    <a class="nav-item" href="index.html"><span class="nav-icon"><i class="fas fa-home"></i></span> Trang chủ</a>
+    <button class="nav-item danger" onclick="doLogout()"><span class="nav-icon"><i class="fas fa-sign-out-alt"></i></span> Đăng xuất</button>
   </nav>
   <div class="sidebar-bottom">
     <div class="status-dot">SERVER ONLINE</div>
@@ -506,9 +514,16 @@
   // ===== THEME =====
   function toggleTheme(){
     document.body.classList.toggle('light-theme');
-    localStorage.setItem('grimz_theme', document.body.classList.contains('light-theme') ? 'light' : 'dark');
+    const isLight = document.body.classList.contains('light-theme');
+    localStorage.setItem('grimz_theme', isLight ? 'light' : 'dark');
+    const icon = document.querySelector('.theme-icon');
+    if(icon) icon.textContent = isLight ? '☀️' : '🌙';
   }
-  if(localStorage.getItem('grimz_theme') === 'light') document.body.classList.add('light-theme');
+  // Set initial icon
+  if(localStorage.getItem('grimz_theme')==='light'){
+    document.body.classList.add('light-theme');
+    document.addEventListener('DOMContentLoaded',()=>{ const i=document.querySelector('.theme-icon'); if(i) i.textContent='☀️'; });
+  }
 
   // ===== MAIN =====
   function toggleSidebar(){
