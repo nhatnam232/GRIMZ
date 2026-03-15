@@ -5,99 +5,225 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Grimz — Admin Panel</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Exo+2:wght@300;400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Poppins:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 <style>
   :root {
     --bg:#09080f; --bg2:#100e1a; --bg3:#161323; --bg4:#1c1830;
     --accent:#7c5cbf; --accent2:#9b7fe8; --accent3:#5a3fa0;
-    --green:#4ade80; --red:#f87171;
-    --text:#e4e0f0; --muted:#5a5470; --border:rgba(124,92,191,0.15);
+    --green:#4ade80; --red:#f87171; --yellow:#fbbf24;
+    --text:#e4e0f0; --muted:#8a84a0; --border:rgba(124,92,191,0.15);
   }
   * { margin:0; padding:0; box-sizing:border-box; }
-  body { background:var(--bg); color:var(--text); font-family:'Exo 2',sans-serif; min-height:100vh; padding:2rem; }
+  body { background:var(--bg); color:var(--text); font-family:'Poppins',sans-serif; min-height:100vh; padding:0; }
   body::before { content:''; position:fixed; inset:0; background-image:linear-gradient(rgba(124,92,191,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(124,92,191,0.03) 1px,transparent 1px); background-size:40px 40px; pointer-events:none; z-index:0; }
-  .wrap { position:relative; z-index:1; max-width:900px; margin:0 auto; }
-  .topbar { display:flex; align-items:center; justify-content:space-between; margin-bottom:2rem; }
-  .logo { font-family:'Rajdhani',sans-serif; font-size:1.2rem; font-weight:700; letter-spacing:0.15em; text-transform:uppercase; color:var(--accent2); }
-  .logo span { color:var(--red); font-size:0.7rem; border:1px solid rgba(248,113,113,0.3); padding:0.15rem 0.5rem; margin-left:0.5rem; font-family:'Share Tech Mono',monospace; letter-spacing:0.1em; vertical-align:middle; }
-  .card { background:var(--bg2); border:1px solid var(--border); padding:1.5rem; margin-bottom:1.5rem; position:relative; }
+  body::after { content:''; position:fixed; top:-50%; left:-50%; width:200%; height:200%; background:radial-gradient(ellipse at 30% 40%,rgba(124,92,191,0.05) 0%,transparent 45%); animation:rotateBg 30s linear infinite; pointer-events:none; z-index:0; }
+  @keyframes rotateBg { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+
+  /* ===== LIGHT THEME ===== */
+  body.light {
+    --bg:#f0eef8; --bg2:#ffffff; --bg3:#e8e5f5; --bg4:#d8d4ec;
+    --text:#2a2440; --muted:#6b6585; --border:rgba(124,92,191,0.2);
+  }
+  body.light .card { box-shadow:0 4px 12px rgba(0,0,0,0.05); }
+  body.light input, body.light select { background:var(--bg3); }
+  body.light .topbar { background:rgba(240,238,248,0.95); }
+  body.light .qh { background:var(--bg3); }
+  body.light .modal-box { background:var(--bg2); }
+
+  /* ===== TOPBAR ===== */
+  .topbar { position:sticky; top:0; z-index:100; background:rgba(9,8,15,0.92); backdrop-filter:blur(12px); border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; padding:0 2rem; height:56px; }
+  .logo { font-family:'Rajdhani',sans-serif; font-size:1.15rem; font-weight:700; letter-spacing:0.15em; text-transform:uppercase; color:var(--accent2); display:flex; align-items:center; gap:0.6rem; }
+  .logo-badge { color:var(--red); font-size:0.65rem; border:1px solid rgba(248,113,113,0.35); padding:0.15rem 0.5rem; font-family:'JetBrains Mono',monospace; letter-spacing:0.1em; }
+  .topbar-actions { display:flex; align-items:center; gap:0.75rem; }
+  .theme-toggle { display:flex; align-items:center; gap:0.5rem; background:none; border:1px solid var(--border); color:var(--muted); padding:0.3rem 0.75rem; font-family:'JetBrains Mono',monospace; font-size:0.62rem; letter-spacing:0.1em; cursor:pointer; transition:all 0.2s; }
+  .theme-toggle:hover { border-color:var(--accent2); color:var(--accent2); }
+  .topbar-link { font-family:'JetBrains Mono',monospace; font-size:0.65rem; color:var(--muted); text-decoration:none; transition:color 0.2s; display:flex; align-items:center; gap:0.4rem; }
+  .topbar-link:hover { color:var(--accent2); }
+
+  /* ===== WRAP ===== */
+  .wrap { position:relative; z-index:1; max-width:980px; margin:0 auto; padding:2rem 1.5rem; }
+
+  /* ===== STATS CARDS ===== */
+  .stats-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:1rem; margin-bottom:1.75rem; }
+  .stat-card { background:var(--bg2); border:1px solid var(--border); padding:1.1rem 1.25rem; position:relative; overflow:hidden; transition:border-color 0.2s,transform 0.2s; }
+  .stat-card::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; }
+  .stat-card.sc-total::before  { background:linear-gradient(90deg,var(--accent3),var(--accent2)); }
+  .stat-card.sc-active::before { background:linear-gradient(90deg,#166534,var(--green)); }
+  .stat-card.sc-soon::before   { background:linear-gradient(90deg,#92400e,var(--yellow)); }
+  .stat-card.sc-expired::before{ background:linear-gradient(90deg,#7f1d1d,var(--red)); }
+  .stat-card:hover { transform:translateY(-2px); border-color:rgba(124,92,191,0.3); }
+  .sc-label { font-family:'JetBrains Mono',monospace; font-size:0.58rem; color:var(--muted); letter-spacing:0.15em; text-transform:uppercase; margin-bottom:0.5rem; display:flex; align-items:center; gap:0.4rem; }
+  .sc-val { font-family:'Rajdhani',sans-serif; font-size:2rem; font-weight:700; line-height:1; }
+  .sc-total .sc-val  { color:var(--accent2); }
+  .sc-active .sc-val { color:var(--green); }
+  .sc-soon .sc-val   { color:var(--yellow); }
+  .sc-expired .sc-val{ color:var(--red); }
+
+  /* ===== CARDS ===== */
+  .card { background:var(--bg2); border:1px solid var(--border); padding:1.5rem; margin-bottom:1.5rem; position:relative; overflow:hidden; }
   .card::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:linear-gradient(90deg,var(--accent3),var(--accent2)); }
-  .card-title { font-family:'Rajdhani',sans-serif; font-size:1rem; font-weight:700; text-transform:uppercase; letter-spacing:0.1em; margin-bottom:1.25rem; display:flex; align-items:center; justify-content:space-between; }
+  .card-title { font-family:'Rajdhani',sans-serif; font-size:1rem; font-weight:700; text-transform:uppercase; letter-spacing:0.1em; margin-bottom:1.25rem; display:flex; align-items:center; justify-content:space-between; gap:1rem; }
+  .card-title i { color:var(--accent2); margin-right:0.4rem; }
+
+  /* ===== FORM ===== */
   .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
   .form-group { display:flex; flex-direction:column; gap:0.4rem; }
   .form-group.full { grid-column:1/-1; }
-  label { font-family:'Share Tech Mono',monospace; font-size:0.62rem; color:var(--muted); letter-spacing:0.15em; text-transform:uppercase; }
-  input, select { background:var(--bg3); border:1px solid var(--border); color:var(--text); padding:0.65rem 0.75rem; font-family:'Exo 2',sans-serif; font-size:0.875rem; outline:none; transition:border-color 0.2s; width:100%; }
-  input:focus, select:focus { border-color:var(--accent); }
-  input:invalid { border-color:var(--red); }
+  label { font-family:'JetBrains Mono',monospace; font-size:0.6rem; color:var(--muted); letter-spacing:0.15em; text-transform:uppercase; }
+  input, select { background:var(--bg3); border:1px solid var(--border); color:var(--text); padding:0.6rem 0.75rem; font-family:'Poppins',sans-serif; font-size:0.85rem; outline:none; transition:border-color 0.2s,box-shadow 0.2s; width:100%; }
+  input:focus, select:focus { border-color:var(--accent); box-shadow:0 0 0 2px rgba(124,92,191,0.1); }
   input::placeholder { color:var(--muted); }
   select option { background:var(--bg3); }
-  .hours-hint { font-family:'Share Tech Mono',monospace; font-size:0.65rem; color:var(--accent2); margin-top:0.3rem; }
-  .quick-hours { display:flex; gap:0.5rem; flex-wrap:wrap; margin-top:0.5rem; }
-  .qh { padding:0.3rem 0.75rem; background:var(--bg3); border:1px solid var(--border); color:var(--muted); font-family:'Share Tech Mono',monospace; font-size:0.68rem; cursor:pointer; transition:all 0.2s; }
+  .ip-err { font-family:'JetBrains Mono',monospace; font-size:0.6rem; color:var(--red); display:none; margin-top:0.2rem; }
+  .hours-hint { font-family:'JetBrains Mono',monospace; font-size:0.65rem; color:var(--accent2); margin-top:0.3rem; min-height:1.2em; }
+  .quick-hours { display:flex; gap:0.4rem; flex-wrap:wrap; margin-top:0.5rem; }
+  .qh { padding:0.25rem 0.65rem; background:var(--bg4); border:1px solid var(--border); color:var(--muted); font-family:'JetBrains Mono',monospace; font-size:0.65rem; cursor:pointer; transition:all 0.2s; }
   .qh:hover { border-color:var(--accent); color:var(--accent2); }
-  .btn { display:inline-flex; align-items:center; gap:0.5rem; padding:0.7rem 1.5rem; font-family:'Rajdhani',sans-serif; font-size:0.9rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; cursor:pointer; border:none; transition:all 0.2s; clip-path:polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,0 100%); }
+
+  /* ===== ASSIGN PREVIEW ===== */
+  .assign-preview { background:rgba(124,92,191,0.05); border:1px solid rgba(124,92,191,0.15); padding:0.85rem 1rem; margin:1rem 0 0; display:grid; grid-template-columns:1fr 1fr 1fr; gap:0.5rem; }
+  .preview-item { display:flex; flex-direction:column; gap:0.2rem; }
+  .preview-label { font-family:'JetBrains Mono',monospace; font-size:0.56rem; color:var(--muted); letter-spacing:0.12em; text-transform:uppercase; }
+  .preview-val { font-family:'JetBrains Mono',monospace; font-size:0.72rem; color:var(--accent2); }
+
+  /* ===== BUTTONS ===== */
+  .btn { display:inline-flex; align-items:center; gap:0.5rem; padding:0.65rem 1.4rem; font-family:'Rajdhani',sans-serif; font-size:0.875rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; cursor:pointer; border:none; transition:all 0.2s cubic-bezier(0.34,1.56,0.64,1); clip-path:polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,0 100%); }
+  .btn:disabled { opacity:0.6; cursor:not-allowed; transform:none !important; }
   .btn-primary { background:var(--accent); color:#fff; }
-  .btn-primary:hover { background:var(--accent2); transform:translateY(-1px); }
-  .btn-sm { padding:0.35rem 0.75rem; font-size:0.75rem; clip-path:none; }
-  .btn-danger { background:rgba(248,113,113,0.15); color:var(--red); border:1px solid rgba(248,113,113,0.3); }
-  .btn-danger:hover { background:rgba(248,113,113,0.25); }
-  .btn-refresh { background:var(--bg3); color:var(--muted); border:1px solid var(--border); }
-  .btn-refresh:hover { color:var(--accent2); border-color:var(--accent); }
-  .btn-extend { background:rgba(74,222,128,0.1); color:var(--green); border:1px solid rgba(74,222,128,0.2); }
-  .btn-extend:hover { background:rgba(74,222,128,0.2); }
+  .btn-primary:hover:not(:disabled) { background:var(--accent2); transform:translateY(-2px); box-shadow:0 6px 16px rgba(124,92,191,0.35); }
+  .btn-sm { padding:0.3rem 0.7rem; font-size:0.72rem; clip-path:none; letter-spacing:0.05em; }
+  .btn-danger  { background:rgba(248,113,113,0.12); color:var(--red);    border:1px solid rgba(248,113,113,0.3); }
+  .btn-danger:hover  { background:rgba(248,113,113,0.22); transform:none; }
+  .btn-warning { background:rgba(251,191,36,0.12);  color:var(--yellow); border:1px solid rgba(251,191,36,0.3); }
+  .btn-warning:hover { background:rgba(251,191,36,0.22); transform:none; }
+  .btn-green   { background:rgba(74,222,128,0.1);  color:var(--green);  border:1px solid rgba(74,222,128,0.25); }
+  .btn-green:hover   { background:rgba(74,222,128,0.2); transform:none; }
+  .btn-muted   { background:var(--bg3); color:var(--muted); border:1px solid var(--border); clip-path:none; }
+  .btn-muted:hover   { color:var(--accent2); border-color:var(--accent); }
+
+  /* ===== TABLE ===== */
   .table-wrap { overflow-x:auto; }
   table { width:100%; border-collapse:collapse; }
-  th { font-family:'Share Tech Mono',monospace; font-size:0.6rem; color:var(--muted); letter-spacing:0.12em; text-transform:uppercase; text-align:left; padding:0.6rem 0.75rem; border-bottom:1px solid var(--border); }
-  td { padding:0.75rem; font-size:0.825rem; border-bottom:1px solid rgba(124,92,191,0.07); vertical-align:middle; }
-  tr:hover td { background:rgba(124,92,191,0.04); }
-  .badge { display:inline-flex; align-items:center; gap:0.3rem; padding:0.2rem 0.6rem; font-family:'Share Tech Mono',monospace; font-size:0.6rem; letter-spacing:0.1em; text-transform:uppercase; }
-  .badge-active { background:rgba(74,222,128,0.1); border:1px solid rgba(74,222,128,0.2); color:var(--green); }
-  .mono { font-family:'Share Tech Mono',monospace; font-size:0.75rem; color:var(--accent2); }
-  .msg { padding:0.65rem 0.75rem; font-family:'Share Tech Mono',monospace; font-size:0.72rem; letter-spacing:0.08em; margin-top:1rem; display:none; }
-  .msg-ok { background:rgba(74,222,128,0.08); border:1px solid rgba(74,222,128,0.2); color:var(--green); display:block; }
-  .msg-err { background:rgba(248,113,113,0.08); border:1px solid rgba(248,113,113,0.2); color:var(--red); display:block; }
-  .empty { text-align:center; padding:2rem; font-family:'Share Tech Mono',monospace; font-size:0.72rem; color:var(--muted); letter-spacing:0.1em; }
-  .copy-btn { background:var(--bg3); border:1px solid var(--border); color:var(--accent2); font-family:'Share Tech Mono',monospace; font-size:0.65rem; padding:0.2rem 0.5rem; cursor:pointer; transition:all 0.2s; }
-  .copy-btn:hover { border-color:var(--accent); }
-  .ip-err { font-family:'Share Tech Mono',monospace; font-size:0.62rem; color:var(--red); display:none; margin-top:0.2rem; }
+  th { font-family:'JetBrains Mono',monospace; font-size:0.58rem; color:var(--muted); letter-spacing:0.12em; text-transform:uppercase; text-align:left; padding:0.6rem 0.75rem; border-bottom:1px solid var(--border); white-space:nowrap; }
+  td { padding:0.7rem 0.75rem; font-size:0.82rem; border-bottom:1px solid rgba(124,92,191,0.06); vertical-align:middle; transition:background 0.15s; }
+  tr:hover td { background:rgba(124,92,191,0.05); }
+  .mono { font-family:'JetBrains Mono',monospace; font-size:0.72rem; color:var(--accent2); }
+  .badge { display:inline-flex; align-items:center; gap:0.3rem; padding:0.2rem 0.55rem; font-family:'JetBrains Mono',monospace; font-size:0.58rem; letter-spacing:0.1em; text-transform:uppercase; white-space:nowrap; }
+  .badge-active  { background:rgba(74,222,128,0.1); border:1px solid rgba(74,222,128,0.25); color:var(--green); }
+  .badge-active::before { content:''; width:4px; height:4px; border-radius:50%; background:var(--green); animation:blink 1.5s infinite; }
+  .badge-expired { background:rgba(248,113,113,0.1); border:1px solid rgba(248,113,113,0.25); color:var(--red); }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+  .copy-btn { background:var(--bg3); border:1px solid var(--border); color:var(--accent2); font-family:'JetBrains Mono',monospace; font-size:0.62rem; padding:0.2rem 0.5rem; cursor:pointer; transition:all 0.2s; white-space:nowrap; }
+  .copy-btn:hover { border-color:var(--accent); background:rgba(124,92,191,0.1); }
+  .actions-cell { display:flex; gap:0.35rem; align-items:center; }
+  .empty { text-align:center; padding:2.5rem; font-family:'JetBrains Mono',monospace; font-size:0.72rem; color:var(--muted); letter-spacing:0.1em; }
+
+  /* ===== MSG ===== */
+  .msg { padding:0.6rem 0.75rem; font-family:'JetBrains Mono',monospace; font-size:0.7rem; letter-spacing:0.08em; margin-top:1rem; display:none; }
+  .msg-ok  { background:rgba(74,222,128,0.07);  border:1px solid rgba(74,222,128,0.2);  color:var(--green); display:block; }
+  .msg-err { background:rgba(248,113,113,0.07); border:1px solid rgba(248,113,113,0.2); color:var(--red);   display:block; }
+
+  /* ===== MODALS ===== */
+  .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.65); z-index:300; display:none; align-items:center; justify-content:center; backdrop-filter:blur(4px); padding:1rem; }
+  .modal-overlay.open { display:flex; animation:mIn 0.2s ease; }
+  @keyframes mIn { from{opacity:0;transform:scale(0.96)} to{opacity:1;transform:scale(1)} }
+  .modal-box { background:var(--bg2); border:1px solid rgba(124,92,191,0.3); padding:1.75rem; width:100%; max-width:420px; position:relative; }
+  .modal-box::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:linear-gradient(90deg,var(--accent3),var(--accent2)); }
+  .modal-title { font-family:'Rajdhani',sans-serif; font-size:1rem; font-weight:700; text-transform:uppercase; letter-spacing:0.1em; margin-bottom:1.25rem; color:var(--accent2); display:flex; align-items:center; gap:0.5rem; }
+  .modal-close { position:absolute; top:1rem; right:1rem; background:none; border:none; color:var(--muted); cursor:pointer; font-size:0.9rem; transition:color 0.2s; }
+  .modal-close:hover { color:var(--text); }
+  .modal-info { display:flex; flex-direction:column; gap:0.6rem; margin-bottom:1.25rem; }
+  .modal-row { display:flex; justify-content:space-between; padding:0.5rem 0.75rem; background:rgba(124,92,191,0.04); border-left:2px solid var(--accent3); }
+  .modal-row-label { font-family:'JetBrains Mono',monospace; font-size:0.6rem; color:var(--muted); letter-spacing:0.1em; text-transform:uppercase; }
+  .modal-row-val { font-family:'JetBrains Mono',monospace; font-size:0.72rem; color:var(--text); }
+  .modal-footer { display:flex; gap:0.75rem; justify-content:flex-end; margin-top:1.25rem; }
+  .modal-input { width:100%; background:var(--bg3); border:1px solid var(--border); color:var(--text); padding:0.6rem 0.75rem; font-family:'Poppins',sans-serif; font-size:0.85rem; outline:none; transition:border-color 0.2s; margin-bottom:0.6rem; }
+  .modal-input:focus { border-color:var(--accent2); }
+
+  /* ===== FAB ===== */
+  .fab-cluster { position:fixed; bottom:2rem; right:1.5rem; display:flex; flex-direction:column; gap:0.5rem; z-index:200; }
+  .fab-btn { width:40px; height:40px; background:rgba(9,8,15,0.9); border:1px solid rgba(124,92,191,0.3); color:var(--muted); cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:0.85rem; transition:all 0.2s; clip-path:polygon(6px 0,100% 0,100% calc(100% - 6px),calc(100% - 6px) 100%,0 100%,0 6px); }
+  .fab-btn:hover { border-color:var(--accent2); color:var(--accent2); background:rgba(124,92,191,0.12); box-shadow:0 0 12px rgba(124,92,191,0.25); }
+
+  /* ===== TOAST ===== */
+  #toast { position:fixed; bottom:2rem; left:50%; transform:translateX(-50%) translateY(10px); background:var(--bg3); border:1px solid var(--accent); color:var(--accent2); font-family:'JetBrains Mono',monospace; font-size:0.72rem; letter-spacing:0.08em; padding:0.6rem 1.5rem; z-index:999; opacity:0; transition:all 0.3s; pointer-events:none; white-space:nowrap; }
+  #toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+  #toast.toast-success { border-color:rgba(74,222,128,0.5); color:var(--green); }
+  #toast.toast-error   { border-color:rgba(248,113,113,0.5); color:var(--red); }
+  #toast.toast-warn    { border-color:rgba(251,191,36,0.5); color:var(--yellow); }
+
+  /* ===== RESPONSIVE ===== */
+  @media(max-width:768px) {
+    .wrap { padding:1rem; }
+    .stats-grid { grid-template-columns:1fr 1fr; }
+    .form-grid { grid-template-columns:1fr; }
+    .form-group.full { grid-column:1; }
+    .assign-preview { grid-template-columns:1fr; }
+    table { font-size:0.75rem; }
+    td { padding:0.5rem; }
+    .btn-sm { padding:0.25rem 0.5rem; font-size:0.65rem; }
+    .topbar { padding:0 1rem; }
+    .topbar-link span { display:none; }
+    .actions-cell { flex-wrap:wrap; }
+  }
+  @media(max-width:480px) {
+    .stats-grid { grid-template-columns:1fr 1fr; gap:0.6rem; }
+    .sc-val { font-size:1.5rem; }
+  }
 </style>
-<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 </head>
 <body>
 
-<!-- LOCK SCREEN — mật khẩu được hash, không lộ plaintext -->
+<!-- LOCK SCREEN -->
 <div id="lock-screen" style="position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:9999;">
   <div style="background:var(--bg2);border:1px solid var(--border);padding:2.5rem 2rem;width:100%;max-width:340px;position:relative;clip-path:polygon(0 0,calc(100% - 16px) 0,100% 16px,100% 100%,0 100%);">
     <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--accent3),var(--accent2));"></div>
     <div style="font-family:'Rajdhani',sans-serif;font-size:1.1rem;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--accent2);text-align:center;margin-bottom:0.3rem;">Grimz Admin</div>
-    <div style="font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:var(--muted);text-align:center;letter-spacing:0.15em;margin-bottom:1.5rem;">// Nhập mật khẩu để tiếp tục</div>
-    <input type="password" id="admin-pw" placeholder="Mật khẩu..." onkeydown="if(event.key==='Enter')checkPw()" style="width:100%;background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:0.7rem 0.75rem;font-family:'Exo 2',sans-serif;font-size:0.875rem;outline:none;margin-bottom:0.75rem;">
+    <div style="font-family:'JetBrains Mono',monospace;font-size:0.62rem;color:var(--muted);text-align:center;letter-spacing:0.15em;margin-bottom:1.5rem;">// Nhập mật khẩu để tiếp tục</div>
+    <input type="password" id="admin-pw" placeholder="Mật khẩu..." onkeydown="if(event.key==='Enter')checkPw()" style="width:100%;background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:0.7rem 0.75rem;font-family:'Poppins',sans-serif;font-size:0.875rem;outline:none;margin-bottom:0.75rem;transition:border-color 0.2s;">
     <div style="display:flex;justify-content:center;margin-bottom:0.75rem;"><div class="cf-turnstile" data-sitekey="0x4AAAAAACrS3npj6qFvSu2W" data-theme="dark"></div></div>
-    <button onclick="checkPw()" style="width:100%;background:var(--accent);color:#fff;padding:0.7rem;font-family:'Rajdhani',sans-serif;font-size:0.9rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;border:none;cursor:pointer;">Đăng nhập</button>
-    <div id="pw-err" style="display:none;margin-top:0.75rem;font-family:'Share Tech Mono',monospace;font-size:0.68rem;color:#f87171;text-align:center;letter-spacing:0.08em;">Sai mật khẩu</div>
+    <button onclick="checkPw()" style="width:100%;background:var(--accent);color:#fff;padding:0.7rem;font-family:'Rajdhani',sans-serif;font-size:0.9rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;border:none;cursor:pointer;transition:background 0.2s;">Đăng nhập</button>
+    <div id="pw-err" style="display:none;margin-top:0.75rem;font-family:'JetBrains Mono',monospace;font-size:0.68rem;color:#f87171;text-align:center;letter-spacing:0.08em;">Sai mật khẩu</div>
+  </div>
+</div>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="logo">Grimz Cloud PC <span class="logo-badge">ADMIN</span></div>
+  <div class="topbar-actions">
+    <button class="theme-toggle" onclick="toggleTheme()"><i class="fas fa-circle-half-stroke"></i> <span>Theme</span></button>
+    <a href="grimz-dashboard.html" class="topbar-link"><i class="fas fa-tachometer-alt"></i> <span>Dashboard</span></a>
+    <a href="index.html" class="topbar-link"><i class="fas fa-home"></i> <span>Trang chủ</span></a>
   </div>
 </div>
 
 <div class="wrap">
-  <div class="topbar">
-    <div class="logo">Grimz Cloud PC <span>ADMIN</span></div>
-    <a href="index.html" style="font-family:'Share Tech Mono',monospace;font-size:0.68rem;color:var(--muted);text-decoration:none;">← Trang chủ</a>
+  <!-- STATS CARDS -->
+  <div class="stats-grid">
+    <div class="stat-card sc-total"><div class="sc-label"><i class="fas fa-server"></i> Tổng máy</div><div class="sc-val" id="stat-total">—</div></div>
+    <div class="stat-card sc-active"><div class="sc-label"><i class="fas fa-circle-check"></i> Đang chạy</div><div class="sc-val" id="stat-active">—</div></div>
+    <div class="stat-card sc-soon"><div class="sc-label"><i class="fas fa-clock"></i> Sắp hết (&lt;24h)</div><div class="sc-val" id="stat-soon">—</div></div>
+    <div class="stat-card sc-expired"><div class="sc-label"><i class="fas fa-triangle-exclamation"></i> Hết hạn</div><div class="sc-val" id="stat-expired">—</div></div>
   </div>
 
-  <!-- GÁN MÁY -->
+  <!-- ASSIGN CARD -->
   <div class="card">
-    <div class="card-title">Gán máy cho user</div>
+    <div class="card-title">
+      <span><i class="fas fa-plus-circle"></i> Gán máy cho user</span>
+      <span id="assign-plan-badge" style="font-family:'JetBrains Mono',monospace;font-size:0.65rem;color:var(--muted);font-weight:400;letter-spacing:0.08em;">— Chưa chọn</span>
+    </div>
     <div class="form-grid">
       <div class="form-group full">
         <label>User ID</label>
-        <input type="text" id="f-userid" placeholder="Paste UUID từ bảng bên dưới hoặc từ Discord...">
+        <input type="text" id="f-userid" placeholder="Paste UUID từ bảng bên dưới hoặc Discord...">
       </div>
       <div class="form-group">
         <label>Địa chỉ IP</label>
         <input type="text" id="f-ip" placeholder="103.x.x.x" pattern="^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$">
-        <div class="ip-err" id="ip-err">IP không đúng định dạng (vd: 103.12.34.56)</div>
+        <div class="ip-err" id="ip-err"><i class="fas fa-xmark"></i> IP không đúng định dạng</div>
       </div>
       <div class="form-group">
         <label>GPU</label>
@@ -121,8 +247,8 @@
       <div class="form-group">
         <label>Storage</label>
         <select id="f-storage">
-          <option value="2 x 1TB HDD">2 x 1TB HDD (RTX 3060/4060)</option>
-          <option value="2TB SSD NVMe + 2TB HDD">2TB SSD NVMe + 2TB HDD (RTX 4070)</option>
+          <option value="2 x 1TB HDD">2 x 1TB HDD</option>
+          <option value="2TB SSD NVMe + 2TB HDD">2TB SSD NVMe + 2TB HDD</option>
         </select>
       </div>
       <div class="form-group">
@@ -133,8 +259,16 @@
         </select>
       </div>
       <div class="form-group">
-        <label>Thời hạn thuê (số giờ)</label>
-        <input type="number" id="f-hours" placeholder="Số giờ..." min="1">
+        <label>Gói dịch vụ</label>
+        <select id="f-plan">
+          <option value="G-NOVA">G-NOVA · RTX 3060 · 3.000đ/h</option>
+          <option value="G-ORBIT">G-ORBIT · RTX 4060 · 5.000đ/h</option>
+          <option value="G-PULSAR">G-PULSAR · RTX 4070 · 6.000đ/h</option>
+        </select>
+      </div>
+      <div class="form-group full">
+        <label>Thời hạn thuê (giờ)</label>
+        <input type="number" id="f-hours" placeholder="Nhập số giờ..." min="1">
         <div class="quick-hours">
           <span class="qh" onclick="setHours(1)">1h</span>
           <span class="qh" onclick="setHours(3)">3h</span>
@@ -147,27 +281,30 @@
         </div>
         <div class="hours-hint" id="expiry-preview">—</div>
       </div>
-      <div class="form-group full">
-        <label>Gói</label>
-        <select id="f-plan">
-          <option value="G-NOVA">Gói 1 · G-NOVA (RTX 3060) — 3.000đ/giờ</option>
-          <option value="G-ORBIT">Gói 2 · G-ORBIT (RTX 4060) — 5.000đ/giờ</option>
-          <option value="G-PULSAR">Gói 3 · G-PULSAR (RTX 4070) — 6.000đ/giờ</option>
-        </select>
-      </div>
     </div>
-    <div style="margin-top:1.25rem;">
-      <button class="btn btn-primary" id="assign-btn" onclick="assignMachine()">Gán máy</button>
+
+    <!-- ASSIGN PREVIEW -->
+    <div class="assign-preview" id="assign-preview">
+      <div class="preview-item"><div class="preview-label">User ID</div><div class="preview-val" id="pv-user">—</div></div>
+      <div class="preview-item"><div class="preview-label">IP</div><div class="preview-val" id="pv-ip">—</div></div>
+      <div class="preview-item"><div class="preview-label">Hết hạn</div><div class="preview-val" id="pv-expiry">—</div></div>
     </div>
-    <div class="msg msg-ok" id="msg-ok" style="display:none;">✓ Gán máy thành công!</div>
+
+    <div style="margin-top:1.25rem;display:flex;gap:0.75rem;align-items:center;">
+      <button class="btn btn-primary" id="assign-btn" onclick="assignMachine()">
+        <i class="fas fa-check"></i> Xác nhận gán
+      </button>
+      <button class="btn btn-muted btn-sm" onclick="clearForm()"><i class="fas fa-rotate-left"></i> Reset</button>
+    </div>
+    <div class="msg msg-ok" id="msg-ok" style="display:none;"><i class="fas fa-check-circle"></i> Gán máy thành công!</div>
     <div class="msg msg-err" id="msg-err" style="display:none;"></div>
   </div>
 
-  <!-- DANH SÁCH MACHINES -->
+  <!-- MACHINES TABLE -->
   <div class="card">
     <div class="card-title">
-      Máy đang hoạt động
-      <button class="btn btn-sm btn-refresh" onclick="loadData()">⟳ Làm mới</button>
+      <span><i class="fas fa-list"></i> Danh sách máy</span>
+      <button class="btn btn-muted btn-sm" onclick="loadData()"><i class="fas fa-rotate-right"></i> Làm mới</button>
     </div>
     <div class="table-wrap">
       <table>
@@ -180,31 +317,60 @@
       </table>
     </div>
   </div>
+</div>
 
-  <!-- EXTEND MODAL -->
-  <div id="extend-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:200;align-items:center;justify-content:center;">
-    <div style="background:var(--bg2);border:1px solid var(--border);padding:2rem;max-width:360px;width:90%;position:relative;">
-      <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--accent3),var(--accent2));"></div>
-      <div style="font-family:'Rajdhani',sans-serif;font-size:1rem;font-weight:700;text-transform:uppercase;margin-bottom:0.5rem;">Gia hạn máy</div>
-      <div id="current-expiry-display" style="font-family:'Share Tech Mono',monospace;font-size:0.68rem;color:var(--accent2);margin-bottom:1rem;letter-spacing:0.08em;">—</div>
-      <input type="hidden" id="extend-id">
-      <label style="font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:var(--muted);letter-spacing:0.15em;text-transform:uppercase;">Thêm số giờ</label>
-      <input type="number" id="extend-hours" placeholder="Số giờ cần thêm..." min="1" style="width:100%;background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:0.65rem 0.75rem;font-family:'Exo 2',sans-serif;font-size:0.875rem;outline:none;margin-top:0.4rem;margin-bottom:0.5rem;">
-      <div class="quick-hours" style="margin-bottom:1rem;">
-        <span class="qh" onclick="document.getElementById('extend-hours').value=1">1h</span>
-        <span class="qh" onclick="document.getElementById('extend-hours').value=5">5h</span>
-        <span class="qh" onclick="document.getElementById('extend-hours').value=10">10h</span>
-        <span class="qh" onclick="document.getElementById('extend-hours').value=24">1 ngày</span>
-        <span class="qh" onclick="document.getElementById('extend-hours').value=72">3 ngày</span>
-        <span class="qh" onclick="document.getElementById('extend-hours').value=168">1 tuần</span>
-      </div>
-      <div style="display:flex;gap:0.75rem;">
-        <button class="btn btn-primary btn-sm" onclick="confirmExtend()">Xác nhận</button>
-        <button class="btn btn-sm" style="background:var(--bg3);color:var(--muted);border:1px solid var(--border);" onclick="closeExtend()">Huỷ</button>
-      </div>
+<!-- EXTEND MODAL -->
+<div class="modal-overlay" id="extend-modal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeExtend()"><i class="fas fa-times"></i></button>
+    <div class="modal-title"><i class="fas fa-clock"></i> Gia hạn máy</div>
+    <div id="current-expiry-display" style="font-family:'JetBrains Mono',monospace;font-size:0.65rem;color:var(--accent2);margin-bottom:1rem;letter-spacing:0.08em;">—</div>
+    <input type="hidden" id="extend-id">
+    <label>Thêm số giờ</label>
+    <input type="number" class="modal-input" id="extend-hours" placeholder="Số giờ cần thêm..." min="1" style="margin-top:0.4rem;">
+    <div class="quick-hours" style="margin-bottom:1rem;">
+      <span class="qh" onclick="document.getElementById('extend-hours').value=1">1h</span>
+      <span class="qh" onclick="document.getElementById('extend-hours').value=5">5h</span>
+      <span class="qh" onclick="document.getElementById('extend-hours').value=10">10h</span>
+      <span class="qh" onclick="document.getElementById('extend-hours').value=24">1 ngày</span>
+      <span class="qh" onclick="document.getElementById('extend-hours').value=72">3 ngày</span>
+      <span class="qh" onclick="document.getElementById('extend-hours').value=168">1 tuần</span>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-muted btn-sm" onclick="closeExtend()">Huỷ</button>
+      <button class="btn btn-primary btn-sm" id="extend-confirm-btn" onclick="confirmExtend()"><i class="fas fa-check"></i> Xác nhận</button>
     </div>
   </div>
 </div>
+
+<!-- REVOKE MODAL -->
+<div class="modal-overlay" id="revoke-modal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeRevoke()"><i class="fas fa-times"></i></button>
+    <div class="modal-title" style="color:var(--yellow);"><i class="fas fa-triangle-exclamation"></i> Thu hồi máy</div>
+    <div class="modal-info">
+      <div class="modal-row"><span class="modal-row-label">User ID</span><span class="modal-row-val" id="rv-user">—</span></div>
+      <div class="modal-row"><span class="modal-row-label">GPU</span><span class="modal-row-val" id="rv-gpu">—</span></div>
+      <div class="modal-row"><span class="modal-row-label">Gói</span><span class="modal-row-val" id="rv-plan">—</span></div>
+      <div class="modal-row"><span class="modal-row-label">Bắt đầu</span><span class="modal-row-val" id="rv-start">—</span></div>
+      <div class="modal-row"><span class="modal-row-label">Tổng giờ đã dùng</span><span class="modal-row-val" id="rv-hours" style="color:var(--yellow);">—</span></div>
+    </div>
+    <div style="font-size:0.78rem;color:var(--muted);margin-bottom:0.5rem;">Dữ liệu sẽ được ghi vào lịch sử thuê của user trước khi xóa máy.</div>
+    <div class="modal-footer">
+      <button class="btn btn-muted btn-sm" onclick="closeRevoke()">Huỷ</button>
+      <button class="btn btn-warning btn-sm" id="revoke-confirm-btn" onclick="confirmRevoke()"><i class="fas fa-ban"></i> Xác nhận thu hồi</button>
+    </div>
+  </div>
+</div>
+
+<!-- FAB -->
+<div class="fab-cluster">
+  <button class="fab-btn" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Lên đầu"><i class="fas fa-arrow-up"></i></button>
+  <button class="fab-btn" onclick="loadData()" title="Làm mới"><i class="fas fa-rotate-right"></i></button>
+  <button class="fab-btn" onclick="document.getElementById('f-userid').focus();window.scrollTo({top:0,behavior:'smooth'})" title="Gán máy nhanh"><i class="fas fa-user-plus"></i></button>
+</div>
+
+<div id="toast"></div>
 
 <script>
   const sb = window.supabase.createClient(
@@ -212,251 +378,239 @@
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZsd2V2b2pxZm9tb3Boc2R3c3FkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM1NzE2NDgsImV4cCI6MjA4OTE0NzY0OH0.6NECwQqKKeZH2fIgqp8SkmA6kPAqtsc5dlhEdGVFgBE'
   );
 
-  // Hash mật khẩu bằng SHA-256
-  async function hashPw(pw) {
-    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(pw));
-    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+  // ===== THEME =====
+  function toggleTheme(){
+    document.body.classList.toggle('light');
+    localStorage.setItem('grimz_admin_theme', document.body.classList.contains('light') ? 'light' : 'dark');
   }
+  if(localStorage.getItem('grimz_admin_theme') === 'light') document.body.classList.add('light');
 
-  // Hash của mật khẩu admin — plaintext không lộ trong code
+  // ===== AUTH =====
   const ADMIN_HASH = 'e8231ca8edc2ae39f8d32ee9366a1f6f5c0338fa10a7aa810727943932b9de95';
-
-  async function checkPw() {
+  async function hashPw(pw){
+    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(pw));
+    return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+  }
+  async function checkPw(){
     const token = document.querySelector('[name="cf-turnstile-response"]')?.value;
-    if (!token) { document.getElementById('pw-err').style.display='block'; document.getElementById('pw-err').textContent='Vui lòng xác minh bạn không phải bot.'; return; }
+    if(!token){ showPwErr('Vui lòng xác minh bạn không phải bot.'); return; }
     const pw = document.getElementById('admin-pw').value;
     const hash = await hashPw(pw);
-    if (hash === ADMIN_HASH) {
-      document.getElementById('lock-screen').style.display = 'none';
+    if(hash === ADMIN_HASH){
+      document.getElementById('lock-screen').style.display='none';
       sessionStorage.setItem('grimz-admin', hash);
       loadData();
     } else {
-      document.getElementById('pw-err').style.display = 'block';
-      document.getElementById('admin-pw').value = '';
+      showPwErr('Sai mật khẩu');
+      document.getElementById('admin-pw').value='';
     }
   }
-
-  async function checkSession() {
-    const saved = sessionStorage.getItem('grimz-admin');
-    if (saved && saved === ADMIN_HASH) {
-      document.getElementById('lock-screen').style.display = 'none';
+  function showPwErr(msg){ const e=document.getElementById('pw-err'); e.style.display='block'; e.textContent=msg; }
+  (function checkSession(){
+    if(sessionStorage.getItem('grimz-admin') === ADMIN_HASH){
+      document.getElementById('lock-screen').style.display='none';
       loadData();
     }
+  })();
+
+  // ===== FORM HELPERS =====
+  function setHours(h){
+    document.getElementById('f-hours').value=h;
+    updatePreview();
   }
-  checkSession();
-
-  function setHours(h) {
-    document.getElementById('f-hours').value = h;
-    updateExpiryPreview();
+  function updatePreview(){
+    const h=parseFloat(document.getElementById('f-hours').value);
+    const uid=document.getElementById('f-userid').value.trim();
+    const ip=document.getElementById('f-ip').value.trim();
+    document.getElementById('pv-user').textContent = uid ? uid.slice(0,16)+'…' : '—';
+    document.getElementById('pv-ip').textContent = ip || '—';
+    if(!h||h<=0){ document.getElementById('expiry-preview').textContent='—'; document.getElementById('pv-expiry').textContent='—'; return; }
+    const expiry = new Date(Date.now()+h*3600000);
+    const str = expiry.toLocaleString('vi-VN',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
+    document.getElementById('expiry-preview').textContent='→ Hết hạn: '+str;
+    document.getElementById('pv-expiry').textContent=str;
   }
+  document.getElementById('f-hours').addEventListener('input', updatePreview);
+  document.getElementById('f-userid').addEventListener('input', updatePreview);
+  document.getElementById('f-ip').addEventListener('input', updatePreview);
 
-  function updateExpiryPreview() {
-    const h = parseFloat(document.getElementById('f-hours').value);
-    if (!h || h <= 0) { document.getElementById('expiry-preview').textContent = '—'; return; }
-    const expiry = new Date(Date.now() + h * 3600000);
-    document.getElementById('expiry-preview').textContent =
-      '→ Hết hạn: ' + expiry.toLocaleString('vi-VN', {day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
-  }
-
-  document.getElementById('f-hours').addEventListener('input', updateExpiryPreview);
-
-  // Auto-select storage based on GPU
-  document.getElementById('f-gpu').addEventListener('change', function() {
-    const storage = document.getElementById('f-storage');
-    if (this.value.includes('4070')) {
-      storage.value = '2TB SSD NVMe + 2TB HDD';
-    } else {
-      storage.value = '2 x 1TB HDD';
-    }
-    // Also auto-select CPU
-    const cpu = document.getElementById('f-cpu');
-    if (this.value.includes('4070')) {
-      cpu.value = 'Intel Core i7';
-    } else {
-      cpu.value = 'Intel Core i5-10400F';
-    }
-    // Auto-select plan
-    const plan = document.getElementById('f-plan');
-    if (this.value.includes('4070')) plan.value = 'G-PULSAR';
-    else if (this.value.includes('4060')) plan.value = 'G-ORBIT';
-    else plan.value = 'G-NOVA';
+  // Auto-select based on GPU
+  document.getElementById('f-gpu').addEventListener('change', function(){
+    const v=this.value;
+    document.getElementById('f-storage').value = v.includes('4070') ? '2TB SSD NVMe + 2TB HDD' : '2 x 1TB HDD';
+    document.getElementById('f-cpu').value = v.includes('4070') ? 'Intel Core i7' : 'Intel Core i5-10400F';
+    const p=document.getElementById('f-plan');
+    p.value = v.includes('4070') ? 'G-PULSAR' : v.includes('4060') ? 'G-ORBIT' : 'G-NOVA';
+    document.getElementById('assign-plan-badge').textContent = p.value;
+  });
+  document.getElementById('f-plan').addEventListener('change', function(){
+    document.getElementById('assign-plan-badge').textContent = this.value;
   });
 
-  // Validate IP
-  function validateIp(ip) {
-    return /^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/.test(ip) &&
-      ip.split('.').every(n => parseInt(n) <= 255);
-  }
-
-  document.getElementById('f-ip').addEventListener('blur', function() {
-    const err = document.getElementById('ip-err');
-    err.style.display = this.value && !validateIp(this.value) ? 'block' : 'none';
+  function validateIp(ip){ return /^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/.test(ip) && ip.split('.').every(n=>parseInt(n)<=255); }
+  document.getElementById('f-ip').addEventListener('blur', function(){
+    document.getElementById('ip-err').style.display = this.value && !validateIp(this.value) ? 'block' : 'none';
   });
 
-  async function loadData() {
-    const { data: machines } = await sb.from('machines').select('*').order('created_at', {ascending:false});
-    const tbody = document.getElementById('machines-table');
-    if (!machines || machines.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="7" class="empty">Chưa có máy nào</td></tr>';
+  function clearForm(){
+    ['f-userid','f-ip','f-hours'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('expiry-preview').textContent='—';
+    document.getElementById('pv-user').textContent='—';
+    document.getElementById('pv-ip').textContent='—';
+    document.getElementById('pv-expiry').textContent='—';
+  }
+
+  // ===== STATS =====
+  function updateStats(machines){
+    const now=new Date();
+    document.getElementById('stat-total').textContent=machines.length;
+    document.getElementById('stat-active').textContent=machines.filter(m=>m.expiry&&new Date(m.expiry)>now).length;
+    document.getElementById('stat-soon').textContent=machines.filter(m=>{ const d=(new Date(m.expiry)-now)/3600000; return d>0&&d<=24; }).length;
+    document.getElementById('stat-expired').textContent=machines.filter(m=>m.expiry&&new Date(m.expiry)<now).length;
+  }
+
+  // ===== LOAD DATA =====
+  async function loadData(){
+    const{data:machines}=await sb.from('machines').select('*').order('created_at',{ascending:false});
+    const tbody=document.getElementById('machines-table');
+    if(!machines||machines.length===0){
+      tbody.innerHTML='<tr><td colspan="7" class="empty"><i class="fas fa-inbox"></i> Chưa có máy nào</td></tr>';
+      updateStats([]);
       return;
     }
-    const now = new Date();
-    tbody.innerHTML = machines.map(m => {
-      const expired = m.expiry && new Date(m.expiry) < now;
-      const expiryStr = m.expiry ? new Date(m.expiry).toLocaleString('vi-VN',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}) : '—';
+    updateStats(machines);
+    const now=new Date();
+    tbody.innerHTML=machines.map(m=>{
+      const expired=m.expiry&&new Date(m.expiry)<now;
+      const soon=!expired&&m.expiry&&(new Date(m.expiry)-now)/3600000<=24;
+      const expiryStr=m.expiry?new Date(m.expiry).toLocaleString('vi-VN',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}):'—';
       return `<tr>
-        <td><button class="copy-btn" onclick="fillUserId('${m.user_id}')">${m.user_id?.slice(0,10)}... 📋</button></td>
-        <td class="mono">${m.ip || '—'}</td>
-        <td style="font-size:0.8rem">${m.gpu?.replace('NVIDIA ','') || '—'}</td>
-        <td style="font-size:0.78rem">${m.plan || '—'}</td>
-        <td style="font-size:0.75rem;color:${expired ? 'var(--red)' : 'var(--muted)'}">${expiryStr}</td>
-        <td><span class="badge ${expired ? '' : 'badge-active'}" style="${expired ? 'background:rgba(248,113,113,0.1);border:1px solid rgba(248,113,113,0.2);color:var(--red)' : ''}">${expired ? 'HẾT HẠN' : 'ACTIVE'}</span></td>
-        <td style="display:flex;gap:0.4rem;">
-          <button class="btn btn-sm btn-extend" onclick="openExtend('${m.id}','${m.expiry}')">+Giờ</button>
-          <button class="btn btn-sm btn-warning" onclick="revokeMachine('${m.id}','${m.user_id}','${m.plan}','${m.gpu}','${m.created_at}','${m.expiry}')">Thu hồi</button>
-          <button class="btn btn-sm btn-danger" onclick="deleteMachine('${m.id}')">Xóa</button>
-        </td>
+        <td><button class="copy-btn" onclick="fillUserId('${m.user_id}')">${m.user_id?.slice(0,10)}… <i class="fas fa-copy" style="font-size:0.55rem;"></i></button></td>
+        <td class="mono">${m.ip||'—'}</td>
+        <td style="font-size:0.78rem;font-family:'JetBrains Mono',monospace;">${m.gpu?.replace('NVIDIA ','')||'—'}</td>
+        <td style="font-size:0.75rem;color:var(--accent2);font-family:'JetBrains Mono',monospace;">${m.plan||'—'}</td>
+        <td style="font-size:0.72rem;font-family:'JetBrains Mono',monospace;color:${expired?'var(--red)':soon?'var(--yellow)':'var(--muted)'}">${expiryStr}</td>
+        <td><span class="badge ${expired?'badge-expired':'badge-active'}">${expired?'HẾT HẠN':'ACTIVE'}</span></td>
+        <td><div class="actions-cell">
+          <button class="btn btn-sm btn-green"   onclick="openExtend('${m.id}','${m.expiry}')"><i class="fas fa-plus"></i> Giờ</button>
+          <button class="btn btn-sm btn-warning" onclick="openRevoke('${m.id}','${m.user_id}','${m.plan}','${m.gpu}','${m.created_at}','${m.expiry}')"><i class="fas fa-ban"></i> Thu hồi</button>
+          <button class="btn btn-sm btn-danger"  onclick="deleteMachine('${m.id}')"><i class="fas fa-trash"></i></button>
+        </div></td>
       </tr>`;
     }).join('');
   }
 
-  function fillUserId(uid) {
-    document.getElementById('f-userid').value = uid;
-    window.scrollTo({top:0, behavior:'smooth'});
+  function fillUserId(uid){
+    document.getElementById('f-userid').value=uid;
+    updatePreview();
+    window.scrollTo({top:0,behavior:'smooth'});
+    showToast('✓ Đã điền User ID','success');
   }
 
-  async function assignMachine() {
-    const userId = document.getElementById('f-userid').value.trim();
-    const ip = document.getElementById('f-ip').value.trim();
-    const hours = parseFloat(document.getElementById('f-hours').value);
-
-    if (!userId) { showMsg('err', 'Chưa điền User ID'); return; }
-    if (!ip) { showMsg('err', 'Chưa điền địa chỉ IP'); return; }
-    if (!validateIp(ip)) { showMsg('err', 'IP không đúng định dạng'); return; }
-    if (!hours || hours <= 0) { showMsg('err', 'Chưa điền số giờ'); return; }
-
-    const btn = document.getElementById('assign-btn');
-    btn.disabled = true; btn.textContent = 'Đang gán...';
-
-    const expiry = new Date(Date.now() + hours * 3600000).toISOString();
-    const payload = {
-      ip, gpu: document.getElementById('f-gpu').value,
-      cpu: document.getElementById('f-cpu').value,
-      ram: document.getElementById('f-ram').value,
-      storage: document.getElementById('f-storage').value,
-      os: document.getElementById('f-os').value,
-      expiry, plan: document.getElementById('f-plan').value,
-    };
-
-    const { data: existing } = await sb.from('machines').select('id').eq('user_id', userId).single();
+  // ===== ASSIGN =====
+  async function assignMachine(){
+    const userId=document.getElementById('f-userid').value.trim();
+    const ip=document.getElementById('f-ip').value.trim();
+    const hours=parseFloat(document.getElementById('f-hours').value);
+    if(!userId){ showMsg('err','Chưa điền User ID'); return; }
+    if(!ip){ showMsg('err','Chưa điền địa chỉ IP'); return; }
+    if(!validateIp(ip)){ showMsg('err','IP không đúng định dạng'); return; }
+    if(!hours||hours<=0){ showMsg('err','Chưa điền số giờ'); return; }
+    const btn=document.getElementById('assign-btn');
+    btn.disabled=true; btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Đang gán...';
+    const expiry=new Date(Date.now()+hours*3600000).toISOString();
+    const payload={ip,gpu:document.getElementById('f-gpu').value,cpu:document.getElementById('f-cpu').value,ram:document.getElementById('f-ram').value,storage:document.getElementById('f-storage').value,os:document.getElementById('f-os').value,expiry,plan:document.getElementById('f-plan').value};
+    const{data:existing}=await sb.from('machines').select('id').eq('user_id',userId).single();
     let error;
-    if (existing) {
-      ({ error } = await sb.from('machines').update(payload).eq('user_id', userId));
-    } else {
-      ({ error } = await sb.from('machines').insert({ user_id: userId, ...payload }));
-    }
-
-    if (error) { showMsg('err', error.message); btn.disabled=false; btn.textContent='Gán máy'; return; }
+    if(existing){ ({error}=await sb.from('machines').update(payload).eq('user_id',userId)); }
+    else { ({error}=await sb.from('machines').insert({user_id:userId,...payload})); }
+    btn.disabled=false; btn.innerHTML='<i class="fas fa-check"></i> Xác nhận gán';
+    if(error){ showMsg('err',error.message); return; }
     showMsg('ok');
-    btn.disabled=false; btn.textContent='Gán máy';
-    document.getElementById('f-userid').value = '';
-    document.getElementById('f-ip').value = '';
-    document.getElementById('f-hours').value = '';
-    document.getElementById('expiry-preview').textContent = '—';
+    clearForm();
     loadData();
   }
 
-  async function revokeMachine(id, userId, plan, gpu, startedAt, expiry) {
-    if (!confirm('Thu hồi máy này?\nDữ liệu sẽ được ghi vào lịch sử thuê của user.')) return;
-
-    // Calculate total hours
-    const started = startedAt && startedAt !== 'null' ? new Date(startedAt) : new Date();
-    const ended   = new Date();
-    const totalHours = parseFloat(((ended - started) / 3600000).toFixed(2));
-
-    // Write to rental_history
-    const { error: histErr } = await sb.from('rental_history').insert({
-      user_id:     userId,
-      plan:        plan || 'G-NOVA',
-      gpu:         gpu  || '—',
-      started_at:  started.toISOString(),
-      ended_at:    ended.toISOString(),
-      total_hours: totalHours
-    });
-
-    if (histErr) {
-      alert('Lỗi ghi lịch sử: ' + histErr.message);
-      return;
-    }
-
-    // Delete machine
-    await sb.from('machines').delete().eq('id', id);
-    showToast('✓ Đã thu hồi & ghi lịch sử (' + totalHours + 'h)', 'success');
+  // ===== DELETE =====
+  async function deleteMachine(id){
+    if(!confirm('Xóa máy này? (Không ghi lịch sử)')) return;
+    await sb.from('machines').delete().eq('id',id);
+    showToast('✓ Đã xóa','success');
     loadData();
   }
 
-  async function deleteMachine(id) {
-    if (!confirm('Xóa máy này?')) return;
-    await sb.from('machines').delete().eq('id', id);
-    loadData();
+  // ===== EXTEND =====
+  function openExtend(id,currentExpiry){
+    document.getElementById('extend-id').value=id;
+    document.getElementById('extend-hours').value='';
+    const str=currentExpiry&&currentExpiry!=='null'?new Date(currentExpiry).toLocaleString('vi-VN',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}):'—';
+    document.getElementById('current-expiry-display').textContent='Hết hạn hiện tại: '+str;
+    document.getElementById('extend-modal').classList.add('open');
   }
-
-  // Gia hạn
-  function openExtend(id, currentExpiry) {
-    document.getElementById('extend-id').value = id;
-    document.getElementById('extend-hours').value = '';
-    const expStr = currentExpiry && currentExpiry !== 'null'
-      ? new Date(currentExpiry).toLocaleString('vi-VN',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'})
-      : '—';
-    document.getElementById('current-expiry-display').textContent = 'Hết hạn hiện tại: ' + expStr;
-    document.getElementById('extend-modal').style.display = 'flex';
-  }
-
-  function closeExtend() {
-    document.getElementById('extend-modal').style.display = 'none';
-  }
-
-  async function confirmExtend() {
-    const id = document.getElementById('extend-id').value;
-    const hours = parseFloat(document.getElementById('extend-hours').value);
-    if (!hours || hours <= 0) return;
-
-    const { data: m } = await sb.from('machines').select('expiry').eq('id', id).single();
-    const currentExpiry = m?.expiry ? new Date(m.expiry) : new Date();
-    const base = currentExpiry > new Date() ? currentExpiry : new Date();
-    const newExpiry = new Date(base.getTime() + hours * 3600000).toISOString();
-
-    const confirmBtn = document.querySelector('#extend-modal .btn-primary');
-    confirmBtn.disabled = true; confirmBtn.textContent = 'Đang gia hạn...';
-    const { error } = await sb.from('machines').update({ expiry: newExpiry }).eq('id', id);
-    confirmBtn.disabled = false; confirmBtn.textContent = 'Xác nhận';
-    if (error) { alert('Lỗi: ' + error.message); return; }
+  function closeExtend(){ document.getElementById('extend-modal').classList.remove('open'); }
+  async function confirmExtend(){
+    const id=document.getElementById('extend-id').value;
+    const hours=parseFloat(document.getElementById('extend-hours').value);
+    if(!hours||hours<=0) return;
+    const{data:m}=await sb.from('machines').select('expiry').eq('id',id).single();
+    const base=m?.expiry&&new Date(m.expiry)>new Date()?new Date(m.expiry):new Date();
+    const newExpiry=new Date(base.getTime()+hours*3600000).toISOString();
+    const btn=document.getElementById('extend-confirm-btn');
+    btn.disabled=true; btn.innerHTML='<i class="fas fa-spinner fa-spin"></i>';
+    const{error}=await sb.from('machines').update({expiry:newExpiry}).eq('id',id);
+    btn.disabled=false; btn.innerHTML='<i class="fas fa-check"></i> Xác nhận';
+    if(error){ showToast('✗ Lỗi: '+error.message,'error'); return; }
     closeExtend();
-    showToast('✓ Gia hạn thành công!');
+    showToast('✓ Gia hạn thành công!','success');
     loadData();
   }
 
-  // Toast
-  const toastEl = document.createElement('div');
-  toastEl.style.cssText = 'position:fixed;bottom:2rem;right:2rem;background:#161323;border:1px solid rgba(124,92,191,0.5);color:#9b7fe8;font-family:"Share Tech Mono",monospace;font-size:0.75rem;padding:0.6rem 1.25rem;z-index:999;opacity:0;transform:translateY(10px);transition:all 0.3s;pointer-events:none;letter-spacing:0.08em;';
-  document.body.appendChild(toastEl);
-  function showToast(msg, type) {
-    toastEl.textContent = msg;
-    toastEl.style.opacity = '1'; toastEl.style.transform = 'translateY(0)';
-    setTimeout(() => { toastEl.style.opacity = '0'; toastEl.style.transform = 'translateY(10px)'; }, 2500);
+  // ===== REVOKE =====
+  let revokeData = null;
+  function openRevoke(id,userId,plan,gpu,startedAt,expiry){
+    revokeData={id,userId,plan,gpu,startedAt,expiry};
+    const started=startedAt&&startedAt!=='null'?new Date(startedAt):new Date();
+    const totalHours=parseFloat(((new Date()-started)/3600000).toFixed(2));
+    document.getElementById('rv-user').textContent=userId?.slice(0,20)+'…';
+    document.getElementById('rv-gpu').textContent=gpu?.replace('NVIDIA ','')||'—';
+    document.getElementById('rv-plan').textContent=plan||'—';
+    document.getElementById('rv-start').textContent=started.toLocaleString('vi-VN',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
+    document.getElementById('rv-hours').textContent=totalHours+' giờ';
+    document.getElementById('revoke-modal').classList.add('open');
+  }
+  function closeRevoke(){ document.getElementById('revoke-modal').classList.remove('open'); revokeData=null; }
+  async function confirmRevoke(){
+    if(!revokeData) return;
+    const{id,userId,plan,gpu,startedAt}=revokeData;
+    const btn=document.getElementById('revoke-confirm-btn');
+    btn.disabled=true; btn.innerHTML='<i class="fas fa-spinner fa-spin"></i>';
+    const started=startedAt&&startedAt!=='null'?new Date(startedAt):new Date();
+    const ended=new Date();
+    const totalHours=parseFloat(((ended-started)/3600000).toFixed(2));
+    const{error:histErr}=await sb.from('rental_history').insert({user_id:userId,plan:plan||'G-NOVA',gpu:gpu||'—',started_at:started.toISOString(),ended_at:ended.toISOString(),total_hours:totalHours});
+    if(histErr){ showToast('✗ Lỗi ghi lịch sử: '+histErr.message,'error'); btn.disabled=false; btn.innerHTML='<i class="fas fa-ban"></i> Xác nhận thu hồi'; return; }
+    await sb.from('machines').delete().eq('id',id);
+    btn.disabled=false; btn.innerHTML='<i class="fas fa-ban"></i> Xác nhận thu hồi';
+    closeRevoke();
+    showToast('✓ Thu hồi & ghi lịch sử ('+totalHours+'h)','success');
+    loadData();
   }
 
-  function showMsg(type, text) {
-    const ok = document.getElementById('msg-ok');
-    const err = document.getElementById('msg-err');
-    ok.style.display = 'none'; err.style.display = 'none';
-    if (type === 'ok') {
-      ok.style.display = 'block';
-      setTimeout(() => ok.style.display = 'none', 3000);
-    } else {
-      err.textContent = '✗ ' + text;
-      err.style.display = 'block';
-    }
+  // ===== TOAST =====
+  function showToast(msg,type,duration){
+    const t=document.getElementById('toast');
+    t.textContent=msg;
+    t.className='show'+(type?' toast-'+type:'');
+    clearTimeout(t._t);
+    t._t=setTimeout(()=>t.classList.remove('show'),duration||2500);
+  }
+
+  // ===== MSG =====
+  function showMsg(type,text){
+    const ok=document.getElementById('msg-ok'),err=document.getElementById('msg-err');
+    ok.style.display='none'; err.style.display='none';
+    if(type==='ok'){ ok.style.display='block'; setTimeout(()=>ok.style.display='none',3000); }
+    else { err.innerHTML='<i class="fas fa-xmark"></i> '+text; err.style.display='block'; }
   }
 </script>
 </body>
