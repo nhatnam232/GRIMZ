@@ -42,6 +42,61 @@
   .al-dot:nth-child(3) { animation-delay:0.4s; }
   @keyframes alDot { 0%,100%{background:#3a3458} 50%{background:#7c5cbf} }
 
+
+  /* ===== CHAT ===== */
+  .chat-fab { position:fixed; bottom:2rem; left:1.5rem; z-index:300; }
+  .chat-fab-btn { width:48px; height:48px; background:var(--accent); border:none; color:#fff; font-size:1.1rem; cursor:pointer; display:flex; align-items:center; justify-content:center; clip-path:polygon(6px 0,100% 0,100% calc(100% - 6px),calc(100% - 6px) 100%,0 100%,0 6px); transition:all 0.2s; position:relative; }
+  .chat-fab-btn:hover { background:var(--accent2); transform:scale(1.05); }
+  .chat-badge { position:absolute; top:-4px; right:-4px; background:var(--red); color:#fff; font-size:0.55rem; font-family:'JetBrains Mono',monospace; width:16px; height:16px; border-radius:50%; display:none; align-items:center; justify-content:center; }
+  .chat-badge.show { display:flex; }
+
+  .chat-panel { position:fixed; bottom:5rem; left:1.5rem; width:min(360px,calc(100vw - 2rem)); background:var(--bg2); border:1px solid rgba(124,92,191,0.3); z-index:299; display:none; flex-direction:column; box-shadow:0 8px 32px rgba(0,0,0,0.4); }
+  .chat-panel.open { display:flex; animation:chatIn 0.2s ease; }
+  @keyframes chatIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+  .chat-panel::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:linear-gradient(90deg,var(--accent3),var(--accent2)); }
+
+  .chat-tabs { display:flex; border-bottom:1px solid var(--border); }
+  .chat-tab { flex:1; padding:0.6rem; font-family:'JetBrains Mono',monospace; font-size:0.6rem; letter-spacing:0.1em; text-transform:uppercase; background:none; border:none; color:var(--muted); cursor:pointer; transition:all 0.2s; position:relative; }
+  .chat-tab.active { color:var(--accent2); background:rgba(124,92,191,0.06); }
+  .chat-tab.active::after { content:''; position:absolute; bottom:0; left:0; right:0; height:1px; background:var(--accent2); }
+  .chat-tab-badge { display:inline-flex; align-items:center; justify-content:center; background:var(--red); color:#fff; font-size:0.5rem; width:14px; height:14px; border-radius:50%; margin-left:4px; vertical-align:middle; }
+
+  .chat-body { height:280px; overflow-y:auto; padding:0.75rem; display:flex; flex-direction:column; gap:0.5rem; }
+  .chat-msg { display:flex; flex-direction:column; gap:0.15rem; max-width:85%; }
+  .chat-msg.mine { align-self:flex-end; align-items:flex-end; }
+  .chat-msg.theirs { align-self:flex-start; }
+  .chat-bubble { padding:0.45rem 0.7rem; font-size:0.8rem; line-height:1.5; word-break:break-word; }
+  .chat-msg.mine .chat-bubble { background:rgba(124,92,191,0.25); border:1px solid rgba(124,92,191,0.3); color:var(--text); }
+  .chat-msg.theirs .chat-bubble { background:var(--bg3); border:1px solid var(--border); color:var(--text); }
+  .chat-meta { font-family:'JetBrains Mono',monospace; font-size:0.55rem; color:var(--muted); }
+  .chat-alias { color:var(--accent2); font-weight:500; }
+  .chat-empty { text-align:center; font-family:'JetBrains Mono',monospace; font-size:0.65rem; color:var(--muted); padding:2rem; letter-spacing:0.1em; }
+
+  /* Support list */
+  .support-list { height:280px; overflow-y:auto; }
+  .support-item { padding:0.65rem 0.75rem; border-bottom:1px solid rgba(124,92,191,0.07); cursor:pointer; transition:background 0.15s; display:flex; align-items:center; justify-content:space-between; gap:0.5rem; }
+  .support-item:hover { background:rgba(124,92,191,0.05); }
+  .support-item.active { background:rgba(124,92,191,0.1); border-left:2px solid var(--accent2); }
+  .support-item-name { font-size:0.78rem; font-weight:500; color:var(--text); }
+  .support-item-preview { font-size:0.65rem; color:var(--muted); margin-top:0.1rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:180px; font-family:'JetBrains Mono',monospace; }
+  .support-item-time { font-family:'JetBrains Mono',monospace; font-size:0.55rem; color:var(--muted); flex-shrink:0; }
+  .support-unread { width:8px; height:8px; border-radius:50%; background:var(--accent2); flex-shrink:0; }
+
+  .chat-input-wrap { display:flex; gap:0; border-top:1px solid var(--border); }
+  .chat-input { flex:1; background:var(--bg3); border:none; color:var(--text); padding:0.65rem 0.75rem; font-family:'Poppins',sans-serif; font-size:0.82rem; outline:none; }
+  .chat-input::placeholder { color:var(--muted); }
+  .chat-send { background:var(--accent); border:none; color:#fff; padding:0 1rem; cursor:pointer; font-size:0.85rem; transition:background 0.2s; }
+  .chat-send:hover { background:var(--accent2); }
+
+  .chat-header { display:flex; align-items:center; justify-content:space-between; padding:0.6rem 0.75rem; border-bottom:1px solid var(--border); }
+  .chat-header-title { font-family:'JetBrains Mono',monospace; font-size:0.62rem; color:var(--accent2); letter-spacing:0.12em; text-transform:uppercase; }
+  .chat-close { background:none; border:none; color:var(--muted); cursor:pointer; font-size:0.85rem; transition:color 0.2s; }
+  .chat-close:hover { color:var(--text); }
+
+  .support-back { background:none; border:none; color:var(--muted); cursor:pointer; font-size:0.75rem; padding:0.4rem 0.6rem; font-family:'JetBrains Mono',monospace; letter-spacing:0.08em; transition:color 0.2s; display:none; }
+  .support-back:hover { color:var(--accent2); }
+  .support-back.show { display:inline-flex; align-items:center; gap:0.3rem; }
+
   /* ===== RATE LIMIT NOTICE ===== */
   #rate-limit-msg { display:none; font-family:'JetBrains Mono',monospace; font-size:0.68rem; color:var(--red); text-align:center; letter-spacing:0.08em; margin-top:0.75rem; }
 
@@ -405,6 +460,51 @@
   <button class="fab-btn" onclick="document.getElementById('f-userid').focus();window.scrollTo({top:0,behavior:'smooth'})" title="Gán máy nhanh"><i class="fas fa-user-plus"></i></button>
 </div>
 
+
+<!-- CHAT FAB -->
+<div class="chat-fab">
+  <button class="chat-fab-btn" onclick="toggleChat()" title="Chat">
+    <i class="fas fa-comments"></i>
+    <span class="chat-badge" id="chat-badge">0</span>
+  </button>
+</div>
+
+<!-- CHAT PANEL -->
+<div class="chat-panel" id="chat-panel">
+  <div class="chat-header">
+    <span class="chat-header-title" id="chat-header-title">// GRIMZ CHAT</span>
+    <div style="display:flex;align-items:center;gap:0.5rem;">
+      <button class="support-back" id="support-back-btn" onclick="backToSupportList()"><i class="fas fa-arrow-left"></i> Danh sách</button>
+      <button class="chat-close" onclick="toggleChat()"><i class="fas fa-times"></i></button>
+    </div>
+  </div>
+  <div class="chat-tabs">
+    <button class="chat-tab active" id="tab-admin" onclick="switchChatTab('admin')"><i class="fas fa-users"></i> Admin <span id="admin-unread" class="chat-tab-badge" style="display:none;">0</span></button>
+    <button class="chat-tab" id="tab-support" onclick="switchChatTab('support')"><i class="fas fa-headset"></i> Support <span id="support-unread" class="chat-tab-badge" style="display:none;">0</span></button>
+  </div>
+
+  <!-- ADMIN CHAT -->
+  <div id="chat-admin-panel" style="display:flex;flex-direction:column;">
+    <div class="chat-body" id="admin-chat-body"><div class="chat-empty">Chưa có tin nhắn</div></div>
+    <div class="chat-input-wrap">
+      <input class="chat-input" id="admin-chat-input" placeholder="Nhắn cho team..." onkeydown="if(event.key==='Enter')sendAdminMsg()">
+      <button class="chat-send" onclick="sendAdminMsg()"><i class="fas fa-paper-plane"></i></button>
+    </div>
+  </div>
+
+  <!-- SUPPORT LIST / CHAT -->
+  <div id="chat-support-panel" style="display:none;">
+    <div id="support-user-list" class="support-list"><div class="chat-empty">Chưa có user nào nhắn</div></div>
+    <div id="support-user-chat" style="display:none; flex-direction:column;">
+      <div class="chat-body" id="support-chat-body"></div>
+      <div class="chat-input-wrap">
+        <input class="chat-input" id="support-chat-input" placeholder="Reply user..." onkeydown="if(event.key==='Enter')sendSupportReply()">
+        <button class="chat-send" onclick="sendSupportReply()"><i class="fas fa-paper-plane"></i></button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div id="toast"></div>
 
 <script>
@@ -755,6 +855,226 @@
     auditLog('REVOKE', 'Thu hồi máy user '+userId+' ('+totalHours+'h)'); showToast('✓ Thu hồi & ghi lịch sử ('+totalHours+'h)','success');
     loadData();
   }
+
+
+  // ===== CHAT SYSTEM =====
+  let chatOpen = false;
+  let currentChatTab = 'admin';
+  let currentSupportUserId = null;
+  let adminAlias = localStorage.getItem('grimz_admin_alias') || null;
+  let adminChatSub = null;
+  let supportChatSub = null;
+  let adminMsgs = [];
+  let supportConvos = {}; // userId -> [msgs]
+  let lastSeenAdmin = parseInt(localStorage.getItem('grimz_last_seen_admin') || '0');
+  let lastSeenSupport = {};
+
+  function getAdminAlias() {
+    if(!adminAlias) {
+      adminAlias = prompt('Nhập tên hiển thị của bạn (alias):') || 'Admin';
+      localStorage.setItem('grimz_admin_alias', adminAlias);
+    }
+    return adminAlias;
+  }
+
+  function toggleChat() {
+    chatOpen = !chatOpen;
+    document.getElementById('chat-panel').classList.toggle('open', chatOpen);
+    if(chatOpen) {
+      getAdminAlias();
+      if(!adminChatSub) initAdminChat();
+      if(!supportChatSub) initSupportChat();
+      markAdminSeen();
+    }
+  }
+
+  function switchChatTab(tab) {
+    currentChatTab = tab;
+    document.getElementById('chat-admin-panel').style.display  = tab==='admin'   ? 'flex' : 'none';
+    document.getElementById('chat-support-panel').style.display= tab==='support' ? 'block': 'none';
+    document.getElementById('tab-admin').classList.toggle('active', tab==='admin');
+    document.getElementById('tab-support').classList.toggle('active', tab==='support');
+    document.getElementById('chat-header-title').textContent = tab==='admin' ? '// ADMIN CHAT' : '// SUPPORT';
+    document.getElementById('support-back-btn').classList.remove('show');
+    if(tab==='admin') { markAdminSeen(); document.getElementById('admin-chat-input').focus(); }
+    if(tab==='support') renderSupportList();
+  }
+
+  // ===== ADMIN CHAT =====
+  async function initAdminChat() {
+    const { data } = await sb.from('admin_chat').select('*').order('created_at', {ascending:true}).limit(50);
+    adminMsgs = data || [];
+    renderAdminChat();
+    adminChatSub = sb.channel('admin-chat-live')
+      .on('postgres_changes', {event:'INSERT', schema:'public', table:'admin_chat'}, payload => {
+        adminMsgs.push(payload.new);
+        renderAdminChat();
+        if(!chatOpen || currentChatTab !== 'admin') {
+          updateAdminUnread();
+          document.getElementById('chat-badge').classList.add('show');
+        } else markAdminSeen();
+      }).subscribe();
+  }
+
+  function renderAdminChat() {
+    const body = document.getElementById('admin-chat-body');
+    if(!adminMsgs.length) { body.innerHTML='<div class="chat-empty">Chưa có tin nhắn</div>'; return; }
+    body.innerHTML = adminMsgs.map(m => {
+      const mine = m.alias === adminAlias;
+      const time = new Date(m.created_at).toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'});
+      return `<div class="chat-msg ${mine?'mine':'theirs'}">
+        <div class="chat-meta"><span class="chat-alias">${m.alias}</span> · ${time}</div>
+        <div class="chat-bubble">${escHtml(m.message)}</div>
+      </div>`;
+    }).join('');
+    body.scrollTop = body.scrollHeight;
+  }
+
+  async function sendAdminMsg() {
+    const input = document.getElementById('admin-chat-input');
+    const msg = input.value.trim();
+    if(!msg) return;
+    input.value = '';
+    await sb.from('admin_chat').insert({ alias: getAdminAlias(), message: msg });
+  }
+
+  function markAdminSeen() {
+    lastSeenAdmin = Date.now();
+    localStorage.setItem('grimz_last_seen_admin', lastSeenAdmin);
+    document.getElementById('admin-unread').style.display = 'none';
+    updateBadge();
+  }
+
+  function updateAdminUnread() {
+    const unseen = adminMsgs.filter(m => new Date(m.created_at).getTime() > lastSeenAdmin && m.alias !== adminAlias).length;
+    const el = document.getElementById('admin-unread');
+    if(unseen > 0) { el.textContent = unseen; el.style.display = 'inline-flex'; } else el.style.display = 'none';
+    updateBadge();
+  }
+
+  // ===== SUPPORT CHAT =====
+  async function initSupportChat() {
+    const { data } = await sb.from('support_chat').select('*').order('created_at', {ascending:true});
+    if(!data) return;
+    supportConvos = {};
+    data.forEach(m => {
+      if(!supportConvos[m.user_id]) supportConvos[m.user_id] = [];
+      supportConvos[m.user_id].push(m);
+    });
+    renderSupportList();
+    supportChatSub = sb.channel('support-chat-live')
+      .on('postgres_changes', {event:'INSERT', schema:'public', table:'support_chat'}, payload => {
+        const uid = payload.new.user_id;
+        if(!supportConvos[uid]) supportConvos[uid] = [];
+        supportConvos[uid].push(payload.new);
+        if(currentSupportUserId === uid) renderSupportMessages(uid);
+        renderSupportList();
+        if(payload.new.sender === 'user') {
+          updateSupportUnread();
+          document.getElementById('chat-badge').classList.add('show');
+        }
+      }).subscribe();
+  }
+
+  function renderSupportList() {
+    const list = document.getElementById('support-user-list');
+    const userIds = Object.keys(supportConvos);
+    if(!userIds.length) { list.innerHTML='<div class="chat-empty">Chưa có user nào nhắn</div>'; return; }
+    list.innerHTML = userIds.map(uid => {
+      const msgs = supportConvos[uid];
+      const last = msgs[msgs.length-1];
+      const time = new Date(last.created_at).toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'});
+      const unread = msgs.filter(m => m.sender==='user' && !m.alias).length;
+      const seen = parseInt(localStorage.getItem('grimz_seen_support_'+uid)||'0');
+      const hasNew = msgs.some(m => m.sender==='user' && new Date(m.created_at).getTime() > seen);
+      return `<div class="support-item ${currentSupportUserId===uid?'active':''}" onclick="openSupportChat('${uid}')">
+        <div style="flex:1;min-width:0;">
+          <div class="support-item-name">${uid.slice(0,16)}…</div>
+          <div class="support-item-preview">${escHtml(last.message)}</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:0.3rem;flex-shrink:0;">
+          <span class="support-item-time">${time}</span>
+          ${hasNew?'<span class="support-unread"></span>':''}
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  function openSupportChat(uid) {
+    currentSupportUserId = uid;
+    document.getElementById('support-user-list').style.display='none';
+    const uc = document.getElementById('support-user-chat');
+    uc.style.display='flex'; uc.style.flexDirection='column';
+    document.getElementById('support-back-btn').classList.add('show');
+    localStorage.setItem('grimz_seen_support_'+uid, Date.now());
+    renderSupportMessages(uid);
+    renderSupportList();
+    updateSupportUnread();
+    setTimeout(()=>document.getElementById('support-chat-input').focus(),100);
+  }
+
+  function backToSupportList() {
+    currentSupportUserId = null;
+    document.getElementById('support-user-list').style.display='block';
+    document.getElementById('support-user-chat').style.display='none';
+    document.getElementById('support-back-btn').classList.remove('show');
+    renderSupportList();
+  }
+
+  function renderSupportMessages(uid) {
+    const body = document.getElementById('support-chat-body');
+    const msgs = supportConvos[uid] || [];
+    body.innerHTML = msgs.map(m => {
+      const mine = m.sender === 'admin';
+      const time = new Date(m.created_at).toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'});
+      return `<div class="chat-msg ${mine?'mine':'theirs'}">
+        <div class="chat-meta">${mine?('<span class="chat-alias">'+escHtml(m.alias||'Admin')+'</span> · '):'User · '}${time}</div>
+        <div class="chat-bubble">${escHtml(m.message)}</div>
+      </div>`;
+    }).join('');
+    body.scrollTop = body.scrollHeight;
+  }
+
+  async function sendSupportReply() {
+    if(!currentSupportUserId) return;
+    const input = document.getElementById('support-chat-input');
+    const msg = input.value.trim();
+    if(!msg) return;
+    input.value = '';
+    await sb.from('support_chat').insert({ user_id: currentSupportUserId, sender:'admin', alias: getAdminAlias(), message: msg });
+  }
+
+  function updateSupportUnread() {
+    let total = 0;
+    Object.entries(supportConvos).forEach(([uid, msgs]) => {
+      const seen = parseInt(localStorage.getItem('grimz_seen_support_'+uid)||'0');
+      total += msgs.filter(m => m.sender==='user' && new Date(m.created_at).getTime() > seen).length;
+    });
+    const el = document.getElementById('support-unread');
+    if(total > 0) { el.textContent = total; el.style.display='inline-flex'; } else el.style.display='none';
+    updateBadge();
+  }
+
+  function updateBadge() {
+    const adminUnseen = adminMsgs.filter(m => new Date(m.created_at).getTime() > lastSeenAdmin && m.alias !== adminAlias).length;
+    let supportUnseen = 0;
+    Object.entries(supportConvos).forEach(([uid, msgs]) => {
+      const seen = parseInt(localStorage.getItem('grimz_seen_support_'+uid)||'0');
+      supportUnseen += msgs.filter(m => m.sender==='user' && new Date(m.created_at).getTime() > seen).length;
+    });
+    const total = adminUnseen + supportUnseen;
+    const badge = document.getElementById('chat-badge');
+    if(total > 0) { badge.textContent = total; badge.classList.add('show'); } else badge.classList.remove('show');
+  }
+
+  function escHtml(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  // Init chat after login
+  const origLoadData = loadData;
+  // Chat auto-init after session check handled by toggleChat on open
+
 
   // ===== TOAST =====
   function showToast(msg,type,duration){

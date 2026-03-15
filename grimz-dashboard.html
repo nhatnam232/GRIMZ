@@ -261,6 +261,37 @@
     to   { opacity:0; }
   }
 
+
+  /* ===== SUPPORT CHAT (USER) ===== */
+  .support-chat-fab { position:fixed; bottom:2rem; right:5.5rem; z-index:200; }
+  .sc-fab-btn { width:44px; height:44px; background:var(--accent); border:none; color:#fff; font-size:1rem; cursor:pointer; display:flex; align-items:center; justify-content:center; clip-path:polygon(6px 0,100% 0,100% calc(100% - 6px),calc(100% - 6px) 100%,0 100%,0 6px); transition:all 0.2s; position:relative; }
+  .sc-fab-btn:hover { background:var(--accent2); transform:scale(1.05); }
+  .sc-fab-badge { position:absolute; top:-4px; right:-4px; background:var(--red); color:#fff; font-size:0.5rem; font-family:'JetBrains Mono',monospace; width:14px; height:14px; border-radius:50%; display:none; align-items:center; justify-content:center; }
+  .sc-fab-badge.show { display:flex; }
+
+  .sc-panel { position:fixed; bottom:5.5rem; right:1.5rem; width:min(320px,calc(100vw - 2rem)); background:var(--bg2); border:1px solid rgba(124,92,191,0.3); z-index:199; display:none; flex-direction:column; box-shadow:0 8px 32px rgba(0,0,0,0.4); max-height:440px; }
+  .sc-panel.open { display:flex; animation:scIn 0.2s ease; }
+  @keyframes scIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+  .sc-panel::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:linear-gradient(90deg,var(--accent3),var(--accent2)); }
+  .sc-header { display:flex; align-items:center; justify-content:space-between; padding:0.65rem 0.85rem; border-bottom:1px solid var(--border); }
+  .sc-header-title { font-family:'JetBrains Mono',monospace; font-size:0.62rem; color:var(--accent2); letter-spacing:0.12em; text-transform:uppercase; display:flex; align-items:center; gap:0.5rem; }
+  .sc-close { background:none; border:none; color:var(--muted); cursor:pointer; font-size:0.85rem; transition:color 0.2s; }
+  .sc-close:hover { color:var(--text); }
+  .sc-body { flex:1; overflow-y:auto; padding:0.75rem; display:flex; flex-direction:column; gap:0.5rem; min-height:200px; max-height:280px; }
+  .sc-msg { display:flex; flex-direction:column; gap:0.15rem; max-width:85%; }
+  .sc-msg.mine { align-self:flex-end; align-items:flex-end; }
+  .sc-msg.theirs { align-self:flex-start; }
+  .sc-bubble { padding:0.4rem 0.65rem; font-size:0.78rem; line-height:1.5; word-break:break-word; }
+  .sc-msg.mine .sc-bubble { background:rgba(124,92,191,0.25); border:1px solid rgba(124,92,191,0.3); color:var(--text); border-radius:0; }
+  .sc-msg.theirs .sc-bubble { background:var(--bg3); border:1px solid var(--border); color:var(--text); }
+  .sc-meta { font-family:'JetBrains Mono',monospace; font-size:0.52rem; color:var(--muted); }
+  .sc-empty { text-align:center; font-family:'JetBrains Mono',monospace; font-size:0.62rem; color:var(--muted); padding:2rem 1rem; letter-spacing:0.08em; line-height:2; }
+  .sc-input-wrap { display:flex; border-top:1px solid var(--border); }
+  .sc-input { flex:1; background:var(--bg3); border:none; color:var(--text); padding:0.6rem 0.75rem; font-family:'Poppins',sans-serif; font-size:0.8rem; outline:none; }
+  .sc-input::placeholder { color:var(--muted); }
+  .sc-send { background:var(--accent); border:none; color:#fff; padding:0 1rem; cursor:pointer; font-size:0.85rem; transition:background 0.2s; }
+  .sc-send:hover { background:var(--accent2); }
+
   /* ===== MOBILE ===== */
   .hamburger { display:none; background:none; border:none; color:var(--accent2); width:40px; height:40px; align-items:center; justify-content:center; font-size:1.3rem; cursor:pointer; flex-shrink:0; }
   .sidebar-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:49; }
@@ -542,6 +573,30 @@
   </div>
 </div>
 
+
+<!-- SUPPORT CHAT FAB -->
+<div class="support-chat-fab">
+  <button class="sc-fab-btn" onclick="toggleSupportChat()" title="Hỗ trợ">
+    <i class="fas fa-headset"></i>
+    <span class="sc-fab-badge" id="sc-badge"></span>
+  </button>
+</div>
+
+<!-- SUPPORT CHAT PANEL -->
+<div class="sc-panel" id="sc-panel">
+  <div class="sc-header">
+    <span class="sc-header-title"><i class="fas fa-headset"></i> Hỗ trợ trực tiếp</span>
+    <button class="sc-close" onclick="toggleSupportChat()"><i class="fas fa-times"></i></button>
+  </div>
+  <div class="sc-body" id="sc-body">
+    <div class="sc-empty">💬 Nhắn tin để được hỗ trợ.<br>Staff sẽ phản hồi sớm nhất có thể.</div>
+  </div>
+  <div class="sc-input-wrap">
+    <input class="sc-input" id="sc-input" placeholder="Nhập tin nhắn..." onkeydown="if(event.key==='Enter')sendSupportMsg()">
+    <button class="sc-send" onclick="sendSupportMsg()"><i class="fas fa-paper-plane"></i></button>
+  </div>
+</div>
+
 <div class="toast" id="toast" onclick="this.classList.remove('show')">✓ Đã copy <span style="margin-left:0.5rem;opacity:0.6;cursor:pointer;">✕</span></div>
 
 <script>
@@ -588,6 +643,69 @@
   })();
 
 
+
+
+
+  // ===== SUPPORT CHAT (USER) =====
+  let scOpen = false;
+  let scUserId = null;
+  let scSub = null;
+  let scMsgs = [];
+  let scLastSeen = parseInt(localStorage.getItem('grimz_sc_seen') || '0');
+
+  function toggleSupportChat() {
+    scOpen = !scOpen;
+    document.getElementById('sc-panel').classList.toggle('open', scOpen);
+    if(scOpen && scUserId) {
+      scLastSeen = Date.now();
+      localStorage.setItem('grimz_sc_seen', scLastSeen);
+      document.getElementById('sc-badge').classList.remove('show');
+      document.getElementById('sc-input').focus();
+    }
+  }
+
+  async function initSupportChat(userId) {
+    scUserId = userId;
+    const { data } = await sb.from('support_chat').select('*').eq('user_id', userId).order('created_at', {ascending:true});
+    scMsgs = data || [];
+    renderScMsgs();
+    scSub = sb.channel('sc-live-'+userId)
+      .on('postgres_changes', {event:'INSERT', schema:'public', table:'support_chat',
+        filter:'user_id=eq.'+userId}, payload => {
+        scMsgs.push(payload.new);
+        renderScMsgs();
+        if(!scOpen && payload.new.sender === 'admin') {
+          document.getElementById('sc-badge').classList.add('show');
+          showToast('💬 Admin đã reply tin nhắn của bạn!', 3000, 'success');
+        }
+      }).subscribe();
+  }
+
+  function renderScMsgs() {
+    const body = document.getElementById('sc-body');
+    if(!scMsgs.length) {
+      body.innerHTML='<div class="sc-empty">💬 Nhắn tin để được hỗ trợ.<br>Staff sẽ phản hồi sớm nhất có thể.</div>';
+      return;
+    }
+    body.innerHTML = scMsgs.map(m => {
+      const mine = m.sender === 'user';
+      const time = new Date(m.created_at).toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'});
+      return `<div class="sc-msg ${mine?'mine':'theirs'}">
+        <div class="sc-meta">${mine?'Bạn':(m.alias||'Staff')} · ${time}</div>
+        <div class="sc-bubble">${String(m.message).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>
+      </div>`;
+    }).join('');
+    body.scrollTop = body.scrollHeight;
+  }
+
+  async function sendSupportMsg() {
+    if(!scUserId) return;
+    const input = document.getElementById('sc-input');
+    const msg = input.value.trim();
+    if(!msg) return;
+    input.value = '';
+    await sb.from('support_chat').insert({ user_id: scUserId, sender: 'user', message: msg });
+  }
 
 
   // ===== HISTORY & CHART =====
@@ -873,6 +991,7 @@
     if(!session){window.location.href='grimz-login.html';return;}
     currentUserId=session.user.id;
     loadHistory(session.user.id);
+    initSupportChat(session.user.id);
     const email=session.user.email||'User';
     const username=email.split('@')[0];
     // Check for saved display name
