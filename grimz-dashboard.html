@@ -201,6 +201,15 @@
         <div class="stat-sub">Singapore Node</div>
       </div>
     </div>
+    <div class="card" style="padding:1.25rem 1.5rem;">
+      <div class="card-label">// User ID của bạn</div>
+      <div style="display:flex;align-items:center;gap:0.75rem;margin-top:0.4rem;">
+        <div id="userUuid" style="font-family:'Share Tech Mono',monospace;font-size:0.8rem;color:var(--accent2);background:var(--bg);border:1px solid var(--border);padding:0.4rem 0.75rem;flex:1;word-break:break-all;">—</div>
+        <button onclick="copyUuid()" style="padding:0.4rem 0.85rem;background:var(--accent);border:none;color:#fff;font-family:'Rajdhani',sans-serif;font-size:0.8rem;font-weight:700;letter-spacing:0.1em;cursor:pointer;text-transform:uppercase;white-space:nowrap;">Copy</button>
+      </div>
+      <div style="font-size:0.72rem;color:var(--muted);margin-top:0.5rem;font-weight:300;">Gửi ID này cho staff khi tạo ticket để được gán máy.</div>
+    </div>
+
     <div class="card" id="noBuyCard" style="text-align:center;padding:2rem;">
       <div class="empty-state">Chưa có máy nào được gán cho tài khoản này.<br>Mua dịch vụ qua Discord để bắt đầu.</div>
       <a href="https://discord.gg/Ct4Gw7GwJJ" target="_blank" class="btn btn-discord" style="margin:0 auto;">
@@ -398,6 +407,15 @@
     document.getElementById('userPlan').textContent = m.gpu?.split(' ')[1] || 'Active';
   }
 
+  function copyUuid() {
+    const uuid = document.getElementById('userUuid').textContent;
+    navigator.clipboard.writeText(uuid).then(() => {
+      const t = document.getElementById('toast');
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2000);
+    });
+  }
+
   async function init() {
     const { data: { session } } = await sb.auth.getSession();
     if (!session) { window.location.href = 'grimz-login.html'; return; }
@@ -406,6 +424,7 @@
     const username = email.split('@')[0];
     document.getElementById('userName').textContent = username;
     document.getElementById('userAvatar').textContent = username[0].toUpperCase();
+    document.getElementById('userUuid').textContent = session.user.id;
 
     const { data: machine } = await sb.from('machines').select('*').eq('user_id', session.user.id).single();
     if (machine) fillMachine(machine);
