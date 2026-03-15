@@ -6,104 +6,266 @@
 <title>Grimz Cloud PC — Điều khoản dịch vụ</title>
 <link rel="icon" type="image/x-icon" href="/favicon.ico">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&family=Exo+2:wght@300;400;500&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&family=Poppins:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
-  :root { --bg:#09080f; --bg2:#100e1a; --accent:#7c5cbf; --accent2:#9b7fe8; --text:#e4e0f0; --muted:#8a84a0; --border:rgba(124,92,191,0.15); }
+  :root {
+    --bg:#09080f; --bg2:#100e1a; --bg3:#161323;
+    --accent:#7c5cbf; --accent2:#9b7fe8; --accent3:#5a3fa0;
+    --green:#4ade80; --red:#f87171; --yellow:#fbbf24;
+    --text:#e4e0f0; --muted:#8a84a0; --border:rgba(124,92,191,0.15);
+  }
   * { margin:0; padding:0; box-sizing:border-box; }
-  body { background:var(--bg); color:var(--text); font-family:'Exo 2',sans-serif; line-height:1.8; }
+  html { scroll-behavior:smooth; }
+  body { background:var(--bg); color:var(--text); font-family:'Poppins',sans-serif; line-height:1.8; }
   body::before { content:''; position:fixed; inset:0; background-image:linear-gradient(rgba(124,92,191,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(124,92,191,0.03) 1px,transparent 1px); background-size:50px 50px; pointer-events:none; z-index:0; }
+  body::after { content:''; position:fixed; top:-50%; left:-50%; width:200%; height:200%; background:radial-gradient(ellipse at 70% 60%,rgba(124,92,191,0.04) 0%,transparent 50%); animation:bgRot 35s linear infinite reverse; pointer-events:none; z-index:0; }
+  @keyframes bgRot { from{transform:rotate(0)} to{transform:rotate(360deg)} }
+
   nav { position:sticky; top:0; z-index:100; padding:0 5%; height:56px; display:flex; align-items:center; justify-content:space-between; background:rgba(9,8,15,0.95); backdrop-filter:blur(12px); border-bottom:1px solid var(--border); }
   .logo { font-family:'Rajdhani',sans-serif; font-size:1.2rem; font-weight:700; letter-spacing:0.15em; text-transform:uppercase; color:var(--accent); text-decoration:none; }
   .logo span { color:var(--accent2); }
-  nav a.back { font-family:'Share Tech Mono',monospace; font-size:0.68rem; color:var(--muted); text-decoration:none; letter-spacing:0.1em; transition:color 0.2s; }
-  nav a.back:hover { color:var(--accent2); }
-  .wrap { position:relative; z-index:1; max-width:760px; margin:0 auto; padding:3rem 2rem 5rem; }
-  .page-tag { font-family:'Share Tech Mono',monospace; font-size:0.65rem; color:var(--accent2); letter-spacing:0.25em; text-transform:uppercase; margin-bottom:0.75rem; }
-  h1 { font-family:'Rajdhani',sans-serif; font-size:2.5rem; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:0.5rem; }
-  .updated { font-family:'Share Tech Mono',monospace; font-size:0.65rem; color:var(--muted); letter-spacing:0.1em; margin-bottom:3rem; padding-bottom:1.5rem; border-bottom:1px solid var(--border); }
-  h2 { font-family:'Rajdhani',sans-serif; font-size:1.2rem; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:var(--accent2); margin:2.5rem 0 0.75rem; display:flex; align-items:center; gap:0.75rem; }
-  h2::before { content:''; display:inline-block; width:3px; height:1.2em; background:var(--accent); flex-shrink:0; }
-  p { color:var(--muted); font-size:0.925rem; margin-bottom:0.75rem; font-weight:400; }
-  ul { list-style:none; margin:0.5rem 0 0.75rem 0; display:flex; flex-direction:column; gap:0.4rem; }
-  ul li { color:var(--muted); font-size:0.925rem; padding-left:1.25rem; position:relative; }
-  ul li::before { content:'▸'; position:absolute; left:0; color:var(--accent); font-size:0.7rem; top:0.2rem; }
+  .nav-links { display:flex; gap:1.5rem; align-items:center; }
+  .nav-links a { font-family:'JetBrains Mono',monospace; font-size:0.65rem; color:var(--muted); text-decoration:none; letter-spacing:0.1em; transition:color 0.2s; }
+  .nav-links a:hover { color:var(--accent2); }
+
+  .wrap { position:relative; z-index:1; max-width:800px; margin:0 auto; padding:3rem 2rem 6rem; }
+  .hero { margin-bottom:3rem; padding-bottom:2rem; border-bottom:1px solid var(--border); }
+  .page-tag { font-family:'JetBrains Mono',monospace; font-size:0.62rem; color:var(--accent2); letter-spacing:0.25em; text-transform:uppercase; margin-bottom:0.75rem; display:flex; align-items:center; gap:0.5rem; }
+  .page-tag::before { content:''; width:20px; height:1px; background:var(--accent2); }
+  h1 { font-family:'Rajdhani',sans-serif; font-size:clamp(2rem,5vw,3rem); font-weight:700; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:0.5rem; }
+  .updated { font-family:'JetBrains Mono',monospace; font-size:0.62rem; color:var(--muted); letter-spacing:0.1em; margin-top:0.5rem; }
+
+  .toc { background:var(--bg2); border:1px solid var(--border); padding:1.25rem 1.5rem; margin-bottom:3rem; position:relative; }
+  .toc::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:linear-gradient(90deg,var(--accent3),var(--accent2)); }
+  .toc-title { font-family:'JetBrains Mono',monospace; font-size:0.62rem; color:var(--muted); letter-spacing:0.2em; text-transform:uppercase; margin-bottom:0.75rem; }
+  .toc-list { display:flex; flex-direction:column; gap:0.3rem; }
+  .toc-list a { font-size:0.82rem; color:var(--muted); text-decoration:none; display:flex; align-items:center; gap:0.5rem; transition:color 0.2s; padding:0.2rem 0; }
+  .toc-list a:hover { color:var(--accent2); }
+  .toc-list a::before { content:''; width:12px; height:1px; background:var(--accent3); flex-shrink:0; }
+  .toc-num { font-family:'JetBrains Mono',monospace; font-size:0.58rem; color:var(--accent3); }
+
+  .section { margin-bottom:2.5rem; opacity:0; transform:translateY(16px); transition:opacity 0.5s ease, transform 0.5s ease; }
+  .section.visible { opacity:1; transform:translateY(0); }
+  h2 { font-family:'Rajdhani',sans-serif; font-size:1.15rem; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:var(--accent2); margin-bottom:1rem; display:flex; align-items:center; gap:0.75rem; padding-bottom:0.5rem; border-bottom:1px solid rgba(124,92,191,0.1); }
+  .section-icon { width:28px; height:28px; background:rgba(124,92,191,0.12); border:1px solid rgba(124,92,191,0.2); display:flex; align-items:center; justify-content:center; font-size:0.75rem; color:var(--accent2); flex-shrink:0; }
+  p { color:var(--muted); font-size:0.875rem; margin-bottom:0.75rem; }
+  a { color:var(--accent2); text-decoration:none; }
+  a:hover { text-decoration:underline; }
+  ul { list-style:none; margin:0.5rem 0 0.75rem; display:flex; flex-direction:column; gap:0.4rem; }
+  ul li { color:var(--muted); font-size:0.875rem; padding:0.4rem 0.75rem 0.4rem 1rem; position:relative; border-left:2px solid rgba(124,92,191,0.15); transition:border-color 0.2s; }
+  ul li:hover { border-left-color:var(--accent); }
   ul li strong { color:var(--text); font-weight:500; }
-  .warning-box { background:rgba(248,113,113,0.06); border:1px solid rgba(248,113,113,0.2); padding:1rem 1.25rem; margin:1rem 0; }
-  .warning-box p { color:#f8a0a0; margin:0; font-size:0.875rem; }
-  .contact-box { margin-top:2rem; background:var(--bg2); border:1px solid var(--border); padding:1.25rem 1.5rem; display:flex; gap:2rem; flex-wrap:wrap; }
-  .contact-box a { font-family:'Share Tech Mono',monospace; font-size:0.75rem; color:var(--accent2); text-decoration:none; letter-spacing:0.08em; }
-  .contact-box a:hover { color:#fff; }
-  footer { text-align:center; padding:2rem; font-family:'Share Tech Mono',monospace; font-size:0.62rem; color:var(--border); letter-spacing:0.1em; border-top:1px solid var(--border); position:relative; z-index:1; }
+
+  .warning-box { background:rgba(248,113,113,0.05); border:1px solid rgba(248,113,113,0.2); padding:1rem 1.25rem; margin:1rem 0; display:flex; gap:0.75rem; align-items:flex-start; }
+  .warning-box i { color:var(--red); margin-top:0.2rem; flex-shrink:0; }
+  .warning-box p { color:#f8a0a0; margin:0; font-size:0.82rem; }
+  .info-box { background:rgba(124,92,191,0.06); border:1px solid rgba(124,92,191,0.2); padding:1rem 1.25rem; margin:1rem 0; display:flex; gap:0.75rem; align-items:flex-start; }
+  .info-box i { color:var(--accent2); margin-top:0.2rem; flex-shrink:0; }
+  .info-box p { margin:0; font-size:0.82rem; }
+
+  /* Refund table */
+  .refund-table { width:100%; border-collapse:collapse; margin:1rem 0; font-size:0.82rem; }
+  .refund-table th { font-family:'JetBrains Mono',monospace; font-size:0.6rem; color:var(--muted); letter-spacing:0.12em; text-transform:uppercase; text-align:left; padding:0.5rem 0.75rem; border-bottom:1px solid var(--border); }
+  .refund-table td { padding:0.65rem 0.75rem; border-bottom:1px solid rgba(124,92,191,0.06); color:var(--muted); vertical-align:top; }
+  .refund-table td:first-child { color:var(--text); font-weight:500; }
+  .refund-table tr:hover td { background:rgba(124,92,191,0.04); }
+  .badge-no { font-family:'JetBrains Mono',monospace; font-size:0.6rem; padding:0.1rem 0.4rem; background:rgba(248,113,113,0.1); border:1px solid rgba(248,113,113,0.25); color:var(--red); }
+  .badge-yes { font-family:'JetBrains Mono',monospace; font-size:0.6rem; padding:0.1rem 0.4rem; background:rgba(74,222,128,0.1); border:1px solid rgba(74,222,128,0.25); color:var(--green); }
+
+  .contact-box { background:var(--bg2); border:1px solid var(--border); padding:1.25rem 1.5rem; display:flex; gap:1.5rem; flex-wrap:wrap; align-items:center; position:relative; overflow:hidden; margin-top:1rem; }
+  .contact-box::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:linear-gradient(90deg,var(--accent3),var(--accent2)); }
+  .contact-box a { font-family:'JetBrains Mono',monospace; font-size:0.72rem; color:var(--accent2); text-decoration:none; letter-spacing:0.08em; display:flex; align-items:center; gap:0.4rem; transition:color 0.2s; }
+  .contact-box a:hover { color:#fff; text-decoration:none; }
+
+  footer { text-align:center; padding:2rem; font-family:'JetBrains Mono',monospace; font-size:0.6rem; color:var(--muted); letter-spacing:0.1em; border-top:1px solid var(--border); position:relative; z-index:1; }
+  footer a { color:var(--accent2); text-decoration:none; }
+
+  #btt { position:fixed; bottom:2rem; right:2rem; width:36px; height:36px; background:var(--bg2); border:1px solid var(--border); color:var(--muted); cursor:pointer; display:none; align-items:center; justify-content:center; font-size:0.8rem; z-index:50; transition:all 0.2s; clip-path:polygon(6px 0,100% 0,100% calc(100% - 6px),calc(100% - 6px) 100%,0 100%,0 6px); }
+  #btt:hover { color:var(--accent2); border-color:var(--accent); }
+  #btt.show { display:flex; }
+
+  @media(max-width:600px) {
+    .wrap { padding:2rem 1rem 5rem; }
+    .nav-links a:not(:last-child) { display:none; }
+    .refund-table { font-size:0.75rem; }
+  }
 </style>
 </head>
 <body>
+
 <nav>
   <a href="index.html" class="logo">GRIMZ <span>CLOUD</span> PC</a>
-  <a href="index.html" class="back">← Trang chủ</a>
+  <div class="nav-links">
+    <a href="privacy.html">Bảo mật</a>
+    <a href="grimz-login.html">Đăng nhập</a>
+    <a href="index.html"><i class="fas fa-arrow-left"></i> Trang chủ</a>
+  </div>
 </nav>
+
 <div class="wrap">
-  <div class="page-tag">// Legal</div>
-  <h1>Điều khoản dịch vụ</h1>
-  <div class="updated">Cập nhật lần cuối: 16/03/2026</div>
+  <div class="hero">
+    <div class="page-tag">// Legal · Terms</div>
+    <h1>Điều khoản dịch vụ</h1>
+    <div class="updated"><i class="fas fa-clock"></i> Cập nhật lần cuối: 16/03/2026 · Phiên bản 2.0</div>
+  </div>
 
-  <h2>1. Chấp nhận điều khoản</h2>
-  <p>Bằng cách đăng ký và sử dụng dịch vụ Grimz Cloud PC, bạn xác nhận đã đọc, hiểu và đồng ý với toàn bộ điều khoản dưới đây. Nếu không đồng ý, vui lòng không sử dụng dịch vụ.</p>
+  <div class="toc">
+    <div class="toc-title">// Mục lục</div>
+    <div class="toc-list">
+      <a href="#t1"><span class="toc-num">01</span> Chấp nhận điều khoản</a>
+      <a href="#t2"><span class="toc-num">02</span> Mô tả dịch vụ</a>
+      <a href="#t3"><span class="toc-num">03</span> Điều kiện sử dụng</a>
+      <a href="#t4"><span class="toc-num">04</span> Trách nhiệm người dùng</a>
+      <a href="#t5"><span class="toc-num">05</span> Nội dung & phần mềm</a>
+      <a href="#t6"><span class="toc-num">06</span> Miễn trừ trách nhiệm</a>
+      <a href="#t7"><span class="toc-num">07</span> Chính sách hoàn tiền</a>
+      <a href="#t8"><span class="toc-num">08</span> Dữ liệu & quyền riêng tư</a>
+      <a href="#t9"><span class="toc-num">09</span> Chấm dứt dịch vụ</a>
+      <a href="#t10"><span class="toc-num">10</span> Thay đổi điều khoản</a>
+      <a href="#t11"><span class="toc-num">11</span> Luật áp dụng</a>
+      <a href="#t12"><span class="toc-num">12</span> Liên hệ</a>
+    </div>
+  </div>
 
-  <h2>2. Mô tả dịch vụ</h2>
-  <ul>
-    <li>Grimz Cloud PC cung cấp máy ảo Windows với cấu hình đã công bố trên website</li>
-    <li>Người dùng kết nối qua phần mềm Parsec hoặc Moonlight</li>
-    <li>Thời gian thuê tính theo giờ thực tế, thanh toán qua chuyển khoản hoặc MoMo</li>
-    <li>Dịch vụ hoạt động 24/7, hỗ trợ qua Discord</li>
-  </ul>
+  <div class="section" id="t1">
+    <h2><div class="section-icon"><i class="fas fa-file-signature"></i></div> 1. Chấp nhận điều khoản</h2>
+    <p>Bằng cách đăng ký và sử dụng dịch vụ Grimz Cloud PC, bạn xác nhận đã đọc, hiểu và đồng ý với toàn bộ điều khoản dưới đây. Nếu không đồng ý, vui lòng không sử dụng dịch vụ.</p>
+    <div class="info-box">
+      <i class="fas fa-info-circle"></i>
+      <p>Điều khoản này áp dụng cho tất cả người dùng dịch vụ Grimz Cloud PC, bao gồm website, dashboard và hệ thống hỗ trợ.</p>
+    </div>
+  </div>
 
-  <h2>3. Trách nhiệm của người dùng</h2>
-  <ul>
-    <li><strong>Bản quyền phần mềm</strong> — Người dùng tự chịu trách nhiệm về việc cài đặt và sử dụng phần mềm, game trên máy ảo, bao gồm tuân thủ quy định bản quyền</li>
-    <li><strong>Nội dung hợp pháp</strong> — Không được lưu trữ, xử lý nội dung vi phạm pháp luật Việt Nam</li>
-    <li><strong>Bảo mật tài khoản</strong> — Giữ thông tin đăng nhập an toàn, không chia sẻ cho người khác</li>
-    <li><strong>Sử dụng đúng mục đích</strong> — Không dùng máy ảo để tấn công mạng, mining tiền ảo, hoặc các hoạt động bất hợp pháp</li>
-  </ul>
-  <div class="warning-box"><p>⚠️ Vi phạm các điều trên có thể dẫn đến chấm dứt dịch vụ ngay lập tức mà không hoàn tiền.</p></div>
+  <div class="section" id="t2">
+    <h2><div class="section-icon"><i class="fas fa-server"></i></div> 2. Mô tả dịch vụ</h2>
+    <ul>
+      <li><strong>Máy ảo Windows</strong> — cung cấp máy ảo với cấu hình đã công bố (G-NOVA, G-ORBIT, G-PULSAR)</li>
+      <li><strong>Kết nối từ xa</strong> — qua phần mềm Parsec hoặc Moonlight</li>
+      <li><strong>Thanh toán theo giờ</strong> — tính theo giờ thực tế, qua chuyển khoản hoặc MoMo</li>
+      <li><strong>Hỗ trợ 24/7</strong> — qua Discord ticket và hệ thống chat trực tiếp</li>
+      <li><strong>Server Singapore</strong> — ping thấp, kết nối ổn định từ Việt Nam và khu vực lân cận</li>
+    </ul>
+  </div>
 
-  <h2>4. Miễn trừ trách nhiệm</h2>
-  <ul>
-    <li>Chúng tôi không chịu trách nhiệm về <strong>mất dữ liệu</strong> do hết hạn dịch vụ hoặc người dùng tự xóa</li>
-    <li>Chúng tôi không chịu trách nhiệm về các vấn đề phát sinh từ <strong>phần mềm người dùng tự cài</strong></li>
-    <li>Chúng tôi không chịu trách nhiệm về <strong>thiệt hại gián tiếp</strong> hoặc thiệt hại do gián đoạn dịch vụ ngoài tầm kiểm soát</li>
-    <li>Dịch vụ được cung cấp "nguyên trạng" — chúng tôi không đảm bảo hoạt động liên tục 100%</li>
-  </ul>
+  <div class="section" id="t3">
+    <h2><div class="section-icon"><i class="fas fa-id-card"></i></div> 3. Điều kiện sử dụng</h2>
+    <ul>
+      <li>Bạn phải từ <strong>13 tuổi trở lên</strong> để sử dụng dịch vụ</li>
+      <li>Mỗi tài khoản chỉ được sử dụng bởi <strong>một người</strong></li>
+      <li>Bạn chịu trách nhiệm về <strong>mọi hoạt động</strong> diễn ra dưới tài khoản của mình</li>
+      <li>Tài khoản phải được <strong>đăng ký bằng email thực</strong>, không dùng email tạm thời</li>
+    </ul>
+  </div>
 
-  <h2>5. Chính sách hoàn tiền</h2>
-  <ul>
-    <li><strong>Không hoàn tiền</strong> sau khi đã giao máy và user đã kết nối thành công</li>
-    <li><strong>Lỗi kỹ thuật từ phía chúng tôi</strong> — bù thời gian tương ứng với thời gian gián đoạn</li>
-    <li><strong>Không thể kết nối</strong> do lỗi thiết bị hoặc mạng của người dùng — không được bù thời gian</li>
-  </ul>
+  <div class="section" id="t4">
+    <h2><div class="section-icon"><i class="fas fa-user-check"></i></div> 4. Trách nhiệm người dùng</h2>
+    <ul>
+      <li><strong>Bảo mật tài khoản</strong> — giữ thông tin đăng nhập an toàn, không chia sẻ cho người khác</li>
+      <li><strong>Thông tin chính xác</strong> — cung cấp thông tin đúng khi đăng ký và liên hệ hỗ trợ</li>
+      <li><strong>Sử dụng đúng mục đích</strong> — không dùng máy ảo để tấn công mạng, mining crypto, spam, hoặc bất kỳ hoạt động bất hợp pháp nào</li>
+      <li><strong>Tuân thủ pháp luật</strong> — không lưu trữ hay xử lý nội dung vi phạm pháp luật Việt Nam</li>
+    </ul>
+    <div class="warning-box">
+      <i class="fas fa-triangle-exclamation"></i>
+      <p>Vi phạm các điều trên sẽ dẫn đến <strong>chấm dứt dịch vụ ngay lập tức mà không hoàn tiền</strong> và có thể bị báo cáo lên cơ quan có thẩm quyền.</p>
+    </div>
+  </div>
 
-  <h2>6. Dữ liệu và quyền riêng tư</h2>
-  <p>Việc thu thập và xử lý dữ liệu cá nhân được thực hiện theo <a href="privacy.html" style="color:var(--accent2);">Chính sách bảo mật</a> của chúng tôi.</p>
-  <p>Khi hết hạn dịch vụ, toàn bộ dữ liệu trên máy ảo sẽ bị xóa tự động. Người dùng cần tự backup dữ liệu quan trọng trước khi hết hạn.</p>
+  <div class="section" id="t5">
+    <h2><div class="section-icon"><i class="fas fa-compact-disc"></i></div> 5. Nội dung & phần mềm</h2>
+    <ul>
+      <li><strong>Bản quyền phần mềm</strong> — người dùng tự chịu trách nhiệm về bản quyền phần mềm, game cài đặt trên máy ảo</li>
+      <li><strong>Game và ứng dụng</strong> — Grimz Cloud PC không chịu trách nhiệm về nội dung phần mềm người dùng tự cài</li>
+      <li><strong>Virus & malware</strong> — không được cài phần mềm độc hại, nếu phát hiện máy sẽ bị thu hồi ngay</li>
+      <li><strong>Dữ liệu cá nhân</strong> — không lưu trữ dữ liệu nhạy cảm của người khác trên máy ảo</li>
+    </ul>
+  </div>
 
-  <h2>7. Chấm dứt dịch vụ</h2>
-  <ul>
-    <li>Chúng tôi có quyền chấm dứt dịch vụ nếu người dùng vi phạm điều khoản</li>
-    <li>Người dùng có thể yêu cầu xóa tài khoản bất cứ lúc nào qua Discord</li>
-    <li>Chúng tôi có quyền thay đổi, tạm ngừng hoặc chấm dứt dịch vụ với thông báo trước 7 ngày</li>
-  </ul>
+  <div class="section" id="t6">
+    <h2><div class="section-icon"><i class="fas fa-shield-halved"></i></div> 6. Miễn trừ trách nhiệm</h2>
+    <ul>
+      <li>Chúng tôi không chịu trách nhiệm về <strong>mất dữ liệu</strong> do hết hạn dịch vụ hoặc người dùng tự xóa</li>
+      <li>Dịch vụ được cung cấp <strong>"nguyên trạng"</strong> — không đảm bảo hoạt động liên tục 100%</li>
+      <li>Không chịu trách nhiệm về <strong>thiệt hại gián tiếp</strong>, mất doanh thu, hoặc thiệt hại do gián đoạn ngoài tầm kiểm soát (thiên tai, sự cố nhà cung cấp hạ tầng...)</li>
+      <li>Không chịu trách nhiệm về các vấn đề từ <strong>phần mềm người dùng tự cài</strong></li>
+    </ul>
+    <div class="info-box">
+      <i class="fas fa-circle-info"></i>
+      <p>Giới hạn trách nhiệm tối đa của Grimz Cloud PC không vượt quá <strong>số tiền bạn đã thanh toán trong 30 ngày gần nhất</strong>.</p>
+    </div>
+  </div>
 
-  <h2>8. Thay đổi điều khoản</h2>
-  <p>Chúng tôi có thể cập nhật điều khoản bất cứ lúc nào. Thông báo sẽ được gửi qua Discord server. Việc tiếp tục sử dụng dịch vụ sau khi thay đổi đồng nghĩa với việc bạn chấp nhận điều khoản mới.</p>
+  <div class="section" id="t7">
+    <h2><div class="section-icon"><i class="fas fa-money-bill-transfer"></i></div> 7. Chính sách hoàn tiền</h2>
+    <table class="refund-table">
+      <thead><tr><th>Tình huống</th><th>Kết quả</th><th>Ghi chú</th></tr></thead>
+      <tbody>
+        <tr><td>Đã giao máy, kết nối thành công</td><td><span class="badge-no">Không hoàn</span></td><td>Dịch vụ đã được cung cấp</td></tr>
+        <tr><td>Lỗi kỹ thuật từ phía Grimz</td><td><span class="badge-yes">Bù thời gian</span></td><td>Bù tương ứng thời gian gián đoạn</td></tr>
+        <tr><td>Không kết nối được do lỗi phía user</td><td><span class="badge-no">Không bù</span></td><td>Lỗi mạng, thiết bị user</td></tr>
+        <tr><td>Thanh toán nhưng chưa giao máy</td><td><span class="badge-yes">Hoàn đầy đủ</span></td><td>Liên hệ trong 24h</td></tr>
+        <tr><td>Vi phạm điều khoản bị thu hồi</td><td><span class="badge-no">Không hoàn</span></td><td>Do vi phạm người dùng</td></tr>
+      </tbody>
+    </table>
+  </div>
 
-  <h2>9. Luật áp dụng</h2>
-  <p>Điều khoản này tuân thủ pháp luật Việt Nam. Mọi tranh chấp được giải quyết thông qua thương lượng trước, nếu không thành sẽ đưa ra tòa án có thẩm quyền tại Việt Nam.</p>
+  <div class="section" id="t8">
+    <h2><div class="section-icon"><i class="fas fa-lock"></i></div> 8. Dữ liệu & quyền riêng tư</h2>
+    <p>Việc thu thập và xử lý dữ liệu cá nhân được thực hiện theo <a href="privacy.html">Chính sách bảo mật</a> của chúng tôi.</p>
+    <ul>
+      <li>Dữ liệu trên máy ảo bị <strong>xóa tự động</strong> khi hết hạn dịch vụ</li>
+      <li>Người dùng cần <strong>tự backup</strong> dữ liệu quan trọng trước khi hết hạn</li>
+      <li>Grimz không thể khôi phục dữ liệu đã xóa</li>
+    </ul>
+  </div>
 
-  <h2>10. Liên hệ</h2>
-  <div class="contact-box">
-    <a href="https://discord.gg/Ct4Gw7GwJJ" target="_blank">Discord: discord.gg/Ct4Gw7GwJJ</a>
+  <div class="section" id="t9">
+    <h2><div class="section-icon"><i class="fas fa-power-off"></i></div> 9. Chấm dứt dịch vụ</h2>
+    <ul>
+      <li><strong>Người dùng vi phạm</strong> — chúng tôi có quyền chấm dứt ngay, không báo trước</li>
+      <li><strong>Yêu cầu xóa tài khoản</strong> — người dùng có thể yêu cầu bất cứ lúc nào qua Discord</li>
+      <li><strong>Ngừng hoạt động dịch vụ</strong> — thông báo trước tối thiểu 7 ngày qua Discord server</li>
+      <li><strong>Hết hạn không gia hạn</strong> — máy ảo bị thu hồi và dữ liệu bị xóa sau 24h grace period</li>
+    </ul>
+  </div>
+
+  <div class="section" id="t10">
+    <h2><div class="section-icon"><i class="fas fa-rotate"></i></div> 10. Thay đổi điều khoản</h2>
+    <p>Chúng tôi có thể cập nhật điều khoản bất cứ lúc nào. Thông báo sẽ được gửi qua Discord server ít nhất <strong>7 ngày trước</strong> khi có thay đổi quan trọng. Việc tiếp tục sử dụng dịch vụ sau khi thay đổi đồng nghĩa với việc bạn chấp nhận điều khoản mới.</p>
+  </div>
+
+  <div class="section" id="t11">
+    <h2><div class="section-icon"><i class="fas fa-scale-balanced"></i></div> 11. Luật áp dụng</h2>
+    <p>Điều khoản này tuân thủ pháp luật <strong>Cộng hòa Xã hội Chủ nghĩa Việt Nam</strong>. Mọi tranh chấp được ưu tiên giải quyết qua thương lượng. Nếu không thành công, tranh chấp sẽ được đưa ra tòa án có thẩm quyền tại Việt Nam.</p>
+  </div>
+
+  <div class="section" id="t12">
+    <h2><div class="section-icon"><i class="fas fa-envelope"></i></div> 12. Liên hệ</h2>
+    <p>Mọi thắc mắc về điều khoản, liên hệ qua:</p>
+    <div class="contact-box">
+      <a href="https://discord.gg/Ct4Gw7GwJJ" target="_blank"><i class="fab fa-discord"></i> discord.gg/Ct4Gw7GwJJ</a>
+    </div>
   </div>
 </div>
-<footer>© <span id="yr"></span> GRIMZ CLOUD PC · VIETNAM</footer>
-<script>document.getElementById('yr').textContent = new Date().getFullYear();</script>
+
+<footer>
+  © <span id="yr"></span> GRIMZ CLOUD PC · VIETNAM ·
+  <a href="privacy.html">Chính sách bảo mật</a> ·
+  <a href="grimz-login.html">Đăng nhập</a>
+</footer>
+
+<button id="btt" onclick="window.scrollTo({top:0,behavior:'smooth'})"><i class="fas fa-arrow-up"></i></button>
+
+<script>
+  document.getElementById('yr').textContent = new Date().getFullYear();
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); });
+  }, {threshold:0.08});
+  document.querySelectorAll('.section').forEach(s => obs.observe(s));
+  window.addEventListener('scroll', () => {
+    document.getElementById('btt').classList.toggle('show', window.scrollY > 300);
+  });
+</script>
 </body>
 </html>
