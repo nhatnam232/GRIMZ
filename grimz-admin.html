@@ -124,6 +124,18 @@
   /* ===== RATE LIMIT NOTICE ===== */
   #rate-limit-msg { display:none; font-family:'JetBrains Mono',monospace; font-size:0.68rem; color:var(--red); text-align:center; letter-spacing:0.08em; margin-top:0.75rem; }
 
+
+  /* Quick Nav */
+  .quick-nav-wrap { position:relative; }
+  .quick-nav-dropdown { position:absolute; top:calc(100% + 8px); right:0; background:var(--bg2); border:1px solid rgba(124,92,191,0.3); min-width:200px; display:none; flex-direction:column; z-index:400; box-shadow:0 8px 24px rgba(0,0,0,0.4); }
+  .quick-nav-dropdown::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:linear-gradient(90deg,var(--accent3),var(--accent2)); }
+  .quick-nav-dropdown.open { display:flex; animation:mIn 0.15s ease; }
+  .qn-title { font-family:'JetBrains Mono',monospace; font-size:0.58rem; color:var(--muted); letter-spacing:0.15em; padding:0.5rem 0.75rem 0.3rem; text-transform:uppercase; }
+  .qn-item { display:flex; align-items:center; gap:0.6rem; padding:0.55rem 0.75rem; font-family:'JetBrains Mono',monospace; font-size:0.65rem; color:var(--muted); text-decoration:none; transition:all 0.15s; letter-spacing:0.06em; }
+  .qn-item:hover { background:rgba(124,92,191,0.08); color:var(--accent2); }
+  .qn-item i { width:14px; text-align:center; font-size:0.75rem; flex-shrink:0; }
+  .qn-divider { height:1px; background:rgba(124,92,191,0.1); margin:0.25rem 0; }
+
   /* ===== LIGHT THEME ===== */
   body.light {
     --bg:#f0eef8; --bg2:#ffffff; --bg3:#e8e5f5; --bg4:#d8d4ec;
@@ -309,8 +321,19 @@
   <div class="logo">Grimz Cloud PC <span class="logo-badge">ADMIN</span></div>
   <div class="topbar-actions">
     <button class="theme-toggle" onclick="toggleTheme()"><i class="fas fa-circle-half-stroke"></i> <span>Theme</span></button>
-    <a href="/dashboard" class="topbar-link"><i class="fas fa-tachometer-alt"></i> <span>Dashboard</span></a>
-    <a href="index.html" class="topbar-link"><i class="fas fa-home"></i> <span>Trang chủ</span></a>
+    <div class="quick-nav-wrap">
+      <button class="topbar-link" onclick="toggleQuickNav()"><i class="fas fa-th-large"></i> <span>Links</span> <i class="fas fa-chevron-down" style="font-size:0.5rem;"></i></button>
+      <div class="quick-nav-dropdown" id="quickNavDropdown">
+        <div class="qn-title">// Mở trang mới</div>
+        <a href="/" target="_blank" class="qn-item"><i class="fas fa-home"></i> Trang chủ</a>
+        <a href="/cloud" target="_blank" class="qn-item"><i class="fas fa-cloud"></i> Landing Page</a>
+        <a href="/login" target="_blank" class="qn-item"><i class="fas fa-sign-in-alt"></i> Đăng nhập</a>
+        <a href="/dashboard" target="_blank" class="qn-item"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+        <div class="qn-divider"></div>
+        <a href="/privacy" target="_blank" class="qn-item"><i class="fas fa-lock"></i> Privacy Policy</a>
+        <a href="/terms" target="_blank" class="qn-item"><i class="fas fa-file-contract"></i> Terms</a>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -664,6 +687,15 @@
     if(logs.length > 50) logs.splice(50);
     localStorage.setItem(AUDIT_KEY, JSON.stringify(logs));
   }
+
+  // ===== QUICK NAV =====
+  function toggleQuickNav() {
+    document.getElementById('quickNavDropdown').classList.toggle('open');
+  }
+  document.addEventListener('click', e => {
+    const wrap = document.querySelector('.quick-nav-wrap');
+    if(wrap && !wrap.contains(e.target)) document.getElementById('quickNavDropdown').classList.remove('open');
+  });
 
   // ===== THEME =====
   function toggleTheme(){
