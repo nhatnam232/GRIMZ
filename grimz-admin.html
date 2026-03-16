@@ -705,22 +705,42 @@
   if(localStorage.getItem('grimz_admin_theme') === 'light') document.body.classList.add('light');
 
   // ===== AUTH =====
-  const ADMIN_HASH = 'e8231ca8edc2ae39f8d32ee9366a1f6f5c0338fa10a7aa810727943932b9de95';
+  let ADMIN_HASH = null;
   async function hashPw(pw){
     const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(pw));
     return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
   }
+  async function fetchAdminHash() {
+    if(ADMIN_HASH) return ADMIN_HASH;
+    try {
+      const res = await fetch('https://vlwevojqfomophsdwsqd.supabase.co/rest/v1/admin_config?key=eq.admin_hash&select=value', {
+        headers: {
+          'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZsd2V2b2pxZm9tb3Boc2R3c3FkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM1NzE2NDgsImV4cCI6MjA4OTE0NzY0OH0.6NECwQqKKeZH2fIgqp8SkmA6kPAqtsc5dlhEdGVFgBE',
+          'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZsd2V2b2pxZm9tb3Boc2R3c3FkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM1NzE2NDgsImV4cCI6MjA4OTE0NzY0OH0.6NECwQqKKeZH2fIgqp8SkmA6kPAqtsc5dlhEdGVFgBE'
+        }
+      });
+      const data = await res.json();
+      ADMIN_HASH = data[0]?.value || null;
+    } catch(e) { ADMIN_HASH = null; }
+    return ADMIN_HASH;
+  }
+
   async function checkPw(){
     if(!checkRateLimit()) return;
     const token = document.querySelector('[name="cf-turnstile-response"]')?.value;
     if(!token){ showPwErr('Vui lòng xác minh bạn không phải bot.'); return; }
     const pw = document.getElementById('admin-pw').value;
+    const loginBtn = document.querySelector('#lock-screen button');
+    if(loginBtn) { loginBtn.disabled=true; loginBtn.textContent='Đang xác thực...'; }
+    const currentHash = await fetchAdminHash();
+    if(!currentHash){ showPwErr('Không thể tải cấu hình. Thử lại sau.'); if(loginBtn){loginBtn.disabled=false;loginBtn.textContent='Đăng nhập';} return; }
     const hash = await hashPw(pw);
-    if(hash === ADMIN_HASH){
+    if(loginBtn){ loginBtn.disabled=false; loginBtn.textContent='Đăng nhập'; }
+    if(hash === currentHash){
       localStorage.removeItem(RL_KEY);
       localStorage.removeItem(RL_TIME);
       document.getElementById('lock-screen').style.display='none';
-      sessionStorage.setItem('grimz-admin', hash);
+      sessionStorage.setItem('grimz-admin', currentHash);
       auditLog('LOGIN', 'Admin đăng nhập thành công');
       startSessionTimer();
       loadData();
@@ -730,12 +750,19 @@
     }
   }
   function showPwErr(msg){ const e=document.getElementById('pw-err'); e.style.display='block'; e.textContent=msg; }
-  (function checkSession(){
+  (async function checkSession(){
     checkRateLimit();
-    if(sessionStorage.getItem('grimz-admin') === ADMIN_HASH){
-      document.getElementById('lock-screen').style.display='none';
-      startSessionTimer();
-      loadData();
+    const savedHash = sessionStorage.getItem('grimz-admin');
+    if(savedHash) {
+      const currentHash = await fetchAdminHash();
+      if(currentHash && savedHash === currentHash){
+        document.getElementById('lock-screen').style.display='none';
+        startSessionTimer();
+        loadData();
+        return;
+      }
+      // Hash changed (new day password), clear session
+      sessionStorage.removeItem('grimz-admin');
     }
   })();
 
