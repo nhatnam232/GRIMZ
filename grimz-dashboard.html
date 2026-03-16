@@ -1069,7 +1069,7 @@
     navigator.clipboard.writeText(ip).then(()=>showToast('✓ Đã copy IP: '+ip,2000,'success'));
   }
 
-  async function doLogout(){ await sb.auth.signOut(); window.location.href='grimz-login.html'; }
+  async function doLogout(){ await sb.auth.signOut(); window.location.href='/login'; }
 
   let countdownInterval=null, statInterval=null;
   function startCountdown(expiry){
@@ -1148,7 +1148,7 @@
 
   async function init(){
     const{data:{session}}=await sb.auth.getSession();
-    if(!session){window.location.href='grimz-login.html';return;}
+    if(!session){window.location.href='/login';return;}
     currentUserId=session.user.id;
     loadHistory(session.user.id);
     initSupportChat(session.user.id);

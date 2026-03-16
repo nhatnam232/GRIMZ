@@ -187,8 +187,8 @@
       <div class="msg" id="regMsg"></div>
       <div class="terms-note">
         Bằng cách đăng ký, bạn đồng ý với
-        <a href="terms.html" target="_blank">Điều khoản dịch vụ</a> và
-        <a href="privacy.html" target="_blank">Chính sách bảo mật</a>
+        <a href="/terms" target="_blank">Điều khoản dịch vụ</a> và
+        <a href="/privacy" target="_blank">Chính sách bảo mật</a>
       </div>
     </div>
   </div>
@@ -211,7 +211,7 @@
   );
 
   sb.auth.getSession().then(({ data }) => {
-    if (data.session) window.location.href = 'grimz-dashboard.html';
+    if (data.session) window.location.href = '/dashboard';
   });
 
   function switchTab(tab) {
@@ -248,7 +248,7 @@
     } else {
       btnText.textContent = '✓ Thành công!';
       btn.style.background = 'rgba(74,222,128,0.8)';
-      setTimeout(() => window.location.href = 'grimz-dashboard.html', 600);
+      setTimeout(() => window.location.href = '/dashboard', 600);
     }
   }
 
