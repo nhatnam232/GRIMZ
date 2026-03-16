@@ -599,7 +599,7 @@
       cta_title:'Muốn thử', cta_sub:'Vào Discord để đặt máy hoặc hỏi thêm thông tin.',
       feat1:'Ping siêu thấp', feat2:'GPU cao cấp', feat3:'Windows VM thực', feat4:'Giá phải chăng', feat5:'Hỗ trợ 24/7', feat6:'Dễ sử dụng',
       rent_btn:'Thuê qua Discord →',
-      hero_desc1:'Play games on any device, no powerful PC required.',
+      hero_desc1:'Chơi game trên bất kỳ thiết bị nào, không cần PC mạnh.',
       steps_heading:'Just 3 Steps to Start',
       ping_btn:'⚡ Đo Ping',
       ping_retry:'⚡ Đo lại',
@@ -854,8 +854,8 @@
   };
   const units = { hour: 'đ/giờ', day: 'đ/ngày', week: 'đ/tuần' };
   const pricesByLang = {
-    vi: { '3060':{hour:'3.000',day:'20.000',week:'120.000'}, '4060':{hour:'5.000',day:'35.000',week:'200.000'}, '4070':{hour:'6.000',day:'42.000',week:'250.000'} },
-    en: { '3060':{hour:'$0.12',day:'$0.80',week:'$4.80'}, '4060':{hour:'$0.20',day:'$1.35',week:'$7.70'}, '4070':{hour:'$0.24',day:'$1.62',week:'$9.60'} },
+    vi: { '3060':{hour:'3.000',day:'N/A',week:'N/A'}, '4060':{hour:'5.000',day:'N/A',week:'N/A'}, '4070':{hour:'6.000',day:'N/A',week:'N/A'} },
+    en: { '3060':{hour:'$0.35',day:'N/A',week:'N/A'}, '4060':{hour:'$0.60',day:'N/A',week:'N/A'}, '4070':{hour:'$0.70',day:'N/A',week:'N/A'} },
   };
   const unitsByLang = {
     vi: {hour:' đ/giờ', day:' đ/ngày', week:' đ/tuần'},
@@ -875,7 +875,18 @@
       const name = card.querySelector('.plan-codename')?.textContent?.trim();
       const key = name?.includes('PULSAR') ? '4070' : name?.includes('ORBIT') ? '4060' : '3060';
       const span = el.querySelector('span');
-      if (span) { el.childNodes[0].textContent = prices[key][mode]; span.textContent = units[mode]; }
+      const priceVal = prices[key][mode];
+      if (priceVal === 'N/A') {
+        el.childNodes[0].textContent = 'N/A';
+        if (span) span.textContent = '';
+        el.style.fontSize = '1.2rem';
+        el.style.color = 'var(--muted)';
+      } else {
+        el.childNodes[0].textContent = priceVal;
+        if (span) span.textContent = units[mode];
+        el.style.fontSize = '';
+        el.style.color = '';
+      }
     });
   }
 
