@@ -729,9 +729,8 @@
   async function toggleLockdown() {
     const SERVICE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZsd2V2b2pxZm9tb3Boc2R3c3FkIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MzU3MTY0OCwiZXhwIjoyMDg5MTQ3NjQ4fQ.pjHDcDYnl2JN8r_z7bRoM16x1NAxPOViBTCEJX0VqUw';
     const newVal = !lockdownActive;
-    const action = newVal ? '🔒 BẬT bảo trì?' : '🔓 TẮT bảo trì?';
-    if(!confirm(action + '
-' + (newVal ? 'Toàn bộ web sẽ hiện màn hình bảo trì.' : 'Web sẽ hoạt động bình thường.'))) return;
+    const newConfirm = newVal ? 'Bat bao tri - Toan bo web se hien man hinh bao tri.' : 'Tat bao tri - Web se hoat dong binh thuong.';
+    if(!confirm(newConfirm)) return;
     try {
       await fetch('https://vlwevojqfomophsdwsqd.supabase.co/rest/v1/admin_config?key=eq.lockdown', {
         method: 'PATCH',
