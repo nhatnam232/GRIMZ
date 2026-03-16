@@ -321,6 +321,9 @@
   <div class="logo">Grimz Cloud PC <span class="logo-badge">ADMIN</span></div>
   <div class="topbar-actions">
     <button class="theme-toggle" onclick="toggleTheme()"><i class="fas fa-circle-half-stroke"></i> <span>Theme</span></button>
+    <button class="theme-toggle" id="lockdown-btn" onclick="toggleLockdown()" style="border-color:rgba(248,113,113,0.3);color:#f87171;" title="Bật/tắt bảo trì">
+      <i class="fas fa-lock" id="lockdown-icon"></i> <span id="lockdown-label">Lock Down</span>
+    </button>
     <div class="quick-nav-wrap">
       <button class="topbar-link" onclick="toggleQuickNav()"><i class="fas fa-th-large"></i> <span>Links</span> <i class="fas fa-chevron-down" style="font-size:0.5rem;"></i></button>
       <div class="quick-nav-dropdown" id="quickNavDropdown">
@@ -688,6 +691,66 @@
     localStorage.setItem(AUDIT_KEY, JSON.stringify(logs));
   }
 
+
+  // ===== LOCKDOWN ADMIN =====
+  let lockdownActive = false;
+
+  async function fetchLockdownStatus() {
+    try {
+      const res = await fetch('https://vlwevojqfomophsdwsqd.supabase.co/rest/v1/admin_config?key=eq.lockdown&select=value', {
+        headers: {
+          'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZsd2V2b2pxZm9tb3Boc2R3c3FkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM1NzE2NDgsImV4cCI6MjA4OTE0NzY0OH0.6NECwQqKKeZH2fIgqp8SkmA6kPAqtsc5dlhEdGVFgBE',
+          'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZsd2V2b2pxZm9tb3Boc2R3c3FkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM1NzE2NDgsImV4cCI6MjA4OTE0NzY0OH0.6NECwQqKKeZH2fIgqp8SkmA6kPAqtsc5dlhEdGVFgBE'
+        }
+      });
+      const data = await res.json();
+      lockdownActive = data[0]?.value === 'true';
+      updateLockdownBtn();
+    } catch(e) {}
+  }
+
+  function updateLockdownBtn() {
+    const btn = document.getElementById('lockdown-btn');
+    const icon = document.getElementById('lockdown-icon');
+    const label = document.getElementById('lockdown-label');
+    if(lockdownActive) {
+      btn.style.background = 'rgba(248,113,113,0.15)';
+      btn.style.borderColor = 'rgba(248,113,113,0.5)';
+      icon.className = 'fas fa-lock';
+      label.textContent = '🔴 Bảo trì ON';
+    } else {
+      btn.style.background = '';
+      btn.style.borderColor = 'rgba(248,113,113,0.3)';
+      icon.className = 'fas fa-lock-open';
+      label.textContent = 'Lock Down';
+    }
+  }
+
+  async function toggleLockdown() {
+    const SERVICE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZsd2V2b2pxZm9tb3Boc2R3c3FkIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MzU3MTY0OCwiZXhwIjoyMDg5MTQ3NjQ4fQ.pjHDcDYnl2JN8r_z7bRoM16x1NAxPOViBTCEJX0VqUw';
+    const newVal = !lockdownActive;
+    const action = newVal ? '🔒 BẬT bảo trì?' : '🔓 TẮT bảo trì?';
+    if(!confirm(action + '
+' + (newVal ? 'Toàn bộ web sẽ hiện màn hình bảo trì.' : 'Web sẽ hoạt động bình thường.'))) return;
+    try {
+      await fetch('https://vlwevojqfomophsdwsqd.supabase.co/rest/v1/admin_config?key=eq.lockdown', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': SERVICE_KEY,
+          'Authorization': 'Bearer ' + SERVICE_KEY
+        },
+        body: JSON.stringify({ value: String(newVal) })
+      });
+      lockdownActive = newVal;
+      updateLockdownBtn();
+      showToast(newVal ? '🔒 Bảo trì đã BẬT' : '🔓 Bảo trì đã TẮT', 3000, newVal ? 'error' : 'success');
+      auditLog('LOCKDOWN', newVal ? 'Bật chế độ bảo trì' : 'Tắt chế độ bảo trì');
+    } catch(e) {
+      showToast('✗ Lỗi: ' + e.message, 3000, 'error');
+    }
+  }
+
   // ===== QUICK NAV =====
   function toggleQuickNav() {
     document.getElementById('quickNavDropdown').classList.toggle('open');
@@ -744,6 +807,7 @@
       auditLog('LOGIN', 'Admin đăng nhập thành công');
       startSessionTimer();
       loadData();
+      fetchLockdownStatus();
     } else {
       recordFail();
       document.getElementById('admin-pw').value='';
