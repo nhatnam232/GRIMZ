@@ -256,7 +256,264 @@
     .nav-cta { padding:0.25rem 0.5rem; font-size:0.7rem; }
   }
 </style>
-<script src="/grimz-guard.js"></script>
+
+<script>
+/**
+ * GRIMZ CLOUD PC — Page Guard
+ * Popup xác minh pass, lưu localStorage, countdown redirect
+ * Dùng chung cho tất cả trang cần bảo vệ
+ */
+document.addEventListener("DOMContentLoaded", function() { (function () {
+  // ── CONFIG ──────────────────────────────────────────────
+  const PASS_HASH   = '5c7bb507989ca82ca7591742fda70607a4d697097f31afc0d415ca3be45997fb';
+  const LAUNCH_DATE = new Date('2026-03-23T00:00:00+07:00');
+  // Tự động tắt guard sau ngày launch
+  if (new Date() >= LAUNCH_DATE) return;
+  const STORAGE_KEY = 'grimz_access';
+  const REDIRECT    = '/';          // redirect về đây nếu hết countdown
+  const COUNTDOWN   = 10;           // giây
+  // ────────────────────────────────────────────────────────
+
+  // Nếu đã có pass hợp lệ thì bỏ qua
+  if (localStorage.getItem(STORAGE_KEY) === PASS_HASH) return;
+
+  // Chặn scroll trang phía sau
+  document.documentElement.style.overflow = 'hidden';
+
+  // ── INJECT CSS ──────────────────────────────────────────
+  const style = document.createElement('style');
+  style.textContent = `
+    #grimz-guard-overlay {
+      position:fixed; inset:0; z-index:99999;
+      background:rgba(9,8,15,0.92);
+      backdrop-filter:blur(12px);
+      display:flex; align-items:center; justify-content:center;
+      padding:1.5rem;
+      animation:guardFadeIn 0.3s ease;
+    }
+    @keyframes guardFadeIn { from{opacity:0} to{opacity:1} }
+
+    #grimz-guard-box {
+      background:#100e1a;
+      border:1px solid rgba(124,92,191,0.25);
+      padding:2rem 2rem 1.75rem;
+      width:100%; max-width:380px;
+      position:relative;
+      clip-path:polygon(0 0,calc(100% - 16px) 0,100% 16px,100% 100%,16px 100%,0 calc(100% - 16px));
+      animation:guardSlideUp 0.35s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    @keyframes guardSlideUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+
+    #grimz-guard-box::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:2px;
+      background:linear-gradient(90deg,#5a3fa0,#9b7fe8,#5a3fa0);
+    }
+    #grimz-guard-box::after {
+      content:''; position:absolute; inset:0;
+      background:radial-gradient(ellipse at 50% 0%,rgba(124,92,191,0.06),transparent 60%);
+      pointer-events:none;
+    }
+
+    .gg-corner { position:absolute; width:7px; height:7px; }
+    .gg-corner-tl { top:4px; left:4px; border-top:1px solid #9b7fe8; border-left:1px solid #9b7fe8; }
+    .gg-corner-br { bottom:4px; right:4px; border-bottom:1px solid #9b7fe8; border-right:1px solid #9b7fe8; }
+
+    .gg-logo {
+      font-family:'Rajdhani',sans-serif; font-size:1rem; font-weight:700;
+      letter-spacing:0.2em; text-transform:uppercase; color:#7c5cbf;
+      text-shadow:0 0 16px rgba(124,92,191,0.5);
+      margin-bottom:1.25rem; position:relative; z-index:1;
+    }
+    .gg-logo span { color:#9b7fe8; }
+
+    .gg-title {
+      font-family:'Rajdhani',sans-serif; font-size:1rem; font-weight:700;
+      text-transform:uppercase; letter-spacing:0.08em; color:#e4e0f0;
+      margin-bottom:0.3rem; position:relative; z-index:1;
+    }
+    .gg-sub {
+      font-family:'JetBrains Mono',monospace; font-size:0.6rem;
+      color:#8a84a0; letter-spacing:0.12em; margin-bottom:1.5rem;
+      position:relative; z-index:1; line-height:1.8;
+    }
+
+    .gg-input-wrap {
+      position:relative; z-index:1; margin-bottom:0.75rem;
+    }
+    .gg-input-label {
+      font-family:'JetBrains Mono',monospace; font-size:0.58rem;
+      color:#8a84a0; letter-spacing:0.15em; text-transform:uppercase;
+      display:block; margin-bottom:0.4rem;
+    }
+    .gg-input-row { position:relative; }
+    #grimz-guard-input {
+      width:100%; padding:0.65rem 2.5rem 0.65rem 0.85rem;
+      background:#161323; border:1px solid rgba(124,92,191,0.18);
+      color:#e4e0f0; font-family:'JetBrains Mono',monospace; font-size:0.85rem;
+      outline:none; transition:border-color 0.2s, box-shadow 0.2s;
+      letter-spacing:0.1em;
+    }
+    #grimz-guard-input:focus {
+      border-color:#9b7fe8;
+      box-shadow:0 0 0 2px rgba(124,92,191,0.12);
+    }
+    #grimz-guard-input.shake {
+      animation:ggShake 0.35s ease;
+    }
+    @keyframes ggShake {
+      0%,100%{transform:translateX(0)}
+      20%{transform:translateX(-6px)}
+      40%{transform:translateX(6px)}
+      60%{transform:translateX(-4px)}
+      80%{transform:translateX(4px)}
+    }
+    #gg-toggle-pass {
+      position:absolute; right:0.65rem; top:50%; transform:translateY(-50%);
+      background:none; border:none; color:#8a84a0; cursor:pointer;
+      font-size:0.75rem; padding:0; transition:color 0.2s;
+    }
+    #gg-toggle-pass:hover { color:#9b7fe8; }
+
+    #grimz-guard-err {
+      font-family:'JetBrains Mono',monospace; font-size:0.6rem;
+      color:#f87171; letter-spacing:0.08em;
+      min-height:1.2em; margin-bottom:0.75rem;
+      position:relative; z-index:1;
+    }
+
+    #grimz-guard-btn {
+      width:100%; padding:0.7rem;
+      background:#7c5cbf; border:none; color:#fff;
+      font-family:'Rajdhani',sans-serif; font-size:0.95rem; font-weight:700;
+      letter-spacing:0.12em; text-transform:uppercase;
+      cursor:pointer; transition:all 0.2s cubic-bezier(0.34,1.56,0.64,1);
+      clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,0 100%);
+      position:relative; z-index:1; margin-bottom:1rem;
+    }
+    #grimz-guard-btn:hover { background:#9b7fe8; transform:translateY(-2px); box-shadow:0 6px 20px rgba(124,92,191,0.35); }
+    #grimz-guard-btn:active { transform:translateY(0); }
+
+    .gg-countdown-row {
+      display:flex; align-items:center; justify-content:space-between;
+      position:relative; z-index:1;
+    }
+    .gg-countdown-text {
+      font-family:'JetBrains Mono',monospace; font-size:0.58rem;
+      color:#5a5470; letter-spacing:0.1em;
+    }
+    .gg-countdown-text span { color:#f87171; font-weight:700; }
+
+    .gg-progress {
+      width:100%; height:1px; background:rgba(124,92,191,0.1);
+      margin-top:0.75rem; position:relative; z-index:1; overflow:hidden;
+    }
+    .gg-progress-fill {
+      height:100%; background:linear-gradient(90deg,#f87171,#fbbf24);
+      transition:width 1s linear;
+    }
+  `;
+  document.head.appendChild(style);
+
+  // ── INJECT HTML ─────────────────────────────────────────
+  const overlay = document.createElement('div');
+  overlay.id = 'grimz-guard-overlay';
+  overlay.innerHTML = `
+    <div id="grimz-guard-box">
+      <div class="gg-corner gg-corner-tl"></div>
+      <div class="gg-corner gg-corner-br"></div>
+      <div class="gg-logo">GRIMZ <span>CLOUD</span> PC</div>
+      <div class="gg-title">🔒 Khu vực giới hạn</div>
+      <div class="gg-sub">Trang này đang trong giai đoạn triển khai.<br>Nhập mật khẩu để tiếp tục.</div>
+      <div class="gg-input-wrap">
+        <label class="gg-input-label">// Mật khẩu truy cập</label>
+        <div class="gg-input-row">
+          <input id="grimz-guard-input" type="password" placeholder="••••••••" autocomplete="off" />
+          <button id="gg-toggle-pass" tabindex="-1">👁</button>
+        </div>
+      </div>
+      <div id="grimz-guard-err"></div>
+      <button id="grimz-guard-btn">Xác nhận</button>
+      <div class="gg-countdown-row">
+        <span class="gg-countdown-text">Tự động redirect sau <span id="gg-cd">${COUNTDOWN}</span>s</span>
+        <span class="gg-countdown-text" style="color:#5a5470">→ /home</span>
+      </div>
+      <div class="gg-progress">
+        <div class="gg-progress-fill" id="gg-progress" style="width:100%"></div>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+
+  // ── LOGIC ───────────────────────────────────────────────
+  const input   = document.getElementById('grimz-guard-input');
+  const btn     = document.getElementById('grimz-guard-btn');
+  const errEl   = document.getElementById('grimz-guard-err');
+  const cdEl    = document.getElementById('gg-cd');
+  const progEl  = document.getElementById('gg-progress');
+  const toggleBtn = document.getElementById('gg-toggle-pass');
+
+  // Show/hide password
+  toggleBtn.addEventListener('click', () => {
+    input.type = input.type === 'password' ? 'text' : 'password';
+    toggleBtn.textContent = input.type === 'password' ? '👁' : '🙈';
+  });
+
+  // Hash password (SHA-256 via Web Crypto)
+  async function hashPass(str) {
+    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+  }
+
+  async function verify() {
+    const val = input.value.trim();
+    if (!val) {
+      showErr('Vui lòng nhập mật khẩu.');
+      return;
+    }
+    const hash = await hashPass(val);
+    if (hash === PASS_HASH) {
+      localStorage.setItem(STORAGE_KEY, PASS_HASH);
+      errEl.textContent = '';
+      btn.textContent = '✓ Đúng rồi!';
+      btn.style.background = 'rgba(74,222,128,0.8)';
+      clearInterval(cdInterval);
+      setTimeout(() => {
+        overlay.style.animation = 'guardFadeIn 0.3s ease reverse forwards';
+        setTimeout(() => overlay.remove(), 300);
+        document.documentElement.style.overflow = '';
+      }, 500);
+    } else {
+      showErr('Mật khẩu không đúng.');
+      input.classList.add('shake');
+      setTimeout(() => input.classList.remove('shake'), 400);
+      input.value = '';
+      input.focus();
+    }
+  }
+
+  function showErr(msg) {
+    errEl.textContent = '⚠ ' + msg;
+  }
+
+  btn.addEventListener('click', verify);
+  input.addEventListener('keydown', e => { if (e.key === 'Enter') verify(); });
+  input.focus();
+
+  // Countdown
+  let remaining = COUNTDOWN;
+  const cdInterval = setInterval(() => {
+    remaining--;
+    cdEl.textContent = remaining;
+    progEl.style.width = (remaining / COUNTDOWN * 100) + '%';
+    if (remaining <= 0) {
+      clearInterval(cdInterval);
+      window.location.replace(REDIRECT);
+    }
+  }, 1000);
+
+})(); }, { once: true });
+
+</script>
 </head>
 <body>
 
