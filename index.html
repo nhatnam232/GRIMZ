@@ -165,6 +165,11 @@
 <script>
   document.getElementById('yr').textContent = new Date().getFullYear();
 
+  // Gate check — redirect về gate.html nếu chưa verify
+  if (sessionStorage.getItem('grimz_verified') !== '1') {
+    window.location.replace('gate.html?next=index.html');
+  }
+
   // ===== LANG DROPDOWN =====
   function manualSetLang(lang) {
     localStorage.setItem('grimz_lang_set', '1');
