@@ -1,63 +1,22 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-<script>
-(async function() {
-  if(sessionStorage.getItem('grimz_unlocked')==='1') return;
-  async function hashStr(s) {
-    const buf = await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));
-    return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
-  }
-  try {
-    const r = await fetch('https://vlwevojqfomophsdwsqd.supabase.co/rest/v1/admin_config?key=eq.lockdown&select=value',{
-      headers:{'apikey':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZsd2V2b2pxZm9tb3Boc2R3c3FkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM1NzE2NDgsImV4cCI6MjA4OTE0NzY0OH0.6NECwQqKKeZH2fIgqp8SkmA6kPAqtsc5dlhEdGVFgBE',
-      'Authorization':'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZsd2V2b2pxZm9tb3Boc2R3c3FkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM1NzE2NDgsImV4cCI6MjA4OTE0NzY0OH0.6NECwQqKKeZH2fIgqp8SkmA6kPAqtsc5dlhEdGVFgBE'}
-    });
-    const d = await r.json();
-    if(d[0]?.value==='true') window.location.href='/';
-  } catch(e){}
-})();
-</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Đăng nhập hoặc tạo tài khoản Grimz Cloud PC — Cloud gaming tốc độ cao tại Việt Nam.">
 <title>Grimz Cloud PC — Đăng nhập</title>
 <link rel="icon" type="image/x-icon" href="/favicon.ico">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&family=Poppins:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="grimz-base.css">
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 <style>
-  :root {
-    --bg:#09080f; --bg2:#100e1a; --bg3:#161323;
-    --accent:#7c5cbf; --accent2:#9b7fe8; --accent3:#5a3fa0;
-    --green:#4ade80; --red:#f87171;
-    --text:#e4e0f0; --muted:#8a84a0; --border:rgba(124,92,191,0.18);
-  }
-  * { margin:0; padding:0; box-sizing:border-box; }
   body {
     background:var(--bg); color:var(--text);
     font-family:'Poppins',sans-serif;
     min-height:100vh; display:flex; align-items:center; justify-content:center;
-    overflow:hidden;
+    overflow-x:hidden;
   }
-
-  /* Background */
-  body::before {
-    content:''; position:fixed; inset:0;
-    background-image:linear-gradient(rgba(124,92,191,0.04) 1px,transparent 1px),
-      linear-gradient(90deg,rgba(124,92,191,0.04) 1px,transparent 1px);
-    background-size:44px 44px; pointer-events:none; z-index:0;
-  }
-  .glow-orb {
-    position:fixed; border-radius:50%; pointer-events:none; z-index:0;
-    filter:blur(80px);
-  }
-  .glow-orb-1 { width:500px; height:500px; background:rgba(124,92,191,0.07); top:-150px; right:-150px; animation:orbFloat 8s ease-in-out infinite; }
-  .glow-orb-2 { width:400px; height:400px; background:rgba(90,63,160,0.05); bottom:-100px; left:-100px; animation:orbFloat 10s ease-in-out infinite reverse; }
-  @keyframes orbFloat { 0%,100%{transform:translate(0,0)} 50%{transform:translate(20px,-20px)} }
-
-  /* Scanline */
-  .scanline { position:fixed; top:0; left:0; right:0; height:1px; background:linear-gradient(90deg,transparent,rgba(124,92,191,0.15),transparent); animation:scan 6s linear infinite; pointer-events:none; z-index:1; }
-  @keyframes scan { 0%{transform:translateY(-1px)} 100%{transform:translateY(100vh)} }
 
   /* Container */
   .container { position:relative; z-index:2; width:100%; max-width:420px; padding:1.5rem; }
@@ -204,8 +163,8 @@
       <div class="msg" id="regMsg"></div>
       <div class="terms-note">
         Bằng cách đăng ký, bạn đồng ý với
-        <a href="/terms" target="_blank">Điều khoản dịch vụ</a> và
-        <a href="/privacy" target="_blank">Chính sách bảo mật</a>
+        <a href="terms.html" target="_blank">Điều khoản dịch vụ</a> và
+        <a href="privacy.html" target="_blank">Chính sách bảo mật</a>
       </div>
     </div>
   </div>
@@ -228,7 +187,7 @@
   );
 
   sb.auth.getSession().then(({ data }) => {
-    if (data.session) window.location.href = '/dashboard';
+    if (data.session) window.location.href = 'grimz-dashboard.html';
   });
 
   function switchTab(tab) {
@@ -254,6 +213,7 @@
     const btnText = document.getElementById('loginBtnText');
     document.getElementById('loginMsg').className = 'msg';
     if (!email || !password) { showMsg('loginMsg','error','Vui lòng điền đầy đủ thông tin.'); return; }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showMsg('loginMsg','error','Email không hợp lệ.'); return; }
     const token = document.querySelector('#loginForm [name="cf-turnstile-response"]')?.value;
     if (!token) { showMsg('loginMsg','error','Vui lòng xác minh bạn không phải bot.'); return; }
     btn.disabled = true;
@@ -265,7 +225,7 @@
     } else {
       btnText.textContent = '✓ Thành công!';
       btn.style.background = 'rgba(74,222,128,0.8)';
-      setTimeout(() => window.location.href = '/dashboard', 600);
+      setTimeout(() => window.location.href = 'grimz-dashboard.html', 600);
     }
   }
 
@@ -277,6 +237,8 @@
     const btnText = document.getElementById('regBtnText');
     document.getElementById('regMsg').className = 'msg';
     if (!email || !password) { showMsg('regMsg','error','Vui lòng điền đầy đủ thông tin.'); return; }
+    // Validate email format
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showMsg('regMsg','error','Email không hợp lệ.'); return; }
     if (password.length < 6) { showMsg('regMsg','error','Mật khẩu tối thiểu 6 ký tự.'); return; }
     if (password !== password2) { showMsg('regMsg','error','Mật khẩu không khớp.'); return; }
     const token = document.querySelector('#registerForm [name="cf-turnstile-response"]')?.value;

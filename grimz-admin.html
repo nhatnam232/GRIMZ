@@ -3,24 +3,16 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex,nofollow">
 <title>Grimz — Admin Panel</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Poppins:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="grimz-base.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 <style>
-  :root {
-    --bg:#09080f; --bg2:#100e1a; --bg3:#161323; --bg4:#1c1830;
-    --accent:#7c5cbf; --accent2:#9b7fe8; --accent3:#5a3fa0;
-    --green:#4ade80; --red:#f87171; --yellow:#fbbf24;
-    --text:#e4e0f0; --muted:#8a84a0; --border:rgba(124,92,191,0.15);
-  }
-  * { margin:0; padding:0; box-sizing:border-box; }
   body { background:var(--bg); color:var(--text); font-family:'Poppins',sans-serif; min-height:100vh; padding:0; }
-  body::before { content:''; position:fixed; inset:0; background-image:linear-gradient(rgba(124,92,191,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(124,92,191,0.03) 1px,transparent 1px); background-size:40px 40px; pointer-events:none; z-index:0; }
-  body::after { content:''; position:fixed; top:-50%; left:-50%; width:200%; height:200%; background:radial-gradient(ellipse at 30% 40%,rgba(124,92,191,0.05) 0%,transparent 45%); animation:rotateBg 30s linear infinite; pointer-events:none; z-index:0; }
-  @keyframes rotateBg { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
 
 
   /* ===== ADMIN LOADER ===== */
@@ -124,18 +116,6 @@
   /* ===== RATE LIMIT NOTICE ===== */
   #rate-limit-msg { display:none; font-family:'JetBrains Mono',monospace; font-size:0.68rem; color:var(--red); text-align:center; letter-spacing:0.08em; margin-top:0.75rem; }
 
-
-  /* Quick Nav */
-  .quick-nav-wrap { position:relative; }
-  .quick-nav-dropdown { position:absolute; top:calc(100% + 8px); right:0; background:var(--bg2); border:1px solid rgba(124,92,191,0.3); min-width:200px; display:none; flex-direction:column; z-index:400; box-shadow:0 8px 24px rgba(0,0,0,0.4); }
-  .quick-nav-dropdown::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:linear-gradient(90deg,var(--accent3),var(--accent2)); }
-  .quick-nav-dropdown.open { display:flex; animation:mIn 0.15s ease; }
-  .qn-title { font-family:'JetBrains Mono',monospace; font-size:0.58rem; color:var(--muted); letter-spacing:0.15em; padding:0.5rem 0.75rem 0.3rem; text-transform:uppercase; }
-  .qn-item { display:flex; align-items:center; gap:0.6rem; padding:0.55rem 0.75rem; font-family:'JetBrains Mono',monospace; font-size:0.65rem; color:var(--muted); text-decoration:none; transition:all 0.15s; letter-spacing:0.06em; }
-  .qn-item:hover { background:rgba(124,92,191,0.08); color:var(--accent2); }
-  .qn-item i { width:14px; text-align:center; font-size:0.75rem; flex-shrink:0; }
-  .qn-divider { height:1px; background:rgba(124,92,191,0.1); margin:0.25rem 0; }
-
   /* ===== LIGHT THEME ===== */
   body.light {
     --bg:#f0eef8; --bg2:#ffffff; --bg3:#e8e5f5; --bg4:#d8d4ec;
@@ -229,7 +209,6 @@
   .badge-active  { background:rgba(74,222,128,0.1); border:1px solid rgba(74,222,128,0.25); color:var(--green); }
   .badge-active::before { content:''; width:4px; height:4px; border-radius:50%; background:var(--green); animation:blink 1.5s infinite; }
   .badge-expired { background:rgba(248,113,113,0.1); border:1px solid rgba(248,113,113,0.25); color:var(--red); }
-  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
   .copy-btn { background:var(--bg3); border:1px solid var(--border); color:var(--accent2); font-family:'JetBrains Mono',monospace; font-size:0.62rem; padding:0.2rem 0.5rem; cursor:pointer; transition:all 0.2s; white-space:nowrap; }
   .copy-btn:hover { border-color:var(--accent); background:rgba(124,92,191,0.1); }
   .actions-cell { display:flex; gap:0.35rem; align-items:center; }
@@ -321,22 +300,8 @@
   <div class="logo">Grimz Cloud PC <span class="logo-badge">ADMIN</span></div>
   <div class="topbar-actions">
     <button class="theme-toggle" onclick="toggleTheme()"><i class="fas fa-circle-half-stroke"></i> <span>Theme</span></button>
-    <button class="theme-toggle" id="lockdown-btn" onclick="toggleLockdown()" style="border-color:rgba(248,113,113,0.3);color:#f87171;" title="Bật/tắt bảo trì">
-      <i class="fas fa-lock" id="lockdown-icon"></i> <span id="lockdown-label">Lock Down</span>
-    </button>
-    <div class="quick-nav-wrap">
-      <button class="topbar-link" onclick="toggleQuickNav()"><i class="fas fa-th-large"></i> <span>Links</span> <i class="fas fa-chevron-down" style="font-size:0.5rem;"></i></button>
-      <div class="quick-nav-dropdown" id="quickNavDropdown">
-        <div class="qn-title">// Mở trang mới</div>
-        <a href="/" target="_blank" class="qn-item"><i class="fas fa-home"></i> Trang chủ</a>
-        <a href="/cloud" target="_blank" class="qn-item"><i class="fas fa-cloud"></i> Landing Page</a>
-        <a href="/login" target="_blank" class="qn-item"><i class="fas fa-sign-in-alt"></i> Đăng nhập</a>
-        <a href="/dashboard" target="_blank" class="qn-item"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
-        <div class="qn-divider"></div>
-        <a href="/privacy" target="_blank" class="qn-item"><i class="fas fa-lock"></i> Privacy Policy</a>
-        <a href="/terms" target="_blank" class="qn-item"><i class="fas fa-file-contract"></i> Terms</a>
-      </div>
-    </div>
+    <a href="grimz-dashboard.html" class="topbar-link"><i class="fas fa-tachometer-alt"></i> <span>Dashboard</span></a>
+    <a href="index.html" class="topbar-link"><i class="fas fa-home"></i> <span>Trang chủ</span></a>
   </div>
 </div>
 
@@ -691,74 +656,6 @@
     localStorage.setItem(AUDIT_KEY, JSON.stringify(logs));
   }
 
-
-  // ===== LOCKDOWN ADMIN =====
-  let lockdownActive = false;
-
-  async function fetchLockdownStatus() {
-    try {
-      const res = await fetch('https://vlwevojqfomophsdwsqd.supabase.co/rest/v1/admin_config?key=eq.lockdown&select=value', {
-        headers: {
-          'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZsd2V2b2pxZm9tb3Boc2R3c3FkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM1NzE2NDgsImV4cCI6MjA4OTE0NzY0OH0.6NECwQqKKeZH2fIgqp8SkmA6kPAqtsc5dlhEdGVFgBE',
-          'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZsd2V2b2pxZm9tb3Boc2R3c3FkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM1NzE2NDgsImV4cCI6MjA4OTE0NzY0OH0.6NECwQqKKeZH2fIgqp8SkmA6kPAqtsc5dlhEdGVFgBE'
-        }
-      });
-      const data = await res.json();
-      lockdownActive = data[0]?.value === 'true';
-      updateLockdownBtn();
-    } catch(e) {}
-  }
-
-  function updateLockdownBtn() {
-    const btn = document.getElementById('lockdown-btn');
-    const icon = document.getElementById('lockdown-icon');
-    const label = document.getElementById('lockdown-label');
-    if(lockdownActive) {
-      btn.style.background = 'rgba(248,113,113,0.15)';
-      btn.style.borderColor = 'rgba(248,113,113,0.5)';
-      icon.className = 'fas fa-lock';
-      label.textContent = '🔴 Bảo trì ON';
-    } else {
-      btn.style.background = '';
-      btn.style.borderColor = 'rgba(248,113,113,0.3)';
-      icon.className = 'fas fa-lock-open';
-      label.textContent = 'Lock Down';
-    }
-  }
-
-  async function toggleLockdown() {
-    const SERVICE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZsd2V2b2pxZm9tb3Boc2R3c3FkIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MzU3MTY0OCwiZXhwIjoyMDg5MTQ3NjQ4fQ.pjHDcDYnl2JN8r_z7bRoM16x1NAxPOViBTCEJX0VqUw';
-    const newVal = !lockdownActive;
-    const newConfirm = newVal ? 'Bat bao tri - Toan bo web se hien man hinh bao tri.' : 'Tat bao tri - Web se hoat dong binh thuong.';
-    if(!confirm(newConfirm)) return;
-    try {
-      await fetch('https://vlwevojqfomophsdwsqd.supabase.co/rest/v1/admin_config?key=eq.lockdown', {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          'apikey': SERVICE_KEY,
-          'Authorization': 'Bearer ' + SERVICE_KEY
-        },
-        body: JSON.stringify({ value: String(newVal) })
-      });
-      lockdownActive = newVal;
-      updateLockdownBtn();
-      showToast(newVal ? '🔒 Bảo trì đã BẬT' : '🔓 Bảo trì đã TẮT', 3000, newVal ? 'error' : 'success');
-      auditLog('LOCKDOWN', newVal ? 'Bật chế độ bảo trì' : 'Tắt chế độ bảo trì');
-    } catch(e) {
-      showToast('✗ Lỗi: ' + e.message, 3000, 'error');
-    }
-  }
-
-  // ===== QUICK NAV =====
-  function toggleQuickNav() {
-    document.getElementById('quickNavDropdown').classList.toggle('open');
-  }
-  document.addEventListener('click', e => {
-    const wrap = document.querySelector('.quick-nav-wrap');
-    if(wrap && !wrap.contains(e.target)) document.getElementById('quickNavDropdown').classList.remove('open');
-  });
-
   // ===== THEME =====
   function toggleTheme(){
     document.body.classList.toggle('light');
@@ -767,65 +664,37 @@
   if(localStorage.getItem('grimz_admin_theme') === 'light') document.body.classList.add('light');
 
   // ===== AUTH =====
-  let ADMIN_HASH = null;
+  const ADMIN_HASH = 'e8231ca8edc2ae39f8d32ee9366a1f6f5c0338fa10a7aa810727943932b9de95';
   async function hashPw(pw){
     const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(pw));
     return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
   }
-  async function fetchAdminHash() {
-    if(ADMIN_HASH) return ADMIN_HASH;
-    try {
-      const res = await fetch('https://vlwevojqfomophsdwsqd.supabase.co/rest/v1/admin_config?key=eq.admin_hash&select=value', {
-        headers: {
-          'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZsd2V2b2pxZm9tb3Boc2R3c3FkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM1NzE2NDgsImV4cCI6MjA4OTE0NzY0OH0.6NECwQqKKeZH2fIgqp8SkmA6kPAqtsc5dlhEdGVFgBE',
-          'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZsd2V2b2pxZm9tb3Boc2R3c3FkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM1NzE2NDgsImV4cCI6MjA4OTE0NzY0OH0.6NECwQqKKeZH2fIgqp8SkmA6kPAqtsc5dlhEdGVFgBE'
-        }
-      });
-      const data = await res.json();
-      ADMIN_HASH = data[0]?.value || null;
-    } catch(e) { ADMIN_HASH = null; }
-    return ADMIN_HASH;
-  }
-
   async function checkPw(){
     if(!checkRateLimit()) return;
     const token = document.querySelector('[name="cf-turnstile-response"]')?.value;
     if(!token){ showPwErr('Vui lòng xác minh bạn không phải bot.'); return; }
     const pw = document.getElementById('admin-pw').value;
-    const loginBtn = document.querySelector('#lock-screen button');
-    if(loginBtn) { loginBtn.disabled=true; loginBtn.textContent='Đang xác thực...'; }
-    const currentHash = await fetchAdminHash();
-    if(!currentHash){ showPwErr('Không thể tải cấu hình. Thử lại sau.'); if(loginBtn){loginBtn.disabled=false;loginBtn.textContent='Đăng nhập';} return; }
     const hash = await hashPw(pw);
-    if(loginBtn){ loginBtn.disabled=false; loginBtn.textContent='Đăng nhập'; }
-    if(hash === currentHash){
+    if(hash === ADMIN_HASH){
       localStorage.removeItem(RL_KEY);
       localStorage.removeItem(RL_TIME);
       document.getElementById('lock-screen').style.display='none';
-      sessionStorage.setItem('grimz-admin', currentHash);
+      sessionStorage.setItem('grimz-admin', hash);
       auditLog('LOGIN', 'Admin đăng nhập thành công');
       startSessionTimer();
       loadData();
-      fetchLockdownStatus();
     } else {
       recordFail();
       document.getElementById('admin-pw').value='';
     }
   }
   function showPwErr(msg){ const e=document.getElementById('pw-err'); e.style.display='block'; e.textContent=msg; }
-  (async function checkSession(){
+  (function checkSession(){
     checkRateLimit();
-    const savedHash = sessionStorage.getItem('grimz-admin');
-    if(savedHash) {
-      const currentHash = await fetchAdminHash();
-      if(currentHash && savedHash === currentHash){
-        document.getElementById('lock-screen').style.display='none';
-        startSessionTimer();
-        loadData();
-        return;
-      }
-      // Hash changed (new day password), clear session
-      sessionStorage.removeItem('grimz-admin');
+    if(sessionStorage.getItem('grimz-admin') === ADMIN_HASH){
+      document.getElementById('lock-screen').style.display='none';
+      startSessionTimer();
+      loadData();
     }
   })();
 

@@ -1,23 +1,6 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-<script>
-(async function() {
-  if(sessionStorage.getItem('grimz_unlocked')==='1') return;
-  async function hashStr(s) {
-    const buf = await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));
-    return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
-  }
-  try {
-    const r = await fetch('https://vlwevojqfomophsdwsqd.supabase.co/rest/v1/admin_config?key=eq.lockdown&select=value',{
-      headers:{'apikey':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZsd2V2b2pxZm9tb3Boc2R3c3FkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM1NzE2NDgsImV4cCI6MjA4OTE0NzY0OH0.6NECwQqKKeZH2fIgqp8SkmA6kPAqtsc5dlhEdGVFgBE',
-      'Authorization':'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZsd2V2b2pxZm9tb3Boc2R3c3FkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM1NzE2NDgsImV4cCI6MjA4OTE0NzY0OH0.6NECwQqKKeZH2fIgqp8SkmA6kPAqtsc5dlhEdGVFgBE'}
-    });
-    const d = await r.json();
-    if(d[0]?.value==='true') window.location.href='/';
-  } catch(e){}
-})();
-</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="Grimz Cloud PC - Dịch vụ cloud gaming tại Việt Nam, server Singapore, RTX 3060, 32GB RAM, giá 3.000đ/giờ. Hỗ trợ 24/7 qua Discord.">
@@ -26,18 +9,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Exo+2:wght@300;400;500;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="grimz-base.css">
 <style>
-  :root {
-    --bg:#09080f; --bg2:#100e1a; --bg3:#161323;
-    --accent:#7c5cbf; --accent2:#9b7fe8; --accent3:#5a3fa0;
-    --text:#e4e0f0; --muted:#5a5470;
-    --border:rgba(124,92,191,0.15);
-    --glow:0 0 30px rgba(124,92,191,0.2);
-  }
-  * { margin:0; padding:0; box-sizing:border-box; }
-  html { scroll-behavior:smooth; }
   body { background:var(--bg); color:var(--text); font-family:'Exo 2',sans-serif; overflow-x:hidden; }
-  body::before { content:''; position:fixed; inset:0; background-image:linear-gradient(rgba(124,92,191,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(124,92,191,0.04) 1px,transparent 1px); background-size:50px 50px; pointer-events:none; z-index:0; }
 
   /* NAV */
   nav { position:fixed; top:0; left:0; right:0; z-index:100; padding:0 5%; height:64px; display:flex; align-items:center; justify-content:space-between; background:rgba(8,12,16,0.85); backdrop-filter:blur(12px); border-bottom:1px solid var(--border); }
@@ -53,11 +27,9 @@
   .hero { position:relative; min-height:100vh; display:flex; align-items:center; padding:0 5%; padding-top:64px; overflow:hidden; }
   .hero-glow-1 { position:absolute; width:600px; height:600px; border-radius:50%; background:radial-gradient(circle,rgba(124,92,191,0.1) 0%,transparent 70%); top:-100px; right:-100px; animation:pulse 4s ease-in-out infinite; }
   .hero-glow-2 { position:absolute; width:400px; height:400px; border-radius:50%; background:radial-gradient(circle,rgba(90,63,160,0.08) 0%,transparent 70%); bottom:0; left:20%; animation:pulse 6s ease-in-out infinite reverse; }
-  @keyframes pulse { 0%,100%{transform:scale(1);opacity:1} 50%{transform:scale(1.1);opacity:0.7} }
   .hero-content { position:relative; z-index:1; max-width:700px; }
   .hero-tag { display:inline-flex; align-items:center; gap:0.5rem; font-family:'Share Tech Mono',monospace; font-size:0.75rem; color:var(--accent); letter-spacing:0.2em; text-transform:uppercase; margin-bottom:1.5rem; border:1px solid var(--border); padding:0.35rem 0.75rem; background:rgba(124,92,191,0.07); }
   .hero-tag::before { content:''; width:6px; height:6px; border-radius:50%; background:var(--accent); box-shadow:0 0 6px var(--accent); animation:blink 1.2s ease-in-out infinite; }
-  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
   .hero h1 { font-family:'Rajdhani',sans-serif; font-size:clamp(3rem,7vw,6rem); font-weight:700; line-height:0.95; letter-spacing:-0.01em; text-transform:uppercase; margin-bottom:1.5rem; }
   .hero h1 .line1 { color:var(--text); }
   .hero h1 .line2 { color:var(--accent); text-shadow:0 0 30px rgba(124,92,191,0.5); display:block; }
@@ -352,7 +324,7 @@
         <button class="lang-opt" id="lbtn-en" onclick="pickLang('en')"><span class="lang-opt-flag">🇬🇧</span>English</button>
       </div>
     </div>
-    <a href="/login" class="nav-cta" style="border-color:var(--border);color:var(--muted) !important;">Dashboard</a>
+    <a href="grimz-login.html" class="nav-cta" style="border-color:var(--border);color:var(--muted) !important;">Dashboard</a>
     <a href="https://discord.gg/Ct4Gw7GwJJ" target="_blank" rel="noopener" class="nav-cta" id="nav-buy-btn">Mua ngay</a>
   </div>
 </nav>
@@ -590,8 +562,8 @@
 <footer>
   <div class="footer-logo">GRIMZ <span>CLOUD</span> PC</div>
   <div class="footer-links">
-    <a href="/terms" data-i18n="footer_terms">Điều khoản dịch vụ</a>
-    <a href="/privacy" data-i18n="footer_privacy">Chính sách bảo mật</a>
+    <a href="terms.html" data-i18n="footer_terms">Điều khoản dịch vụ</a>
+    <a href="privacy.html" data-i18n="footer_privacy">Chính sách bảo mật</a>
     <a href="https://discord.gg/Ct4Gw7GwJJ" target="_blank" rel="noopener">Discord</a>
   </div>
   <p>© <span id="footer-year"></span> Grimz Cloud PC · Vietnam · <span data-i18n="footer_support">Hỗ trợ qua Discord</span></p>
@@ -616,7 +588,7 @@
       cta_title:'Muốn thử', cta_sub:'Vào Discord để đặt máy hoặc hỏi thêm thông tin.',
       feat1:'Ping siêu thấp', feat2:'GPU cao cấp', feat3:'Windows VM thực', feat4:'Giá phải chăng', feat5:'Hỗ trợ 24/7', feat6:'Dễ sử dụng',
       rent_btn:'Thuê qua Discord →',
-      hero_desc1:'Chơi game trên bất kỳ thiết bị nào, không cần PC mạnh.',
+      hero_desc1:'Play games on any device, no powerful PC required.',
       steps_heading:'Just 3 Steps to Start',
       ping_btn:'⚡ Đo Ping',
       ping_retry:'⚡ Đo lại',
@@ -717,7 +689,7 @@
     const cb = document.getElementById('cookie-text-span');
     const ca = document.getElementById('cookie-accept-btn');
     const cd = document.getElementById('cookie-decline-btn');
-    if (cb) cb.innerHTML = t.cookie_text + ' <a href="/privacy">' + (t.footer_privacy || 'Privacy Policy') + '</a>.';
+    if (cb) cb.innerHTML = t.cookie_text + ' <a href="privacy.html">' + (t.footer_privacy || 'Privacy Policy') + '</a>.';
     if (ca) ca.textContent = t.cookie_accept;
     if (cd) cd.textContent = t.cookie_decline;
     // Update nav buy button
@@ -871,8 +843,8 @@
   };
   const units = { hour: 'đ/giờ', day: 'đ/ngày', week: 'đ/tuần' };
   const pricesByLang = {
-    vi: { '3060':{hour:'3.000',day:'N/A',week:'N/A'}, '4060':{hour:'5.000',day:'N/A',week:'N/A'}, '4070':{hour:'6.000',day:'N/A',week:'N/A'} },
-    en: { '3060':{hour:'$0.35',day:'N/A',week:'N/A'}, '4060':{hour:'$0.50',day:'N/A',week:'N/A'}, '4070':{hour:'$0.70',day:'N/A',week:'N/A'} },
+    vi: { '3060':{hour:'3.000',day:'20.000',week:'120.000'}, '4060':{hour:'5.000',day:'35.000',week:'200.000'}, '4070':{hour:'6.000',day:'42.000',week:'250.000'} },
+    en: { '3060':{hour:'$0.12',day:'$0.80',week:'$4.80'}, '4060':{hour:'$0.20',day:'$1.35',week:'$7.70'}, '4070':{hour:'$0.24',day:'$1.62',week:'$9.60'} },
   };
   const unitsByLang = {
     vi: {hour:' đ/giờ', day:' đ/ngày', week:' đ/tuần'},
@@ -892,18 +864,7 @@
       const name = card.querySelector('.plan-codename')?.textContent?.trim();
       const key = name?.includes('PULSAR') ? '4070' : name?.includes('ORBIT') ? '4060' : '3060';
       const span = el.querySelector('span');
-      const priceVal = prices[key][mode];
-      if (priceVal === 'N/A') {
-        el.childNodes[0].textContent = 'N/A';
-        if (span) span.textContent = '';
-        el.style.fontSize = '1.2rem';
-        el.style.color = 'var(--muted)';
-      } else {
-        el.childNodes[0].textContent = priceVal;
-        if (span) span.textContent = units[mode];
-        el.style.fontSize = '';
-        el.style.color = '';
-      }
+      if (span) { el.childNodes[0].textContent = prices[key][mode]; span.textContent = units[mode]; }
     });
   }
 
@@ -1100,7 +1061,7 @@
         const cb = document.getElementById('cookie-text-span');
         const ca = document.getElementById('cookie-accept-btn');
         const cd = document.getElementById('cookie-decline-btn');
-        if (cb) cb.innerHTML = t.cookie_text + ' <a href="/privacy">' + (t.footer_privacy || 'Privacy Policy') + '</a>.';
+        if (cb) cb.innerHTML = t.cookie_text + ' <a href="privacy.html">' + (t.footer_privacy || 'Privacy Policy') + '</a>.';
         if (ca) ca.textContent = t.cookie_accept;
         if (cd) cd.textContent = t.cookie_decline;
         document.getElementById('cookieBanner').classList.add('show');

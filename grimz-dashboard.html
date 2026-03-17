@@ -3,22 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Grimz Cloud PC — Dashboard quản lý máy ảo và gói dịch vụ cloud gaming của bạn.">
+<meta name="robots" content="noindex,nofollow">
 <title>Grimz Cloud PC — Dashboard</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@700&family=Rajdhani:wght@400;500;600;700&family=Poppins:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="grimz-base.css">
 <style>
-  :root {
-    --bg:#09080f; --bg2:#100e1a; --bg3:#161323; --bg4:#1c1830;
-    --accent:#7c5cbf; --accent2:#9b7fe8; --accent3:#5a3fa0;
-    --green:#4ade80; --red:#f87171; --yellow:#fbbf24;
-    --text:#e4e0f0; --muted:#8a84a0; --border:rgba(124,92,191,0.15);
-  }
-  * { margin:0; padding:0; box-sizing:border-box; }
   body { background:var(--bg); color:var(--text); font-family:'Poppins',sans-serif; min-height:100vh; display:flex; overflow-x:hidden; }
-  body::before { content:''; position:fixed; inset:0; background-image:linear-gradient(rgba(124,92,191,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(124,92,191,0.03) 1px,transparent 1px); background-size:40px 40px; pointer-events:none; z-index:0; }
-  body::after { content:''; position:fixed; top:-50%; left:-50%; width:200%; height:200%; background:radial-gradient(ellipse at 30% 40%,rgba(124,92,191,0.06) 0%,transparent 45%),radial-gradient(ellipse at 70% 60%,rgba(90,63,160,0.04) 0%,transparent 40%); animation:rotateBg 25s linear infinite; pointer-events:none; z-index:0; }
-  @keyframes rotateBg { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
 
   /* ===== KANJI LOADER ===== */
   #kanji-loader { position:fixed; inset:0; background:#09080f; z-index:9999; display:flex; flex-direction:column; align-items:center; justify-content:center; overflow:hidden; }
@@ -112,10 +105,7 @@
   @media(max-width:500px) { .spec-grid { grid-template-columns:1fr; } }
 
   /* ===== BADGE ===== */
-  .badge { display:inline-flex; align-items:center; gap:0.4rem; padding:0.3rem 0.75rem; font-family:'JetBrains Mono',monospace; font-size:0.65rem; letter-spacing:0.15em; text-transform:uppercase; }
-  .badge-online { background:rgba(74,222,128,0.1); border:1px solid rgba(74,222,128,0.25); color:var(--green); }
-  .badge-online::before { content:''; width:5px; height:5px; border-radius:50%; background:var(--green); box-shadow:0 0 6px var(--green); animation:blink 1.5s infinite; }
-  .badge-offline { background:rgba(90,84,112,0.2); border:1px solid var(--border); color:var(--muted); }
+  /* (badge styles from grimz-base.css) */
 
   /* ===== STATS ROW ===== */
   .stats-row { display:grid; grid-template-columns:repeat(3,1fr); gap:1.25rem; }
@@ -137,7 +127,6 @@
   /* ===== EMPTY STATE ===== */
   .empty-state { text-align:center; padding:2.5rem 1rem; display:flex; flex-direction:column; align-items:center; gap:1rem; }
   .empty-robot { font-size:3rem; animation:float 3s ease-in-out infinite; }
-  @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
   .empty-text { font-family:'JetBrains Mono',monospace; font-size:0.72rem; color:var(--muted); letter-spacing:0.12em; line-height:2; }
 
   /* ===== TABS ===== */
@@ -175,18 +164,6 @@
   .copy-ip:hover { background:rgba(124,92,191,0.15); border-color:var(--accent); transform:scale(1.05); }
   .copy-ip::before { content:'Copy'; position:absolute; bottom:calc(100% + 4px); left:50%; transform:translateX(-50%) scale(0); background:var(--bg3); border:1px solid var(--border); color:var(--accent2); font-size:0.55rem; padding:0.15rem 0.4rem; white-space:nowrap; transition:transform 0.15s; pointer-events:none; }
   .copy-ip:hover::before { transform:translateX(-50%) scale(1); }
-
-  /* ===== TOAST ===== */
-  .toast { position:fixed; bottom:2rem; right:2rem; background:var(--bg3); border:1px solid var(--accent); color:var(--accent2); font-family:'JetBrains Mono',monospace; font-size:0.75rem; letter-spacing:0.1em; padding:0.6rem 1.25rem; z-index:999; opacity:0; transform:translateY(10px); transition:all 0.3s; pointer-events:none; }
-  .toast.show { opacity:1; transform:translateY(0); }
-  .toast.toast-success { border-color:rgba(74,222,128,0.5); color:var(--green); }
-  .toast.toast-warn { border-color:rgba(251,191,36,0.5); color:var(--yellow); }
-  .toast.toast-error { border-color:rgba(248,113,113,0.5); color:var(--red); }
-
-  /* ===== SCROLLBAR ===== */
-  ::-webkit-scrollbar { width:5px; }
-  ::-webkit-scrollbar-track { background:var(--bg); }
-  ::-webkit-scrollbar-thumb { background:var(--bg4); }
 
 
 
@@ -1069,7 +1046,7 @@
     navigator.clipboard.writeText(ip).then(()=>showToast('✓ Đã copy IP: '+ip,2000,'success'));
   }
 
-  async function doLogout(){ await sb.auth.signOut(); window.location.href='/login'; }
+  async function doLogout(){ await sb.auth.signOut(); window.location.href='grimz-login.html'; }
 
   let countdownInterval=null, statInterval=null;
   function startCountdown(expiry){
@@ -1148,7 +1125,7 @@
 
   async function init(){
     const{data:{session}}=await sb.auth.getSession();
-    if(!session){window.location.href='/login';return;}
+    if(!session){window.location.href='grimz-login.html';return;}
     currentUserId=session.user.id;
     loadHistory(session.user.id);
     initSupportChat(session.user.id);
