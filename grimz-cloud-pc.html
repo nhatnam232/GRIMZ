@@ -672,7 +672,7 @@
 
   const CURRENCY = {
     vi:{nova:'3.000',orbit:'5.000',pulsar:'6.000',unit:' đ/giờ'},
-    en:{nova:'$0.12',orbit:'$0.20',pulsar:'$0.24',unit:'/hr'},
+    en:{nova:'$0.50',orbit:'$0.60',pulsar:'$0.70',unit:'/hr'},
   };
   function updateCurrency(lang) {
     // Use setPriceMode to update all prices consistently
@@ -813,7 +813,7 @@
   // ===== TYPING EFFECT =====
   const typingLinesByLang = {
     vi: ['RTX 3060, 32GB RAM, Windows 10/11','Ping <30ms từ Việt Nam','Giá chỉ 3.000đ/giờ','Kết nối qua Parsec hoặc Moonlight','Hỗ trợ 24/7 qua Discord'],
-    en: ['RTX 3060, 32GB RAM, Windows 10/11','Ping <30ms from anywhere','From $0.12/hr only','Connect via Parsec or Moonlight','24/7 Discord support'],
+    en: ['RTX 3060, 32GB RAM, Windows 10/11','Ping <30ms from anywhere','From $0.50/hr only','Connect via Parsec or Moonlight','24/7 Discord support'],
   };
   let typingLines = typingLinesByLang['vi'];
   let tIdx = 0, tChar = 0, tDeleting = false;
@@ -837,14 +837,14 @@
 
   // ===== PRICING TOGGLE =====
   const prices = {
-    '3060': { hour: '3.000', day: '20.000', week: '120.000' },
-    '4060': { hour: '5.000', day: '35.000', week: '200.000' },
-    '4070': { hour: '6.000', day: '42.000', week: '250.000' },
+    '3060': { hour: '3.000', day: 'N/A', week: 'N/A' },
+    '4060': { hour: '5.000', day: 'N/A', week: 'N/A' },
+    '4070': { hour: '6.000', day: 'N/A', week: 'N/A' },
   };
   const units = { hour: 'đ/giờ', day: 'đ/ngày', week: 'đ/tuần' };
   const pricesByLang = {
-    vi: { '3060':{hour:'3.000',day:'20.000',week:'120.000'}, '4060':{hour:'5.000',day:'35.000',week:'200.000'}, '4070':{hour:'6.000',day:'42.000',week:'250.000'} },
-    en: { '3060':{hour:'$0.12',day:'$0.80',week:'$4.80'}, '4060':{hour:'$0.20',day:'$1.35',week:'$7.70'}, '4070':{hour:'$0.24',day:'$1.62',week:'$9.60'} },
+    vi: { '3060':{hour:'3.000',day:'N/A',week:'N/A'}, '4060':{hour:'5.000',day:'N/A',week:'N/A'}, '4070':{hour:'6.000',day:'N/A',week:'N/A'} },
+    en: { '3060':{hour:'$0.50',day:'N/A',week:'N/A'}, '4060':{hour:'$0.60',day:'N/A',week:'N/A'}, '4070':{hour:'$0.70',day:'N/A',week:'N/A'} },
   };
   const unitsByLang = {
     vi: {hour:' đ/giờ', day:' đ/ngày', week:' đ/tuần'},
