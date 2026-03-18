@@ -166,7 +166,8 @@
   document.getElementById('yr').textContent = new Date().getFullYear();
 
   // Gate check — redirect về gate.html nếu chưa verify
-  if (sessionStorage.getItem('grimz_verified') !== '1') {
+  const _isBot = /Googlebot|bingbot|Slurp|DuckDuckBot|Baiduspider|YandexBot|Sogou|facebookexternalhit|Twitterbot|LinkedInBot|crawler|spider|bot/i.test(navigator.userAgent);
+  if (!_isBot && sessionStorage.getItem('grimz_verified') !== '1') {
     window.location.replace('gate.html?next=index.html');
   }
 
