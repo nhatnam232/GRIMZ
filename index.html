@@ -112,6 +112,8 @@
     <button class="lang-option" id="btn-en" onclick="manualSetLang('en')"><span class="lang-flag">🇬🇧</span>English</button>
     <div class="lang-divider"></div>
     <button class="lang-option" id="btn-id" onclick="manualSetLang('id')"><span class="lang-flag">🇮🇩</span>Indonesia</button>
+    <div class="lang-divider"></div>
+    <button class="lang-option" id="btn-hi" onclick="manualSetLang('hi')"><span class="lang-flag">🇮🇳</span>HI</button>
   </div>
 </div>
 <div class="glow1"></div>
@@ -219,6 +221,15 @@
       days: 'Hari', hours: 'Jam', mins: 'Menit', secs: 'Detik',
       progress: 'Progres Persiapan',
       discord: 'Bergabung Discord',
+    },
+    hi: {
+      status: 'जल्द आ रहा है',
+      headline: 'जल्द लॉन्च होगा',
+      desc: 'Grimz Cloud PC तैनाती जारी है।<br><strong>हाई-स्पीड क्लाउड गेमिंग · सिंगापुर सर्वर · RTX 3060+</strong><br>लॉन्च पर सूचना के लिए Discord जॉइन करें।',
+      launching: '// लॉन्च में',
+      days: 'दिन', hours: 'घंटे', mins: 'मिनट', secs: 'सेकंड',
+      progress: 'तैनाती प्रगति',
+      discord: 'Discord जॉइन करें',
     }
   };
 
@@ -239,7 +250,7 @@
     document.getElementById('desc-text').innerHTML = t.desc;
 
     // Update trigger
-    document.getElementById('currentFlag').textContent = {'vi':'🇻🇳','en':'🇬🇧','id':'🇮🇩'}[lang];
+    document.getElementById('currentFlag').textContent = {'vi':'🇻🇳','en':'🇬🇧','id':'🇮🇩','hi':'🇮🇳'}[lang];
     document.getElementById('currentLangLabel').textContent = lang.toUpperCase();
     // Update selected state
     document.querySelectorAll('.lang-option').forEach(b => b.classList.remove('selected'));
@@ -266,6 +277,7 @@
       let lang = 'en'; // default
       if (country === 'VN') lang = 'vi';
       else if (country === 'ID') lang = 'id';
+      else if (country === 'IN') lang = 'hi';
       setLang(lang);
     } catch {
       // Nếu lỗi thì dùng ngôn ngữ đã lưu hoặc VI

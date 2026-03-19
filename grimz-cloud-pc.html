@@ -580,6 +580,8 @@ document.addEventListener("DOMContentLoaded", function() { (function () {
         <button class="lang-opt sel" id="lbtn-vi" onclick="pickLang('vi')"><span class="lang-opt-flag">🇻🇳</span>Tiếng Việt</button>
         <div class="lang-sep"></div>
         <button class="lang-opt" id="lbtn-en" onclick="pickLang('en')"><span class="lang-opt-flag">🇬🇧</span>English</button>
+        <div class="lang-sep"></div>
+        <button class="lang-opt" id="lbtn-hi" onclick="pickLang('hi')"><span class="lang-opt-flag">🇮🇳</span>HI</button>
       </div>
     </div>
     <a href="grimz-login.html" class="nav-cta" style="border-color:var(--border);color:var(--muted) !important;">Dashboard</a>
@@ -833,6 +835,7 @@ document.addEventListener("DOMContentLoaded", function() { (function () {
   const LANGS = {
     vi: { flag:'🇻🇳', code:'VI', country:['VN'] },
     en: { flag:'🇬🇧', code:'EN', country:[] },
+    hi: { flag:'🇮🇳', code:'HI', country:['IN'] },
   };
 
   const T = {
@@ -923,6 +926,53 @@ document.addEventListener("DOMContentLoaded", function() { (function () {
     faq_a7:'Yes, data is kept throughout your rental period. However after expiry without renewal, the machine may be reset. Please backup important data.',
     nav_dashboard:'Dashboard', nav_buy:'Buy Now',
     },
+    hi: {
+      why_title_1:'क्यों चुनें', why_sub:'क्लाउड PC गेमिंग, सिंगापुर सर्वर।',
+      price_title:'स्पेक्स &', price_title2:'मूल्य', price_sub:'सिर्फ इस्तेमाल के घंटों का भुगतान।',
+      steps_title:'बस', steps_title2:'शुरू करें', steps_sub:'खरीदें और मिनटों में खेलें।',
+      faq_title:'अक्सर पूछे', faq_title2:'जाने वाले सवाल',
+      review_title:'ग्राहक', review_title2:'क्या कहते हैं',
+      join_discord:'Discord जॉइन करें', join_discord_now:'Discord जॉइन करें', view_price:'मूल्य देखें',
+      cta_title:'आज़माएं', cta_sub:'Discord जॉइन करें ऑर्डर या जानकारी के लिए।',
+      feat1:'बहुत कम Ping', feat2:'हाई-एंड GPU', feat3:'असली Windows VM', feat4:'किफायती मूल्य', feat5:'24/7 सपोर्ट', feat6:'आसान उपयोग',
+      rent_btn:'Discord से किराए पर →',
+      hero_desc1:'Play games on any device, no powerful PC required.',
+      steps_heading:'Just 3 Steps to Start',
+      ping_btn:'⚡ Ping टेस्ट',
+      ping_retry:'⚡ दोबारा',
+      ping_good:'अच्छा',
+      ping_high:'ज़्यादा',
+      members:'सदस्य',
+      loading:'लोड हो रहा...',
+      cookie_text:'हम लॉगिन और अनुभव बेहतर बनाने के लिए कुकी उपयोग करते हैं।',
+      cookie_accept:'स्वीकार', cookie_decline:'अस्वीकार',
+    feat1_desc:'सिंगापुर सर्वर, भारत से 50ms से कम ping। स्थिर कनेक्शन।',
+    feat2_desc:'RTX 3060, 4060, 4070 dedicated। हाई सेटिंग पर गेम चलाएं।',
+    feat3_desc:'Windows 10/11, कोई भी सॉफ्टवेयर इंस्टॉल करें, पूर्ण एडमिन।',
+    feat4_desc:'$0.50/घंटा, सिर्फ उपयोग का भुगतान। कोई सब्सक्रिप्शन नहीं।',
+    feat5_desc:'Discord टिकट से सपोर्ट। मिनटों में जवाब।',
+    feat6_desc:'Parsec या Moonlight से कनेक्ट। पुराने लैपटॉप, फोन पर भी चले।',
+    toggle_hour:'घंटा', toggle_day:'दिन (8h)', toggle_week:'सप्ताह',
+    spec_ping:'Singapore Ping <50ms', spec_support:'24/7 सपोर्ट',
+    step1_title:'Discord जॉइन करें', step1_desc:'Grimz Cloud PC Discord सर्वर जॉइन करें।',
+    step2_title:'टिकट बनाएं', step2_desc:'टिकट बनाएं, स्टाफ को बताएं कितने घंटे चाहिए, UPI/PayPal से भुगतान।',
+    step3_title:'मशीन पाएं और खेलें', step3_desc:'स्टाफ कनेक्शन भेजेगा। Parsec या Moonlight इंस्टॉल करें।',
+    ping_label:'// सर्वर ping टेस्ट', dc_label:'// Discord कम्युनिटी',
+    tag_why:'// WHY GRIMZ', tag_price:'// स्पेक्स & मूल्य', tag_how:'// कैसे खरीदें', tag_faq:'// FAQ', tag_review:'// रिव्यू',
+    faq_sub:'आम सवालों के त्वरित उत्तर।', review_sub:'Grimz Discord कम्युनिटी की प्रतिक्रिया।',
+    faq_q1:'मशीन कब तक मिलेगी?', faq_q2:'कनेक्ट करने के लिए क्या चाहिए?',
+    faq_q3:'मेरे डिवाइस में क्या स्पेक्स चाहिए?', faq_q4:'क्या ping स्थिर है? लैग होगा?',
+    faq_q5:'भुगतान कैसे करें?', faq_q6:'क्या गेम और सॉफ्टवेयर इंस्टॉल कर सकते हैं?',
+    faq_q7:'क्या डेटा सेशन में सेव रहता है?',
+    faq_a1:'भुगतान के 5-15 मिनट बाद। 30 मिनट से ज़्यादा हो तो Discord टिकट में स्टाफ को ping करें।',
+    faq_a2:'Parsec (parsec.app) या Moonlight (moonlight-stream.org), दोनों फ्री। Windows, Mac, Android, iOS पर चलते हैं।',
+    faq_a3:'शक्तिशाली डिवाइस नहीं चाहिए। बस स्थिर इंटरनेट (10 Mbps+) और Parsec/Moonlight। पुराने लैपटॉप, फोन सब चलेगा।',
+    faq_a4:'सिंगापुर सर्वर, भारत से ~50ms। FPS और MOBA सहित अधिकांश गेम के लिए पर्याप्त।',
+    faq_a5:'UPI, PayPal या क्रिप्टो। स्टाफ Discord टिकट में भुगतान विवरण भेजेगा।',
+    faq_a6:'हाँ। पूर्ण एडमिन अधिकार, असली PC जैसे सॉफ्टवेयर और गेम इंस्टॉल करें।',
+    faq_a7:'हाँ, किराये की अवधि तक डेटा रहता है। समाप्ति के बाद मशीन रीसेट हो सकती है। महत्वपूर्ण डेटा बैकअप करें।',
+    nav_dashboard:'Dashboard', nav_buy:'अभी खरीदें',
+    },
   };
 
   let activeLang = localStorage.getItem('grimz_lang') || 'vi';
@@ -931,6 +981,7 @@ document.addEventListener("DOMContentLoaded", function() { (function () {
   const CURRENCY = {
     vi:{nova:'3.000',orbit:'5.000',pulsar:'6.000',unit:' đ/giờ'},
     en:{nova:'$0.50',orbit:'$0.60',pulsar:'$0.70',unit:'/hr'},
+    hi:{nova:'$0.50',orbit:'$0.60',pulsar:'$0.70',unit:'/hr'},
   };
   function updateCurrency(lang) {
     // Use setPriceMode to update all prices consistently
@@ -1015,6 +1066,7 @@ document.addEventListener("DOMContentLoaded", function() { (function () {
       const cc = data.country_code;
       let lang = 'en';
       if (cc === 'VN') lang = 'vi';
+      else if (cc === 'IN') lang = 'hi';
       setActiveLang(lang);
     } catch {
       setActiveLang(activeLang);
@@ -1103,10 +1155,12 @@ document.addEventListener("DOMContentLoaded", function() { (function () {
   const pricesByLang = {
     vi: { '3060':{hour:'3.000',day:'N/A',week:'N/A'}, '4060':{hour:'5.000',day:'N/A',week:'N/A'}, '4070':{hour:'6.000',day:'N/A',week:'N/A'} },
     en: { '3060':{hour:'$0.50',day:'N/A',week:'N/A'}, '4060':{hour:'$0.60',day:'N/A',week:'N/A'}, '4070':{hour:'$0.70',day:'N/A',week:'N/A'} },
+    hi: { '3060':{hour:'$0.50',day:'N/A',week:'N/A'}, '4060':{hour:'$0.60',day:'N/A',week:'N/A'}, '4070':{hour:'$0.70',day:'N/A',week:'N/A'} },
   };
   const unitsByLang = {
     vi: {hour:' đ/giờ', day:' đ/ngày', week:' đ/tuần'},
     en: {hour:'/hr', day:'/day', week:'/week'},
+    hi: {hour:'/hr', day:'/day', week:'/week'},
   };
   let priceMode = 'hour';
   function setPriceMode(mode, btn) {
