@@ -555,6 +555,10 @@ document.addEventListener("DOMContentLoaded", function() { (function () {
       <input type="password" id="admin-pw" placeholder="Mật khẩu..." onkeydown="if(event.key==='Enter')checkPw()" style="width:100%;background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:0.7rem 0.75rem;font-family:'Poppins',sans-serif;font-size:0.875rem;outline:none;margin-bottom:0.75rem;transition:border-color 0.2s;">
       <div style="display:flex;justify-content:center;margin-bottom:0.75rem;"><div class="cf-turnstile" data-sitekey="0x4AAAAAACrS3npj6qFvSu2W" data-theme="dark"></div></div>
       <button onclick="checkPw()" style="width:100%;background:var(--accent);color:#fff;padding:0.7rem;font-family:'Rajdhani',sans-serif;font-size:0.9rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;border:none;cursor:pointer;transition:background 0.2s;">Đăng nhập</button>
+      <div id="gen-pw-wrap" style="display:none;margin-top:0.75rem;">
+        <button onclick="genPassword()" id="gen-pw-btn" style="width:100%;background:rgba(74,222,128,0.1);border:1px solid rgba(74,222,128,0.3);color:#4ade80;padding:0.6rem;font-family:'JetBrains Mono',monospace;font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;transition:all 0.2s;">🔑 Gen Password mới → Discord</button>
+        <div id="gen-pw-msg" style="display:none;margin-top:0.5rem;font-family:'JetBrains Mono',monospace;font-size:0.65rem;text-align:center;letter-spacing:0.08em;"></div>
+      </div>
     </div>
     <div id="pw-err" style="display:none;margin-top:0.75rem;font-family:'JetBrains Mono',monospace;font-size:0.68rem;color:#f87171;text-align:center;letter-spacing:0.08em;"></div>
     <div id="rate-limit-msg" style="display:none;margin-top:0.75rem;font-family:'JetBrains Mono',monospace;font-size:0.68rem;color:#f87171;text-align:center;letter-spacing:0.08em;"></div>
@@ -1045,7 +1049,8 @@ document.addEventListener("DOMContentLoaded", function() { (function () {
       .maybeSingle();
 
     if (!config) {
-      showPwErr('Chưa có password trong hệ thống. Chạy admin-gen-password trước.');
+      showPwErr('Chưa có password trong hệ thống.');
+      document.getElementById('gen-pw-wrap').style.display = 'block';
       return;
     }
 
@@ -1643,7 +1648,29 @@ document.addEventListener("DOMContentLoaded", function() { (function () {
   }
 
 
-  // ===== TOAST =====
+  // ===== GEN PASSWORD =====
+  async function genPassword() {
+    const btn = document.getElementById('gen-pw-btn');
+    const msg = document.getElementById('gen-pw-msg');
+    btn.textContent = '⏳ Đang gen...';
+    btn.style.pointerEvents = 'none';
+    msg.style.display = 'none';
+    try {
+      const { data, error } = await sb.functions.invoke('admin-gen-password');
+      if (error) throw error;
+      msg.style.color = '#4ade80';
+      msg.textContent = '✓ Password đã gửi vào Discord!';
+      msg.style.display = 'block';
+      btn.textContent = '✓ Đã gửi → Discord';
+    } catch(e) {
+      msg.style.color = '#f87171';
+      msg.textContent = '✗ Lỗi: ' + (e.message || String(e));
+      msg.style.display = 'block';
+      btn.textContent = '🔑 Gen Password mới → Discord';
+      btn.style.pointerEvents = 'auto';
+    }
+  }
+
   function showToast(msg,type,duration){
     const t=document.getElementById('toast');
     t.textContent=msg;
