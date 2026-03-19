@@ -570,9 +570,23 @@ document.addEventListener("DOMContentLoaded", function() { (function () {
 <div class="topbar">
   <div class="logo">Grimz Cloud PC <span class="logo-badge">ADMIN</span></div>
   <div class="topbar-actions">
+    <button class="theme-toggle" onclick="genPasswordPanel()" style="border-color:rgba(74,222,128,0.3);color:#4ade80;" title="Gen password mới"><i class="fas fa-key"></i> <span>Gen Pass</span></button>
     <button class="theme-toggle" onclick="toggleTheme()"><i class="fas fa-circle-half-stroke"></i> <span>Theme</span></button>
     <a href="grimz-dashboard.html" class="topbar-link"><i class="fas fa-tachometer-alt"></i> <span>Dashboard</span></a>
     <a href="index.html" class="topbar-link"><i class="fas fa-home"></i> <span>Trang chủ</span></a>
+  </div>
+</div>
+
+<!-- GEN PASSWORD MODAL -->
+<div class="modal-overlay" id="gen-pw-modal">
+  <div class="modal-box" style="max-width:360px;">
+    <button class="modal-close" onclick="document.getElementById('gen-pw-modal').classList.remove('open')"><i class="fas fa-times"></i></button>
+    <div class="modal-title" style="color:#4ade80;"><i class="fas fa-key"></i> Gen Password Mới</div>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:0.65rem;color:var(--muted);margin-bottom:1.25rem;line-height:1.8;">Password mới sẽ được gen ngẫu nhiên, lưu vào Supabase và gửi vào Discord.</div>
+    <button onclick="doGenPassword()" id="do-gen-btn" class="btn btn-primary" style="width:100%;justify-content:center;background:rgba(74,222,128,0.15);border:1px solid rgba(74,222,128,0.3);color:#4ade80;">
+      <i class="fas fa-rotate"></i> Gen Password Mới
+    </button>
+    <div id="gen-result" style="display:none;margin-top:1rem;background:rgba(74,222,128,0.07);border:1px solid rgba(74,222,128,0.2);padding:0.75rem;font-family:'JetBrains Mono',monospace;font-size:0.72rem;color:#4ade80;word-break:break-all;text-align:center;"></div>
   </div>
 </div>
 
@@ -1720,6 +1734,48 @@ document.addEventListener("DOMContentLoaded", function() { (function () {
 
     // Auto fill password field
     document.getElementById('admin-pw').value = password;
+  }
+
+  // ===== GEN PASSWORD PANEL =====
+  function genPasswordPanel() {
+    document.getElementById('gen-pw-modal').classList.add('open');
+    document.getElementById('gen-result').style.display = 'none';
+    document.getElementById('do-gen-btn').innerHTML = '<i class="fas fa-rotate"></i> Gen Password Mới';
+    document.getElementById('do-gen-btn').style.pointerEvents = 'auto';
+  }
+
+  async function doGenPassword() {
+    const btn = document.getElementById('do-gen-btn');
+    const result = document.getElementById('gen-result');
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang gen...';
+    btn.style.pointerEvents = 'none';
+
+    const upper='ABCDEFGHIJKLMNOPQRSTUVWXYZ',lower='abcdefghijklmnopqrstuvwxyz',digits='0123456789',special='!@#$%&*_+-=';
+    const all=upper+lower+digits+special;
+    const required=[upper[Math.floor(Math.random()*upper.length)],lower[Math.floor(Math.random()*lower.length)],digits[Math.floor(Math.random()*digits.length)],special[Math.floor(Math.random()*special.length)]];
+    const rest=Array.from({length:12},()=>all[Math.floor(Math.random()*all.length)]);
+    const chars=[...required,...rest];
+    for(let i=chars.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[chars[i],chars[j]]=[chars[j],chars[i]];}
+    const password=chars.join('');
+
+    const buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(password));
+    const hash=Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+
+    const{error}=await sb.from('admin_config').upsert({key:'admin_pw_hash',value:hash,updated_at:new Date().toISOString()},{onConflict:'key'});
+    if(error){showToast('✗ Lỗi: '+error.message,'error');btn.innerHTML='<i class="fas fa-rotate"></i> Gen Password Mới';btn.style.pointerEvents='auto';return;}
+
+    // Gửi Discord webhook
+    try {
+      await fetch('https://discord.com/api/webhooks/1484272817552883772/L22ILl-AckFGFheGkoimVmMOrKJKhFzDJWRM8UmiMfb40AP0s9u2Y5BPogGPRVzPxjYo',{
+        method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({embeds:[{title:'🔑 New Admin Password Generated',color:0x4ade80,fields:[{name:'🔐 Password',value:'```'+password+'```',inline:false},{name:'⚠️ Warning',value:'Save this password. It will NOT be shown again.',inline:false},{name:'Generated At',value:`<t:${Math.floor(Date.now()/1000)}:F>`,inline:true}],footer:{text:'Grimz Admin Security'},timestamp:new Date().toISOString()}]})
+      });
+    } catch(e){console.warn('Discord notify failed:',e);}
+
+    result.innerHTML = `✓ Password mới đã gửi vào Discord!<br><br><strong style="font-size:1rem;color:#fff;">${password}</strong><br><br><span style="color:#f87171;font-size:0.6rem;">⚠ Copy ngay! Sẽ không hiện lại.</span>`;
+    result.style.display = 'block';
+    btn.innerHTML = '✓ Đã gen!';
+    showToast('✓ Password mới đã gửi Discord!', 'success');
   }
 
   // ===== TOAST =====
