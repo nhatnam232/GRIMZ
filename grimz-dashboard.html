@@ -199,6 +199,8 @@
   .theme-toggle:hover { background:rgba(124,92,191,0.12); transform:translateX(2px); }
   .theme-toggle:hover .theme-label { color:var(--accent2); }
   .theme-toggle { position:relative; }
+  .lang-btn.active { border-color:var(--accent2) !important; color:var(--accent2) !important; background:rgba(124,92,191,0.1) !important; }
+  .lang-btn:hover { border-color:var(--accent) !important; color:var(--text) !important; }
   .theme-toggle:hover::after { content:'Đổi theme'; position:absolute; left:calc(100% + 8px); top:50%; transform:translateY(-50%); background:var(--bg3); border:1px solid var(--border); color:var(--accent2); font-family:'JetBrains Mono',monospace; font-size:0.6rem; padding:0.2rem 0.5rem; white-space:nowrap; letter-spacing:0.08em; pointer-events:none; z-index:100; }
   .theme-track { width:36px; height:20px; background:var(--bg4); border:1px solid var(--border); border-radius:10px; position:relative; transition:background 0.3s; flex-shrink:0; }
   .theme-thumb { width:14px; height:14px; background:var(--muted); border-radius:50%; position:absolute; top:2px; left:2px; transition:all 0.3s; }
@@ -539,14 +541,14 @@ document.addEventListener("DOMContentLoaded", function() { (function () {
   async function verify() {
     const val = input.value.trim();
     if (!val) {
-      showErr('Vui lòng nhập mật khẩu.');
+      showErr(t('guard_empty'));
       return;
     }
     const hash = await hashPass(val);
     if (hash === PASS_HASH) {
       localStorage.setItem(STORAGE_KEY, PASS_HASH);
       errEl.textContent = '';
-      btn.textContent = '✓ Đúng rồi!';
+      btn.textContent = t('btn_confirmed');
       btn.style.background = 'rgba(74,222,128,0.8)';
       clearInterval(cdInterval);
       setTimeout(() => {
@@ -555,7 +557,7 @@ document.addEventListener("DOMContentLoaded", function() { (function () {
         document.documentElement.style.overflow = '';
       }, 500);
     } else {
-      showErr('Mật khẩu không đúng.');
+      showErr(t('guard_wrong'));
       input.classList.add('shake');
       setTimeout(() => input.classList.remove('shake'), 400);
       input.value = '';
@@ -594,14 +596,14 @@ document.addEventListener("DOMContentLoaded", function() { (function () {
 <div class="modal-overlay" id="profileModal">
   <div class="modal-box">
     <button class="modal-close" onclick="closeProfileModal()"><i class="fas fa-times"></i></button>
-    <div class="modal-title">✏️ Chỉnh sửa profile</div>
-    <div style="font-family:'JetBrains Mono',monospace;font-size:0.62rem;color:var(--muted);letter-spacing:0.12em;margin-bottom:0.75rem;">TÊN HIỂN THỊ</div>
-    <input class="modal-input" id="displayNameInput" type="text" placeholder="Nhập tên hiển thị..." maxlength="32">
-    <div style="font-size:0.75rem;color:var(--muted);margin-bottom:1.25rem;">Tên này chỉ hiển thị trên dashboard của bạn.</div>
+    <div class="modal-title" data-i18n="modal_edit_profile">✏️ Chỉnh sửa profile</div>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:0.62rem;color:var(--muted);letter-spacing:0.12em;margin-bottom:0.75rem;" data-i18n="display_name_label">TÊN HIỂN THỊ</div>
+    <input class="modal-input" id="displayNameInput" type="text" placeholder="Nhập tên hiển thị..." maxlength="32" data-i18n-placeholder="display_name_ph">
+    <div style="font-size:0.75rem;color:var(--muted);margin-bottom:1.25rem;" data-i18n="display_name_note">Tên này chỉ hiển thị trên dashboard của bạn.</div>
     <div class="modal-footer">
-      <button class="btn btn-outline" style="padding:0.5rem 1rem;font-size:0.8rem;" onclick="closeProfileModal()">Hủy</button>
+      <button class="btn btn-outline" style="padding:0.5rem 1rem;font-size:0.8rem;" onclick="closeProfileModal()" data-i18n="btn_cancel">Hủy</button>
       <button class="btn btn-discord" style="padding:0.5rem 1.25rem;font-size:0.8rem;" onclick="saveProfile()">
-        <i class="fas fa-save"></i> Lưu
+        <i class="fas fa-save"></i> <span data-i18n="btn_save">Lưu</span>
       </button>
     </div>
   </div>
@@ -631,19 +633,25 @@ document.addEventListener("DOMContentLoaded", function() { (function () {
   </div>
   <nav class="sidebar-nav">
     <div class="nav-section">// Main</div>
-    <button class="nav-item active" onclick="goTo('dashboard',this)"><span class="nav-icon"><i class="fas fa-th-large"></i></span> Dashboard</button>
-    <button class="nav-item" onclick="goTo('machine',this)"><span class="nav-icon"><i class="fas fa-server"></i></span> Máy của tôi</button>
-    <button class="nav-item" onclick="goTo('time',this)"><span class="nav-icon"><i class="fas fa-clock"></i></span> Thời gian</button>
-    <button class="nav-item" onclick="goTo('history',this)"><span class="nav-icon"><i class="fas fa-history"></i></span> Lịch sử thuê</button>
+    <button class="nav-item active" onclick="goTo('dashboard',this)"><span class="nav-icon"><i class="fas fa-th-large"></i></span> <span data-i18n="nav_dashboard">Dashboard</span></button>
+    <button class="nav-item" onclick="goTo('machine',this)"><span class="nav-icon"><i class="fas fa-server"></i></span> <span data-i18n="nav_machine">Máy của tôi</span></button>
+    <button class="nav-item" onclick="goTo('time',this)"><span class="nav-icon"><i class="fas fa-clock"></i></span> <span data-i18n="nav_time">Thời gian</span></button>
+    <button class="nav-item" onclick="goTo('history',this)"><span class="nav-icon"><i class="fas fa-history"></i></span> <span data-i18n="nav_history">Lịch sử thuê</span></button>
     <div class="nav-section">// Support</div>
-    <button class="nav-item" onclick="goTo('connect',this)"><span class="nav-icon"><i class="fas fa-plug"></i></span> Hướng dẫn kết nối</button>
-    <button class="nav-item" onclick="goTo('support',this)"><span class="nav-icon"><i class="fas fa-headset"></i></span> Hỗ trợ</button>
+    <button class="nav-item" onclick="goTo('connect',this)"><span class="nav-icon"><i class="fas fa-plug"></i></span> <span data-i18n="nav_connect">Hướng dẫn kết nối</span></button>
+    <button class="nav-item" onclick="goTo('support',this)"><span class="nav-icon"><i class="fas fa-headset"></i></span> <span data-i18n="nav_support">Hỗ trợ</span></button>
     <div class="nav-section">// Account</div>
-    <a class="nav-item" href="index.html"><span class="nav-icon"><i class="fas fa-home"></i></span> Trang chủ</a>
-    <button class="nav-item danger" onclick="doLogout()"><span class="nav-icon"><i class="fas fa-sign-out-alt"></i></span> Đăng xuất</button>
+    <a class="nav-item" href="index.html"><span class="nav-icon"><i class="fas fa-home"></i></span> <span data-i18n="nav_home">Trang chủ</span></a>
+    <button class="nav-item danger" onclick="doLogout()"><span class="nav-icon"><i class="fas fa-sign-out-alt"></i></span> <span data-i18n="nav_logout">Đăng xuất</span></button>
   </nav>
   <div class="sidebar-bottom">
     <div class="status-dot">SERVER ONLINE</div>
+    <div class="lang-switch-row" style="display:flex;gap:0.35rem;margin-top:0.6rem;flex-wrap:wrap;">
+      <button class="lang-btn active" id="lbtn-vi" onclick="pickLang('vi')" style="background:none;border:1px solid var(--border);color:var(--muted);font-family:'JetBrains Mono',monospace;font-size:0.6rem;padding:0.2rem 0.45rem;cursor:pointer;transition:all 0.2s;letter-spacing:0.08em;">🇻🇳 VI</button>
+      <button class="lang-btn" id="lbtn-en" onclick="pickLang('en')" style="background:none;border:1px solid var(--border);color:var(--muted);font-family:'JetBrains Mono',monospace;font-size:0.6rem;padding:0.2rem 0.45rem;cursor:pointer;transition:all 0.2s;letter-spacing:0.08em;">🇬🇧 EN</button>
+      <button class="lang-btn" id="lbtn-id" onclick="pickLang('id')" style="background:none;border:1px solid var(--border);color:var(--muted);font-family:'JetBrains Mono',monospace;font-size:0.6rem;padding:0.2rem 0.45rem;cursor:pointer;transition:all 0.2s;letter-spacing:0.08em;">🇮🇩 ID</button>
+      <button class="lang-btn" id="lbtn-hi" onclick="pickLang('hi')" style="background:none;border:1px solid var(--border);color:var(--muted);font-family:'JetBrains Mono',monospace;font-size:0.6rem;padding:0.2rem 0.45rem;cursor:pointer;transition:all 0.2s;letter-spacing:0.08em;">🇮🇳 HI</button>
+    </div>
     <button class="theme-toggle" onclick="toggleTheme()" title="Đổi theme">
       <div class="theme-track"><div class="theme-thumb"></div></div>
       <span class="theme-label"><span class="theme-icon">🌙</span> Theme</span>
@@ -663,19 +671,19 @@ document.addEventListener("DOMContentLoaded", function() { (function () {
     <div class="card card-top-line">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;flex-wrap:wrap;gap:0.75rem;">
         <div>
-          <div class="card-label">// Máy đang thuê</div>
+          <div class="card-label" data-i18n="lbl_current_machine">// Máy đang thuê</div>
           <div class="machine-title-wrap">
             <div class="machine-title" id="machineName" data-text="—">—</div>
           </div>
         </div>
         <div style="display:flex;align-items:center;gap:0.75rem;flex-wrap:wrap;">
-          <div class="badge badge-offline" id="machineStatus">Chưa có máy</div>
-          <button id="show-conn-btn" onclick="showConnModalFromData()" style="display:none;background:rgba(74,222,128,0.1);border:1px solid rgba(74,222,128,0.25);color:var(--green);font-family:'JetBrains Mono',monospace;font-size:0.6rem;padding:0.25rem 0.65rem;cursor:pointer;letter-spacing:0.1em;transition:all 0.2s;">🔑 THÔNG TIN KẾT NỐI</button>
+          <div class="badge badge-offline" id="machineStatus" data-i18n="status_no_machine">Chưa có máy</div>
+          <button id="show-conn-btn" onclick="showConnModalFromData()" style="display:none;background:rgba(74,222,128,0.1);border:1px solid rgba(74,222,128,0.25);color:var(--green);font-family:'JetBrains Mono',monospace;font-size:0.6rem;padding:0.25rem 0.65rem;cursor:pointer;letter-spacing:0.1em;transition:all 0.2s;" data-i18n="btn_conn_info">🔑 THÔNG TIN KẾT NỐI</button>
         </div>
       </div>
       <div class="divider"></div>
       <div class="spec-grid">
-        <div class="spec-row"><span class="spec-label">Địa chỉ IP</span><span class="spec-val empty" id="machineIp">—</span></div>
+        <div class="spec-row"><span class="spec-label" data-i18n="spec_ip">Địa chỉ IP</span><span class="spec-val empty" id="machineIp">—</span></div>
         <div class="spec-row"><span class="spec-label">GPU</span><span class="spec-val empty" id="machineGpu">—</span></div>
         <div class="spec-row"><span class="spec-label">RAM</span><span class="spec-val empty" id="machineRam">—</span></div>
         <div class="spec-row"><span class="spec-label">CPU</span><span class="spec-val empty" id="machineCpu">—</span></div>
@@ -686,44 +694,44 @@ document.addEventListener("DOMContentLoaded", function() { (function () {
 
     <div class="stats-row">
       <div class="stat-card">
-        <div class="stat-label">// Trạng thái gói</div>
-        <div class="stat-val empty" id="statPlan">Chưa có</div>
-        <div class="stat-sub">Mua qua Discord để kích hoạt</div>
+        <div class="stat-label" data-i18n="lbl_plan_status">// Trạng thái gói</div>
+        <div class="stat-val empty" id="statPlan" data-i18n="status_none">Chưa có</div>
+        <div class="stat-sub" data-i18n="sub_buy_discord">Mua qua Discord để kích hoạt</div>
       </div>
       <div class="stat-card">
-        <div class="stat-label">// Thời gian còn lại</div>
+        <div class="stat-label" data-i18n="lbl_time_left">// Thời gian còn lại</div>
         <div class="stat-val empty" id="statTime">—</div>
-        <div class="stat-sub">Chưa có dữ liệu</div>
+        <div class="stat-sub" data-i18n="sub_no_data">Chưa có dữ liệu</div>
       </div>
       <div class="stat-card">
-        <div class="stat-label">// Ping tới server</div>
+        <div class="stat-label" data-i18n="lbl_ping">// Ping tới server</div>
         <div class="stat-val empty" id="ping-value">~30ms</div>
         <div class="stat-sub">Singapore Node</div>
       </div>
     </div>
 
     <div class="card" style="padding:1.25rem 1.5rem;">
-      <div class="card-label">// User ID của bạn</div>
+      <div class="card-label" data-i18n="lbl_user_id">// User ID của bạn</div>
       <div style="display:flex;align-items:center;gap:0.75rem;margin-top:0.4rem;">
         <div id="userUuid" style="font-family:'JetBrains Mono',monospace;font-size:0.75rem;color:var(--accent2);background:var(--bg);border:1px solid var(--border);padding:0.4rem 0.75rem;flex:1;word-break:break-all;">—</div>
         <button onclick="copyUuid()" style="padding:0.4rem 0.85rem;background:var(--accent);border:none;color:#fff;font-family:'Rajdhani',sans-serif;font-size:0.8rem;font-weight:700;letter-spacing:0.1em;cursor:pointer;text-transform:uppercase;white-space:nowrap;transition:background 0.2s;">Copy</button>
       </div>
-      <div style="font-size:0.72rem;color:var(--muted);margin-top:0.5rem;font-weight:400;">Gửi ID này cho staff khi tạo ticket để được gán máy.</div>
+      <div style="font-size:0.72rem;color:var(--muted);margin-top:0.5rem;font-weight:400;" data-i18n="user_id_note">Gửi ID này cho staff khi tạo ticket để được gán máy.</div>
     </div>
 
     <div class="card" id="firstLoginNotice" style="padding:1.25rem 1.5rem;background:rgba(124,92,191,0.07);border:1px solid rgba(124,92,191,0.3);">
-      <div style="font-family:'JetBrains Mono',monospace;font-size:0.7rem;color:var(--accent2);letter-spacing:0.15em;margin-bottom:0.4rem;">// HƯỚNG DẪN</div>
-      <div style="font-size:0.9rem;color:var(--text);font-weight:500;margin-bottom:0.3rem;">Liên hệ Admin để được gán máy!</div>
-      <div style="font-size:0.8rem;color:var(--muted);font-weight:400;">Copy <strong style="color:var(--accent2);">User ID</strong> bên trên → gửi cho staff qua Discord ticket → staff sẽ gán máy cho bạn.</div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:0.7rem;color:var(--accent2);letter-spacing:0.15em;margin-bottom:0.4rem;" data-i18n="lbl_guide">// HƯỚNG DẪN</div>
+      <div style="font-size:0.9rem;color:var(--text);font-weight:500;margin-bottom:0.3rem;" data-i18n="guide_title">Liên hệ Admin để được gán máy!</div>
+      <div style="font-size:0.8rem;color:var(--muted);font-weight:400;" data-i18n-html="guide_desc">Copy <strong style="color:var(--accent2);">User ID</strong> bên trên → gửi cho staff qua Discord ticket → staff sẽ gán máy cho bạn.</div>
     </div>
 
     <div class="card" id="noBuyCard" style="padding:2rem;">
       <div class="empty-state">
         <div class="empty-robot">🤖</div>
-        <div class="empty-text">Chưa có máy nào được gán.<br>Mua dịch vụ qua Discord để bắt đầu.</div>
+        <div class="empty-text" data-i18n-html="empty_no_machine">Chưa có máy nào được gán.<br>Mua dịch vụ qua Discord để bắt đầu.</div>
         <a href="https://discord.gg/Ct4Gw7GwJJ" target="_blank" class="btn btn-discord">
           <svg width="16" height="12" viewBox="0 0 71 55" fill="currentColor"><path d="M60.1 4.9A58.5 58.5 0 0 0 45.4.9a40 40 0 0 0-1.8 3.6 54 54 0 0 0-16.2 0A38.4 38.4 0 0 0 25.6.9 58.4 58.4 0 0 0 10.9 5C1.6 18.7-1 32 .3 45a58.7 58.7 0 0 0 17.9 9 44 44 0 0 0 3.8-6.2 38.3 38.3 0 0 1-6-2.9l1.4-1.1a41.9 41.9 0 0 0 35.7 0l1.5 1.1a38.2 38.2 0 0 1-6 2.9 43.6 43.6 0 0 0 3.8 6.2 58.5 58.5 0 0 0 17.9-9C71.8 30 68.2 16.8 60.1 4.9ZM23.7 37.3c-3.5 0-6.4-3.2-6.4-7.1s2.8-7.2 6.4-7.2 6.5 3.2 6.4 7.2c0 3.9-2.8 7.1-6.4 7.1Zm23.6 0c-3.5 0-6.4-3.2-6.4-7.1s2.8-7.2 6.4-7.2 6.5 3.2 6.4 7.2c0 3.9-2.8 7.1-6.4 7.1Z"/></svg>
-          Mua qua Discord
+          <span data-i18n="btn_buy_discord">Mua qua Discord</span>
         </a>
       </div>
     </div>
@@ -732,16 +740,16 @@ document.addEventListener("DOMContentLoaded", function() { (function () {
   <!-- MACHINE -->
   <div class="page" id="page-machine">
     <div class="card card-top-line">
-      <div class="card-label">// Thông tin máy</div>
-      <div class="card-title">Máy của tôi</div>
+      <div class="card-label" data-i18n="lbl_machine_info">// Thông tin máy</div>
+      <div class="card-title" data-i18n="title_my_machine">Máy của tôi</div>
       <div class="spec-grid">
-        <div class="spec-row"><span class="spec-label">Địa chỉ IP</span><span class="spec-val empty" id="m2Ip">—</span></div>
+        <div class="spec-row"><span class="spec-label" data-i18n="spec_ip">Địa chỉ IP</span><span class="spec-val empty" id="m2Ip">—</span></div>
         <div class="spec-row"><span class="spec-label">GPU</span><span class="spec-val empty" id="m2Gpu">—</span></div>
         <div class="spec-row"><span class="spec-label">RAM</span><span class="spec-val empty" id="m2Ram">—</span></div>
         <div class="spec-row"><span class="spec-label">CPU</span><span class="spec-val empty" id="m2Cpu">—</span></div>
         <div class="spec-row"><span class="spec-label">Storage</span><span class="spec-val empty" id="m2Storage">—</span></div>
         <div class="spec-row"><span class="spec-label">OS</span><span class="spec-val empty" id="m2Os">—</span></div>
-        <div class="spec-row"><span class="spec-label">Trạng thái</span><span class="badge badge-offline" id="m2Status">Chưa có máy</span></div>
+        <div class="spec-row"><span class="spec-label" data-i18n="spec_status">Trạng thái</span><span class="badge badge-offline" id="m2Status" data-i18n="status_no_machine">Chưa có máy</span></div>
       </div>
     </div>
   </div>
@@ -749,31 +757,31 @@ document.addEventListener("DOMContentLoaded", function() { (function () {
   <!-- TIME -->
   <div class="page" id="page-time">
     <div class="card card-top-line">
-      <div class="card-label">// Thời gian thuê</div>
-      <div class="card-title">Thời gian còn lại</div>
+      <div class="card-label" data-i18n="lbl_rental_time">// Thời gian thuê</div>
+      <div class="card-title" data-i18n="title_time_left">Thời gian còn lại</div>
       <div class="divider"></div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;">
         <div>
-          <div class="stat-label">Thời gian còn lại</div>
+          <div class="stat-label" data-i18n="title_time_left">Thời gian còn lại</div>
           <div class="countdown" id="countdown-wrap">
-            <div class="cd-unit"><span class="cd-num" id="cd-d">--</span><span class="cd-label">ngày</span></div>
+            <div class="cd-unit"><span class="cd-num" id="cd-d">--</span><span class="cd-label" data-i18n="cd_days">ngày</span></div>
             <span class="cd-sep">:</span>
-            <div class="cd-unit"><span class="cd-num" id="cd-h">--</span><span class="cd-label">giờ</span></div>
+            <div class="cd-unit"><span class="cd-num" id="cd-h">--</span><span class="cd-label" data-i18n="cd_hours">giờ</span></div>
             <span class="cd-sep">:</span>
-            <div class="cd-unit"><span class="cd-num" id="cd-m">--</span><span class="cd-label">phút</span></div>
+            <div class="cd-unit"><span class="cd-num" id="cd-m">--</span><span class="cd-label" data-i18n="cd_mins">phút</span></div>
             <span class="cd-sep">:</span>
-            <div class="cd-unit"><span class="cd-num" id="cd-s">--</span><span class="cd-label">giây</span></div>
+            <div class="cd-unit"><span class="cd-num" id="cd-s">--</span><span class="cd-label" data-i18n="cd_secs">giây</span></div>
           </div>
         </div>
         <div>
-          <div class="stat-label">Ngày hết hạn</div>
+          <div class="stat-label" data-i18n="lbl_expiry_date">Ngày hết hạn</div>
           <div class="spec-val empty" id="expiryDate" style="margin-top:0.5rem;">—</div>
         </div>
       </div>
     </div>
     <div class="card" style="display:flex;flex-direction:column;gap:1rem;align-items:flex-start;">
-      <div style="font-size:0.825rem;color:var(--muted);font-weight:400;">Gia hạn qua Discord ticket.</div>
-      <a href="https://discord.gg/Ct4Gw7GwJJ" target="_blank" class="btn btn-discord">Gia hạn qua Discord</a>
+      <div style="font-size:0.825rem;color:var(--muted);font-weight:400;" data-i18n="renew_note">Gia hạn qua Discord ticket.</div>
+      <a href="https://discord.gg/Ct4Gw7GwJJ" target="_blank" class="btn btn-discord" data-i18n="btn_renew_discord">Gia hạn qua Discord</a>
     </div>
   </div>
 
@@ -781,8 +789,8 @@ document.addEventListener("DOMContentLoaded", function() { (function () {
   <!-- HISTORY -->
   <div class="page" id="page-history">
     <div class="card card-top-line">
-      <div class="card-label">// Thống kê 7 ngày</div>
-      <div class="card-title" style="margin-bottom:1.25rem;">Giờ sử dụng</div>
+      <div class="card-label" data-i18n="lbl_stats_7d">// Thống kê 7 ngày</div>
+      <div class="card-title" style="margin-bottom:1.25rem;" data-i18n="title_usage_hours">Giờ sử dụng</div>
       <div style="position:relative;height:180px;">
         <canvas id="usageChart"></canvas>
       </div>
@@ -790,15 +798,15 @@ document.addEventListener("DOMContentLoaded", function() { (function () {
     <div class="card card-top-line">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;">
         <div>
-          <div class="card-label">// Lịch sử thuê máy</div>
-          <div class="card-title" style="margin-bottom:0;">Các phiên đã dùng</div>
+          <div class="card-label" data-i18n="lbl_rental_history">// Lịch sử thuê máy</div>
+          <div class="card-title" style="margin-bottom:0;" data-i18n="title_sessions">Các phiên đã dùng</div>
         </div>
         <div style="font-family:'JetBrains Mono',monospace;font-size:0.65rem;color:var(--muted);" id="historyCount">— phiên</div>
       </div>
       <div id="historyList">
         <div class="empty-state">
           <div class="empty-robot">📋</div>
-          <div class="empty-text">Chưa có lịch sử thuê.<br>Dữ liệu sẽ hiện sau khi hết hạn máy.</div>
+          <div class="empty-text" data-i18n-html="empty_history">Chưa có lịch sử thuê.<br>Dữ liệu sẽ hiện sau khi hết hạn máy.</div>
         </div>
       </div>
     </div>
@@ -808,7 +816,7 @@ document.addEventListener("DOMContentLoaded", function() { (function () {
   <div class="page" id="page-connect">
     <div class="card card-top-line">
       <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;margin-bottom:1.25rem;">
-        <div><div class="card-label">// Hướng dẫn</div><div class="card-title" style="margin-bottom:0;">Kết nối máy ảo</div></div>
+        <div><div class="card-label" data-i18n="lbl_guide">// Hướng dẫn</div><div class="card-title" style="margin-bottom:0;" data-i18n="title_connect_vm">Kết nối máy ảo</div></div>
         <div class="tab-group">
           <button class="tab active" onclick="switchTab('parsec',this)">Parsec</button>
           <button class="tab" onclick="switchTab('moonlight',this)">Moonlight</button>
@@ -817,18 +825,18 @@ document.addEventListener("DOMContentLoaded", function() { (function () {
       <div class="divider"></div>
       <div class="tab-content active" id="tab-parsec">
         <div class="steps-list">
-          <div class="step-row"><div class="step-num-sm">1</div><div class="step-text">Tải và cài <strong>Parsec</strong> tại <strong>parsec.app</strong></div></div>
-          <div class="step-row"><div class="step-num-sm">2</div><div class="step-text">Đăng nhập Parsec → tab <strong>Computers</strong> → nhập IP máy từ Discord</div></div>
-          <div class="step-row"><div class="step-num-sm">3</div><div class="step-text">Nhập <strong>mật khẩu</strong> staff gửi qua Discord ticket</div></div>
-          <div class="step-row"><div class="step-num-sm">4</div><div class="step-text">Cài đặt: <strong>H.264 · 50 Mbps · 1080p</strong></div></div>
+          <div class="step-row"><div class="step-num-sm">1</div><div class="step-text" data-i18n-html="parsec_s1">Tải và cài <strong>Parsec</strong> tại <strong>parsec.app</strong></div></div>
+          <div class="step-row"><div class="step-num-sm">2</div><div class="step-text" data-i18n-html="parsec_s2">Đăng nhập Parsec → tab <strong>Computers</strong> → nhập IP máy từ Discord</div></div>
+          <div class="step-row"><div class="step-num-sm">3</div><div class="step-text" data-i18n-html="parsec_s3">Nhập <strong>mật khẩu</strong> staff gửi qua Discord ticket</div></div>
+          <div class="step-row"><div class="step-num-sm">4</div><div class="step-text" data-i18n-html="parsec_s4">Cài đặt: <strong>H.264 · 50 Mbps · 1080p</strong></div></div>
         </div>
       </div>
       <div class="tab-content" id="tab-moonlight">
         <div class="steps-list">
-          <div class="step-row"><div class="step-num-sm">1</div><div class="step-text">Tải <strong>Moonlight</strong> tại <strong>moonlight-stream.org</strong></div></div>
-          <div class="step-row"><div class="step-num-sm">2</div><div class="step-text">Mở Moonlight → <strong>Add PC</strong> → nhập IP máy từ Discord</div></div>
-          <div class="step-row"><div class="step-num-sm">3</div><div class="step-text">Nhập <strong>PIN 4 số</strong> hiện trên Moonlight (nhờ staff nhập hộ)</div></div>
-          <div class="step-row"><div class="step-num-sm">4</div><div class="step-text">Cài đặt: <strong>H.264 · 50 Mbps · 1080p · 60fps</strong></div></div>
+          <div class="step-row"><div class="step-num-sm">1</div><div class="step-text" data-i18n-html="moon_s1">Tải <strong>Moonlight</strong> tại <strong>moonlight-stream.org</strong></div></div>
+          <div class="step-row"><div class="step-num-sm">2</div><div class="step-text" data-i18n-html="moon_s2">Mở Moonlight → <strong>Add PC</strong> → nhập IP máy từ Discord</div></div>
+          <div class="step-row"><div class="step-num-sm">3</div><div class="step-text" data-i18n-html="moon_s3">Nhập <strong>PIN 4 số</strong> hiện trên Moonlight (nhờ staff nhập hộ)</div></div>
+          <div class="step-row"><div class="step-num-sm">4</div><div class="step-text" data-i18n-html="moon_s4">Cài đặt: <strong>H.264 · 50 Mbps · 1080p · 60fps</strong></div></div>
         </div>
       </div>
     </div>
@@ -837,10 +845,10 @@ document.addEventListener("DOMContentLoaded", function() { (function () {
   <!-- SUPPORT -->
   <div class="page" id="page-support">
     <div class="support-grid">
-      <div class="support-card"><div class="support-icon">💬</div><div class="support-title">Tạo ticket hỗ trợ</div><div class="support-desc">Gặp vấn đề? Tạo ticket trong Discord, staff phản hồi trong vài phút.</div><a href="https://discord.gg/Ct4Gw7GwJJ" target="_blank" class="btn btn-discord">Mở Discord</a></div>
-      <div class="support-card"><div class="support-icon">🔄</div><div class="support-title">Gia hạn dịch vụ</div><div class="support-desc">Gói sắp hết? Tạo ticket gia hạn trong Discord.</div><a href="https://discord.gg/Ct4Gw7GwJJ" target="_blank" class="btn btn-outline">Tạo ticket gia hạn →</a></div>
-      <div class="support-card"><div class="support-icon">❓</div><div class="support-title">Hỏi đáp</div><div class="support-desc">Chưa biết cách kết nối? Xem hướng dẫn hoặc hỏi staff.</div><button class="btn btn-outline" onclick="goTo('connect',document.querySelector('[onclick*=connect]'))">Xem hướng dẫn →</button></div>
-      <div class="support-card"><div class="support-icon">🛒</div><div class="support-title">Mua thêm giờ</div><div class="support-desc">Hết giờ? Nạp thêm bất cứ lúc nào qua Discord ticket.</div><a href="https://discord.gg/Ct4Gw7GwJJ" target="_blank" class="btn btn-outline">Nạp thêm giờ →</a></div>
+      <div class="support-card"><div class="support-icon">💬</div><div class="support-title" data-i18n="sup_ticket">Tạo ticket hỗ trợ</div><div class="support-desc" data-i18n="sup_ticket_desc">Gặp vấn đề? Tạo ticket trong Discord, staff phản hồi trong vài phút.</div><a href="https://discord.gg/Ct4Gw7GwJJ" target="_blank" class="btn btn-discord" data-i18n="btn_open_discord">Mở Discord</a></div>
+      <div class="support-card"><div class="support-icon">🔄</div><div class="support-title" data-i18n="sup_renew">Gia hạn dịch vụ</div><div class="support-desc" data-i18n="sup_renew_desc">Gói sắp hết? Tạo ticket gia hạn trong Discord.</div><a href="https://discord.gg/Ct4Gw7GwJJ" target="_blank" class="btn btn-outline" data-i18n="btn_renew_ticket">Tạo ticket gia hạn →</a></div>
+      <div class="support-card"><div class="support-icon">❓</div><div class="support-title" data-i18n="sup_faq">Hỏi đáp</div><div class="support-desc" data-i18n="sup_faq_desc">Chưa biết cách kết nối? Xem hướng dẫn hoặc hỏi staff.</div><button class="btn btn-outline" onclick="goTo('connect',document.querySelector('[onclick*=connect]'))" data-i18n="btn_view_guide">Xem hướng dẫn →</button></div>
+      <div class="support-card"><div class="support-icon">🛒</div><div class="support-title" data-i18n="sup_buy_hours">Mua thêm giờ</div><div class="support-desc" data-i18n="sup_buy_hours_desc">Hết giờ? Nạp thêm bất cứ lúc nào qua Discord ticket.</div><a href="https://discord.gg/Ct4Gw7GwJJ" target="_blank" class="btn btn-outline" data-i18n="btn_add_hours">Nạp thêm giờ →</a></div>
     </div>
   </div>
 </div>
@@ -850,8 +858,8 @@ document.addEventListener("DOMContentLoaded", function() { (function () {
 <!-- CONNECTION MODAL -->
 <div id="conn-modal">
   <div class="conn-box">
-    <div class="conn-title">🖥️ Máy đã sẵn sàng!</div>
-    <div class="conn-sub">// Dùng Parsec để kết nối · parsec.app</div>
+    <div class="conn-title" data-i18n="conn_ready">🖥️ Máy đã sẵn sàng!</div>
+    <div class="conn-sub" data-i18n="conn_sub">// Dùng Parsec để kết nối · parsec.app</div>
     <div class="conn-row">
       <span class="conn-row-label">IP</span>
       <span class="conn-row-val" id="conn-ip">—</span>
@@ -867,15 +875,15 @@ document.addEventListener("DOMContentLoaded", function() { (function () {
       <span class="conn-row-val" id="conn-gpu">—</span>
     </div>
     <div class="conn-row">
-      <span class="conn-row-label">Hết hạn</span>
+      <span class="conn-row-label" data-i18n="lbl_expiry">Hết hạn</span>
       <span class="conn-row-val" id="conn-expiry">—</span>
     </div>
     <div class="conn-divider"></div>
     <div class="conn-steps">
-      <div class="conn-step"><span class="conn-step-num">01</span><span>Tải <strong>Parsec</strong> tại <strong>parsec.app</strong> (miễn phí, không cần tạo tài khoản)</span></div>
-      <div class="conn-step"><span class="conn-step-num">02</span><span>Mở Parsec → <strong>Computers</strong> → <strong>Connect</strong> → nhập IP bên trên</span></div>
-      <div class="conn-step"><span class="conn-step-num">03</span><span>Nhập <strong>Password</strong> bên trên khi được hỏi → Done!</span></div>
-      <div class="conn-step"><span class="conn-step-num">💡</span><span>Gặp lỗi? Bấm <strong>Hỗ trợ</strong> hoặc nhắn chat bên dưới.</span></div>
+      <div class="conn-step"><span class="conn-step-num">01</span><span data-i18n-html="conn_s1">Tải <strong>Parsec</strong> tại <strong>parsec.app</strong> (miễn phí, không cần tạo tài khoản)</span></div>
+      <div class="conn-step"><span class="conn-step-num">02</span><span data-i18n-html="conn_s2">Mở Parsec → <strong>Computers</strong> → <strong>Connect</strong> → nhập IP bên trên</span></div>
+      <div class="conn-step"><span class="conn-step-num">03</span><span data-i18n-html="conn_s3">Nhập <strong>Password</strong> bên trên khi được hỏi → Done!</span></div>
+      <div class="conn-step"><span class="conn-step-num">💡</span><span data-i18n-html="conn_s4">Gặp lỗi? Bấm <strong>Hỗ trợ</strong> hoặc nhắn chat bên dưới.</span></div>
     </div>
     <div class="conn-countdown" id="conn-countdown"></div>
     <div class="conn-footer">
@@ -900,21 +908,21 @@ document.addEventListener("DOMContentLoaded", function() { (function () {
 <!-- SUPPORT CHAT PANEL -->
 <div class="sc-panel" id="sc-panel">
   <div class="sc-header">
-    <span class="sc-header-title"><i class="fas fa-headset"></i> Hỗ trợ trực tiếp</span>
+    <span class="sc-header-title"><i class="fas fa-headset"></i> <span data-i18n="chat_title">Hỗ trợ trực tiếp</span></span>
     <button class="sc-close" onclick="toggleSupportChat()"><i class="fas fa-times"></i></button>
   </div>
   <div class="sc-body" id="sc-body">
-    <div class="sc-empty">💬 Nhắn tin để được hỗ trợ.<br>Staff sẽ phản hồi sớm nhất có thể.</div>
+    <div class="sc-empty" data-i18n-html="chat_empty">💬 Nhắn tin để được hỗ trợ.<br>Staff sẽ phản hồi sớm nhất có thể.</div>
   </div>
-  <div class="sc-typing" id="sc-typing"><span class="sc-typing-label">Staff đang nhập</span><span class="sc-typing-dot"></span><span class="sc-typing-dot"></span><span class="sc-typing-dot"></span></div>
+  <div class="sc-typing" id="sc-typing"><span class="sc-typing-label" data-i18n="chat_typing">Staff đang nhập</span><span class="sc-typing-dot"></span><span class="sc-typing-dot"></span><span class="sc-typing-dot"></span></div>
   <div class="sc-input-wrap">
-    <input class="sc-input" id="sc-input" placeholder="Nhập tin nhắn..." onkeydown="if(event.key='Enter')sendSupportMsg()" oninput="userTyping()">
+    <input class="sc-input" id="sc-input" placeholder="Nhập tin nhắn..." data-i18n-placeholder="chat_placeholder" onkeydown="if(event.key='Enter')sendSupportMsg()" oninput="userTyping()">
     <label class="sc-attach-btn" title="Gửi ảnh"><i class="fas fa-image"></i><input type="file" accept="image/*" style="display:none;" onchange="sendSupportImage(this)"></label>
     <button class="sc-send" onclick="sendSupportMsg()"><i class="fas fa-paper-plane"></i></button>
   </div>
 </div>
 
-<div class="toast" id="toast" onclick="this.classList.remove('show')">✓ Đã copy <span style="margin-left:0.5rem;opacity:0.6;cursor:pointer;">✕</span></div>
+<div class="toast" id="toast" onclick="this.classList.remove('show')"></div>
 
 <script>
   // ===== KANJI LOADER =====
@@ -959,6 +967,279 @@ document.addEventListener("DOMContentLoaded", function() { (function () {
     setTimeout(()=>{ clearInterval(rain); loader.classList.add('fade-out'); setTimeout(()=>loader.style.display='none',600); },6200);
   })();
 
+  // ===== I18N SYSTEM =====
+  const DT = {
+    vi: {
+      nav_dashboard:'Dashboard', nav_machine:'Máy của tôi', nav_time:'Thời gian', nav_history:'Lịch sử thuê',
+      nav_connect:'Hướng dẫn kết nối', nav_support:'Hỗ trợ', nav_home:'Trang chủ', nav_logout:'Đăng xuất',
+      lbl_current_machine:'// Máy đang thuê', status_no_machine:'Chưa có máy', btn_conn_info:'🔑 THÔNG TIN KẾT NỐI',
+      spec_ip:'Địa chỉ IP', spec_status:'Trạng thái',
+      lbl_plan_status:'// Trạng thái gói', status_none:'Chưa có', sub_buy_discord:'Mua qua Discord để kích hoạt',
+      lbl_time_left:'// Thời gian còn lại', sub_no_data:'Chưa có dữ liệu', lbl_ping:'// Ping tới server',
+      lbl_user_id:'// User ID của bạn', user_id_note:'Gửi ID này cho staff khi tạo ticket để được gán máy.',
+      lbl_guide:'// HƯỚNG DẪN', guide_title:'Liên hệ Admin để được gán máy!',
+      guide_desc:'Copy <strong style="color:var(--accent2);">User ID</strong> bên trên → gửi cho staff qua Discord ticket → staff sẽ gán máy cho bạn.',
+      empty_no_machine:'Chưa có máy nào được gán.<br>Mua dịch vụ qua Discord để bắt đầu.',
+      btn_buy_discord:'Mua qua Discord',
+      lbl_machine_info:'// Thông tin máy', title_my_machine:'Máy của tôi',
+      lbl_rental_time:'// Thời gian thuê', title_time_left:'Thời gian còn lại',
+      cd_days:'ngày', cd_hours:'giờ', cd_mins:'phút', cd_secs:'giây',
+      lbl_expiry_date:'Ngày hết hạn', renew_note:'Gia hạn qua Discord ticket.', btn_renew_discord:'Gia hạn qua Discord',
+      lbl_stats_7d:'// Thống kê 7 ngày', title_usage_hours:'Giờ sử dụng',
+      lbl_rental_history:'// Lịch sử thuê máy', title_sessions:'Các phiên đã dùng',
+      empty_history:'Chưa có lịch sử thuê.<br>Dữ liệu sẽ hiện sau khi hết hạn máy.',
+      title_connect_vm:'Kết nối máy ảo',
+      parsec_s1:'Tải và cài <strong>Parsec</strong> tại <strong>parsec.app</strong>',
+      parsec_s2:'Đăng nhập Parsec → tab <strong>Computers</strong> → nhập IP máy từ Discord',
+      parsec_s3:'Nhập <strong>mật khẩu</strong> staff gửi qua Discord ticket',
+      parsec_s4:'Cài đặt: <strong>H.264 · 50 Mbps · 1080p</strong>',
+      moon_s1:'Tải <strong>Moonlight</strong> tại <strong>moonlight-stream.org</strong>',
+      moon_s2:'Mở Moonlight → <strong>Add PC</strong> → nhập IP máy từ Discord',
+      moon_s3:'Nhập <strong>PIN 4 số</strong> hiện trên Moonlight (nhờ staff nhập hộ)',
+      moon_s4:'Cài đặt: <strong>H.264 · 50 Mbps · 1080p · 60fps</strong>',
+      sup_ticket:'Tạo ticket hỗ trợ', sup_ticket_desc:'Gặp vấn đề? Tạo ticket trong Discord, staff phản hồi trong vài phút.',
+      btn_open_discord:'Mở Discord',
+      sup_renew:'Gia hạn dịch vụ', sup_renew_desc:'Gói sắp hết? Tạo ticket gia hạn trong Discord.', btn_renew_ticket:'Tạo ticket gia hạn →',
+      sup_faq:'Hỏi đáp', sup_faq_desc:'Chưa biết cách kết nối? Xem hướng dẫn hoặc hỏi staff.', btn_view_guide:'Xem hướng dẫn →',
+      sup_buy_hours:'Mua thêm giờ', sup_buy_hours_desc:'Hết giờ? Nạp thêm bất cứ lúc nào qua Discord ticket.', btn_add_hours:'Nạp thêm giờ →',
+      conn_ready:'🖥️ Máy đã sẵn sàng!', conn_sub:'// Dùng Parsec để kết nối · parsec.app', lbl_expiry:'Hết hạn',
+      conn_s1:'Tải <strong>Parsec</strong> tại <strong>parsec.app</strong> (miễn phí, không cần tạo tài khoản)',
+      conn_s2:'Mở Parsec → <strong>Computers</strong> → <strong>Connect</strong> → nhập IP bên trên',
+      conn_s3:'Nhập <strong>Password</strong> bên trên khi được hỏi → Done!',
+      conn_s4:'Gặp lỗi? Bấm <strong>Hỗ trợ</strong> hoặc nhắn chat bên dưới.',
+      chat_title:'Hỗ trợ trực tiếp', chat_empty:'💬 Nhắn tin để được hỗ trợ.<br>Staff sẽ phản hồi sớm nhất có thể.',
+      chat_typing:'Staff đang nhập', chat_placeholder:'Nhập tin nhắn...',
+      modal_edit_profile:'✏️ Chỉnh sửa profile', display_name_label:'TÊN HIỂN THỊ',
+      display_name_ph:'Nhập tên hiển thị...', display_name_note:'Tên này chỉ hiển thị trên dashboard của bạn.',
+      btn_cancel:'Hủy', btn_save:'Lưu',
+      // JS strings
+      status_running:'Đang chạy', status_expired:'Đã hết hạn', status_no_pass:'(không có)',
+      toast_copied:'✓ Đã copy', toast_copied_id:'✓ Đã copy User ID', toast_name_saved:'✓ Đã cập nhật tên',
+      toast_updated:'🖥️ Máy của bạn đã được cập nhật!', toast_revoked:'⚠️ Máy của bạn đã bị thu hồi.',
+      toast_admin_reply:'💬 Admin đã reply tin nhắn của bạn!', toast_file_big:'File quá lớn (max 5MB)',
+      toast_warn_2h:'⏰ Còn dưới 2 giờ! Gia hạn ngay.', toast_warn_24h:'⏰ Còn dưới 24 giờ.',
+      auto_close:'Tự đóng sau', unit_sessions:'phiên', unit_hours:'giờ',
+      chat_you:'Bạn', btn_confirmed:'✓ Đúng rồi!', guard_wrong:'Mật khẩu không đúng.',
+      guard_empty:'Vui lòng nhập mật khẩu.',
+      titles:{dashboard:'Dashboard',machine:'Máy của tôi',time:'Thời gian',history:'Lịch sử thuê',connect:'Hướng dẫn kết nối',support:'Hỗ trợ'},
+    },
+    en: {
+      nav_dashboard:'Dashboard', nav_machine:'My Machine', nav_time:'Time', nav_history:'Rental History',
+      nav_connect:'Connection Guide', nav_support:'Support', nav_home:'Home', nav_logout:'Logout',
+      lbl_current_machine:'// Current Machine', status_no_machine:'No machine', btn_conn_info:'🔑 CONNECTION INFO',
+      spec_ip:'IP Address', spec_status:'Status',
+      lbl_plan_status:'// Plan Status', status_none:'None', sub_buy_discord:'Buy via Discord to activate',
+      lbl_time_left:'// Time Remaining', sub_no_data:'No data yet', lbl_ping:'// Server Ping',
+      lbl_user_id:'// Your User ID', user_id_note:'Send this ID to staff when creating a ticket to get assigned.',
+      lbl_guide:'// GUIDE', guide_title:'Contact Admin to get assigned!',
+      guide_desc:'Copy <strong style="color:var(--accent2);">User ID</strong> above → send to staff via Discord ticket → staff will assign your machine.',
+      empty_no_machine:'No machine assigned yet.<br>Buy service via Discord to start.',
+      btn_buy_discord:'Buy via Discord',
+      lbl_machine_info:'// Machine Info', title_my_machine:'My Machine',
+      lbl_rental_time:'// Rental Time', title_time_left:'Time Remaining',
+      cd_days:'days', cd_hours:'hours', cd_mins:'mins', cd_secs:'secs',
+      lbl_expiry_date:'Expiry Date', renew_note:'Renew via Discord ticket.', btn_renew_discord:'Renew via Discord',
+      lbl_stats_7d:'// Stats (7 days)', title_usage_hours:'Usage Hours',
+      lbl_rental_history:'// Rental History', title_sessions:'Past Sessions',
+      empty_history:'No rental history yet.<br>Data appears after machine expires.',
+      title_connect_vm:'Connect to VM',
+      parsec_s1:'Download & install <strong>Parsec</strong> at <strong>parsec.app</strong>',
+      parsec_s2:'Login Parsec → <strong>Computers</strong> tab → enter IP from Discord',
+      parsec_s3:'Enter <strong>password</strong> sent by staff via Discord ticket',
+      parsec_s4:'Settings: <strong>H.264 · 50 Mbps · 1080p</strong>',
+      moon_s1:'Download <strong>Moonlight</strong> at <strong>moonlight-stream.org</strong>',
+      moon_s2:'Open Moonlight → <strong>Add PC</strong> → enter IP from Discord',
+      moon_s3:'Enter <strong>4-digit PIN</strong> shown on Moonlight (ask staff to enter)',
+      moon_s4:'Settings: <strong>H.264 · 50 Mbps · 1080p · 60fps</strong>',
+      sup_ticket:'Create Support Ticket', sup_ticket_desc:'Having issues? Create a ticket in Discord, staff responds in minutes.',
+      btn_open_discord:'Open Discord',
+      sup_renew:'Renew Service', sup_renew_desc:'Plan expiring? Create a renewal ticket in Discord.', btn_renew_ticket:'Create Renewal Ticket →',
+      sup_faq:'FAQ', sup_faq_desc:'Not sure how to connect? Check the guide or ask staff.', btn_view_guide:'View Guide →',
+      sup_buy_hours:'Buy More Hours', sup_buy_hours_desc:'Out of hours? Top up anytime via Discord ticket.', btn_add_hours:'Add Hours →',
+      conn_ready:'🖥️ Machine Ready!', conn_sub:'// Use Parsec to connect · parsec.app', lbl_expiry:'Expires',
+      conn_s1:'Download <strong>Parsec</strong> at <strong>parsec.app</strong> (free, no account needed)',
+      conn_s2:'Open Parsec → <strong>Computers</strong> → <strong>Connect</strong> → enter IP above',
+      conn_s3:'Enter <strong>Password</strong> above when asked → Done!',
+      conn_s4:'Error? Click <strong>Support</strong> or chat below.',
+      chat_title:'Live Support', chat_empty:'💬 Send a message for support.<br>Staff will respond ASAP.',
+      chat_typing:'Staff is typing', chat_placeholder:'Type a message...',
+      modal_edit_profile:'✏️ Edit Profile', display_name_label:'DISPLAY NAME',
+      display_name_ph:'Enter display name...', display_name_note:'This name is only shown on your dashboard.',
+      btn_cancel:'Cancel', btn_save:'Save',
+      status_running:'Running', status_expired:'Expired', status_no_pass:'(none)',
+      toast_copied:'✓ Copied', toast_copied_id:'✓ Copied User ID', toast_name_saved:'✓ Name updated',
+      toast_updated:'🖥️ Your machine has been updated!', toast_revoked:'⚠️ Your machine has been revoked.',
+      toast_admin_reply:'💬 Admin replied to your message!', toast_file_big:'File too large (max 5MB)',
+      toast_warn_2h:'⏰ Less than 2 hours left! Renew now.', toast_warn_24h:'⏰ Less than 24 hours left.',
+      auto_close:'Auto-close in', unit_sessions:'sessions', unit_hours:'hours',
+      chat_you:'You', btn_confirmed:'✓ Correct!', guard_wrong:'Wrong password.',
+      guard_empty:'Please enter password.',
+      titles:{dashboard:'Dashboard',machine:'My Machine',time:'Time',history:'Rental History',connect:'Connection Guide',support:'Support'},
+    },
+    id: {
+      nav_dashboard:'Dashboard', nav_machine:'Mesin Saya', nav_time:'Waktu', nav_history:'Riwayat Sewa',
+      nav_connect:'Panduan Koneksi', nav_support:'Bantuan', nav_home:'Beranda', nav_logout:'Keluar',
+      lbl_current_machine:'// Mesin Aktif', status_no_machine:'Belum ada', btn_conn_info:'🔑 INFO KONEKSI',
+      spec_ip:'Alamat IP', spec_status:'Status',
+      lbl_plan_status:'// Status Paket', status_none:'Belum ada', sub_buy_discord:'Beli via Discord untuk aktivasi',
+      lbl_time_left:'// Waktu Tersisa', sub_no_data:'Belum ada data', lbl_ping:'// Ping Server',
+      lbl_user_id:'// User ID Anda', user_id_note:'Kirim ID ini ke staff saat buat tiket untuk dapat mesin.',
+      lbl_guide:'// PANDUAN', guide_title:'Hubungi Admin untuk mendapat mesin!',
+      guide_desc:'Copy <strong style="color:var(--accent2);">User ID</strong> di atas → kirim ke staff via tiket Discord → staff akan assign mesin.',
+      empty_no_machine:'Belum ada mesin yang di-assign.<br>Beli layanan via Discord untuk mulai.',
+      btn_buy_discord:'Beli via Discord',
+      lbl_machine_info:'// Info Mesin', title_my_machine:'Mesin Saya',
+      lbl_rental_time:'// Waktu Sewa', title_time_left:'Waktu Tersisa',
+      cd_days:'hari', cd_hours:'jam', cd_mins:'menit', cd_secs:'detik',
+      lbl_expiry_date:'Tanggal Habis', renew_note:'Perpanjang via tiket Discord.', btn_renew_discord:'Perpanjang via Discord',
+      lbl_stats_7d:'// Statistik 7 hari', title_usage_hours:'Jam Penggunaan',
+      lbl_rental_history:'// Riwayat Sewa', title_sessions:'Sesi Sebelumnya',
+      empty_history:'Belum ada riwayat sewa.<br>Data muncul setelah mesin habis.',
+      title_connect_vm:'Koneksi ke VM',
+      parsec_s1:'Unduh & install <strong>Parsec</strong> di <strong>parsec.app</strong>',
+      parsec_s2:'Login Parsec → tab <strong>Computers</strong> → masukkan IP dari Discord',
+      parsec_s3:'Masukkan <strong>password</strong> dari staff via tiket Discord',
+      parsec_s4:'Pengaturan: <strong>H.264 · 50 Mbps · 1080p</strong>',
+      moon_s1:'Unduh <strong>Moonlight</strong> di <strong>moonlight-stream.org</strong>',
+      moon_s2:'Buka Moonlight → <strong>Add PC</strong> → masukkan IP dari Discord',
+      moon_s3:'Masukkan <strong>PIN 4 digit</strong> di Moonlight (minta staff masukkan)',
+      moon_s4:'Pengaturan: <strong>H.264 · 50 Mbps · 1080p · 60fps</strong>',
+      sup_ticket:'Buat Tiket Bantuan', sup_ticket_desc:'Ada masalah? Buat tiket di Discord, staff respon dalam hitungan menit.',
+      btn_open_discord:'Buka Discord',
+      sup_renew:'Perpanjang Layanan', sup_renew_desc:'Paket mau habis? Buat tiket perpanjangan di Discord.', btn_renew_ticket:'Buat Tiket Perpanjangan →',
+      sup_faq:'FAQ', sup_faq_desc:'Belum tahu cara koneksi? Lihat panduan atau tanya staff.', btn_view_guide:'Lihat Panduan →',
+      sup_buy_hours:'Beli Jam Tambahan', sup_buy_hours_desc:'Habis jam? Top up kapan saja via tiket Discord.', btn_add_hours:'Tambah Jam →',
+      conn_ready:'🖥️ Mesin Siap!', conn_sub:'// Gunakan Parsec · parsec.app', lbl_expiry:'Habis',
+      conn_s1:'Unduh <strong>Parsec</strong> di <strong>parsec.app</strong> (gratis, tanpa akun)',
+      conn_s2:'Buka Parsec → <strong>Computers</strong> → <strong>Connect</strong> → masukkan IP di atas',
+      conn_s3:'Masukkan <strong>Password</strong> di atas saat diminta → Selesai!',
+      conn_s4:'Error? Klik <strong>Bantuan</strong> atau chat di bawah.',
+      chat_title:'Bantuan Langsung', chat_empty:'💬 Kirim pesan untuk bantuan.<br>Staff akan membalas secepatnya.',
+      chat_typing:'Staff sedang mengetik', chat_placeholder:'Ketik pesan...',
+      modal_edit_profile:'✏️ Edit Profil', display_name_label:'NAMA TAMPILAN',
+      display_name_ph:'Masukkan nama tampilan...', display_name_note:'Nama ini hanya tampil di dashboard Anda.',
+      btn_cancel:'Batal', btn_save:'Simpan',
+      status_running:'Berjalan', status_expired:'Habis', status_no_pass:'(tidak ada)',
+      toast_copied:'✓ Disalin', toast_copied_id:'✓ User ID disalin', toast_name_saved:'✓ Nama diperbarui',
+      toast_updated:'🖥️ Mesin Anda telah diperbarui!', toast_revoked:'⚠️ Mesin Anda telah dicabut.',
+      toast_admin_reply:'💬 Admin membalas pesan Anda!', toast_file_big:'File terlalu besar (maks 5MB)',
+      toast_warn_2h:'⏰ Kurang dari 2 jam! Perpanjang sekarang.', toast_warn_24h:'⏰ Kurang dari 24 jam.',
+      auto_close:'Tutup otomatis dalam', unit_sessions:'sesi', unit_hours:'jam',
+      chat_you:'Anda', btn_confirmed:'✓ Benar!', guard_wrong:'Password salah.',
+      guard_empty:'Silakan masukkan password.',
+      titles:{dashboard:'Dashboard',machine:'Mesin Saya',time:'Waktu',history:'Riwayat Sewa',connect:'Panduan Koneksi',support:'Bantuan'},
+    },
+    hi: {
+      nav_dashboard:'Dashboard', nav_machine:'मेरी मशीन', nav_time:'समय', nav_history:'किराया इतिहास',
+      nav_connect:'कनेक्शन गाइड', nav_support:'सहायता', nav_home:'होम', nav_logout:'लॉगआउट',
+      lbl_current_machine:'// वर्तमान मशीन', status_no_machine:'कोई मशीन नहीं', btn_conn_info:'🔑 कनेक्शन जानकारी',
+      spec_ip:'IP पता', spec_status:'स्थिति',
+      lbl_plan_status:'// प्लान स्थिति', status_none:'कोई नहीं', sub_buy_discord:'Discord से खरीदकर शुरू करें',
+      lbl_time_left:'// शेष समय', sub_no_data:'अभी कोई डेटा नहीं', lbl_ping:'// सर्वर Ping',
+      lbl_user_id:'// आपका User ID', user_id_note:'टिकट बनाते समय यह ID स्टाफ को भेजें।',
+      lbl_guide:'// गाइड', guide_title:'मशीन पाने के लिए Admin से संपर्क करें!',
+      guide_desc:'ऊपर <strong style="color:var(--accent2);">User ID</strong> कॉपी करें → Discord टिकट में स्टाफ को भेजें → स्टाफ मशीन असाइन करेगा।',
+      empty_no_machine:'कोई मशीन असाइन नहीं है।<br>शुरू करने के लिए Discord से खरीदें।',
+      btn_buy_discord:'Discord से खरीदें',
+      lbl_machine_info:'// मशीन जानकारी', title_my_machine:'मेरी मशीन',
+      lbl_rental_time:'// किराया समय', title_time_left:'शेष समय',
+      cd_days:'दिन', cd_hours:'घंटे', cd_mins:'मिनट', cd_secs:'सेकंड',
+      lbl_expiry_date:'समाप्ति तिथि', renew_note:'Discord टिकट से नवीनीकरण करें।', btn_renew_discord:'Discord से नवीनीकरण',
+      lbl_stats_7d:'// 7 दिन आँकड़े', title_usage_hours:'उपयोग घंटे',
+      lbl_rental_history:'// किराया इतिहास', title_sessions:'पिछले सेशन',
+      empty_history:'अभी कोई किराया इतिहास नहीं।<br>मशीन समाप्ति के बाद डेटा दिखेगा।',
+      title_connect_vm:'VM से कनेक्ट',
+      parsec_s1:'<strong>Parsec</strong> डाउनलोड करें <strong>parsec.app</strong> से',
+      parsec_s2:'Parsec लॉगिन → <strong>Computers</strong> टैब → Discord से IP डालें',
+      parsec_s3:'Discord टिकट से स्टाफ का <strong>पासवर्ड</strong> डालें',
+      parsec_s4:'सेटिंग: <strong>H.264 · 50 Mbps · 1080p</strong>',
+      moon_s1:'<strong>Moonlight</strong> डाउनलोड करें <strong>moonlight-stream.org</strong> से',
+      moon_s2:'Moonlight खोलें → <strong>Add PC</strong> → Discord से IP डालें',
+      moon_s3:'Moonlight पर दिखा <strong>4-अंक PIN</strong> डालें (स्टाफ से कहें)',
+      moon_s4:'सेटिंग: <strong>H.264 · 50 Mbps · 1080p · 60fps</strong>',
+      sup_ticket:'सहायता टिकट बनाएं', sup_ticket_desc:'समस्या? Discord में टिकट बनाएं, मिनटों में जवाब।',
+      btn_open_discord:'Discord खोलें',
+      sup_renew:'सेवा नवीनीकरण', sup_renew_desc:'प्लान समाप्त हो रहा? Discord में नवीनीकरण टिकट बनाएं।', btn_renew_ticket:'नवीनीकरण टिकट →',
+      sup_faq:'FAQ', sup_faq_desc:'कनेक्ट कैसे करें? गाइड देखें या स्टाफ से पूछें।', btn_view_guide:'गाइड देखें →',
+      sup_buy_hours:'और घंटे खरीदें', sup_buy_hours_desc:'घंटे खत्म? Discord टिकट से कभी भी टॉप अप।', btn_add_hours:'घंटे जोड़ें →',
+      conn_ready:'🖥️ मशीन तैयार!', conn_sub:'// Parsec से कनेक्ट करें · parsec.app', lbl_expiry:'समाप्ति',
+      conn_s1:'<strong>Parsec</strong> डाउनलोड करें <strong>parsec.app</strong> से (फ्री, अकाउंट नहीं चाहिए)',
+      conn_s2:'Parsec खोलें → <strong>Computers</strong> → <strong>Connect</strong> → ऊपर का IP डालें',
+      conn_s3:'पूछे जाने पर ऊपर का <strong>Password</strong> डालें → हो गया!',
+      conn_s4:'Error? <strong>सहायता</strong> क्लिक करें या नीचे चैट करें।',
+      chat_title:'लाइव सहायता', chat_empty:'💬 सहायता के लिए संदेश भेजें।<br>स्टाफ जल्द जवाब देगा।',
+      chat_typing:'स्टाफ टाइप कर रहा', chat_placeholder:'संदेश लिखें...',
+      modal_edit_profile:'✏️ प्रोफाइल संपादन', display_name_label:'प्रदर्शन नाम',
+      display_name_ph:'प्रदर्शन नाम दर्ज करें...', display_name_note:'यह नाम केवल आपके dashboard पर दिखता है।',
+      btn_cancel:'रद्द', btn_save:'सहेजें',
+      status_running:'चल रहा', status_expired:'समाप्त', status_no_pass:'(कोई नहीं)',
+      toast_copied:'✓ कॉपी हुआ', toast_copied_id:'✓ User ID कॉपी हुआ', toast_name_saved:'✓ नाम अपडेट हुआ',
+      toast_updated:'🖥️ आपकी मशीन अपडेट हुई!', toast_revoked:'⚠️ आपकी मशीन वापस ली गई।',
+      toast_admin_reply:'💬 Admin ने जवाब दिया!', toast_file_big:'फाइल बहुत बड़ी (max 5MB)',
+      toast_warn_2h:'⏰ 2 घंटे से कम! अभी नवीनीकरण करें।', toast_warn_24h:'⏰ 24 घंटे से कम।',
+      auto_close:'ऑटो बंद', unit_sessions:'सेशन', unit_hours:'घंटे',
+      chat_you:'आप', btn_confirmed:'✓ सही!', guard_wrong:'गलत पासवर्ड।',
+      guard_empty:'कृपया पासवर्ड दर्ज करें।',
+      titles:{dashboard:'Dashboard',machine:'मेरी मशीन',time:'समय',history:'किराया इतिहास',connect:'कनेक्शन गाइड',support:'सहायता'},
+    },
+  };
+
+  let dashLang = localStorage.getItem('grimz_lang') || 'vi';
+
+  function applyDashLang(lang) {
+    const t = DT[lang] || DT.vi;
+    // Update all data-i18n elements (text)
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const key = el.getAttribute('data-i18n');
+      if (t[key]) el.textContent = t[key];
+    });
+    // Update all data-i18n-html elements (innerHTML)
+    document.querySelectorAll('[data-i18n-html]').forEach(el => {
+      const key = el.getAttribute('data-i18n-html');
+      if (t[key]) el.innerHTML = t[key];
+    });
+    // Update placeholders
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+      const key = el.getAttribute('data-i18n-placeholder');
+      if (t[key]) el.placeholder = t[key];
+    });
+    // Update lang buttons
+    document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+    const btn = document.getElementById('lbtn-' + lang);
+    if (btn) btn.classList.add('active');
+  }
+
+  function pickLang(lang) {
+    dashLang = lang;
+    localStorage.setItem('grimz_lang', lang);
+    localStorage.setItem('grimz_lang_set', '1');
+    applyDashLang(lang);
+  }
+
+  // Auto detect
+  (async function autoDetectDashLang() {
+    if (localStorage.getItem('grimz_lang_set')) {
+      applyDashLang(dashLang);
+      return;
+    }
+    try {
+      const res = await fetch('https://ipapi.co/json/', { signal: AbortSignal.timeout(3000) });
+      const data = await res.json();
+      const cc = data.country_code;
+      let lang = 'en';
+      if (cc === 'VN') lang = 'vi';
+      else if (cc === 'ID') lang = 'id';
+      else if (cc === 'IN') lang = 'hi';
+      dashLang = lang;
+      localStorage.setItem('grimz_lang', lang);
+      applyDashLang(lang);
+    } catch {
+      applyDashLang(dashLang);
+    }
+  })();
+
+  // Helper to get translated string in JS
+  function t(key) { return (DT[dashLang] || DT.vi)[key] || (DT.vi)[key] || key; }
 
 
 
@@ -967,7 +1248,7 @@ document.addEventListener("DOMContentLoaded", function() { (function () {
   // ===== CONNECTION MODAL =====
   function showConnModal(m) {
     document.getElementById('conn-ip').textContent   = m.ip       || '—';
-    document.getElementById('conn-pass').textContent = m.password || '(không có)';
+    document.getElementById('conn-pass').textContent = m.password || t('status_no_pass');
     document.getElementById('conn-gpu').textContent  = m.gpu      || '—';
     document.getElementById('conn-expiry').textContent = m.expiry
       ? new Date(m.expiry).toLocaleString('vi-VN',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'})
@@ -976,10 +1257,10 @@ document.addEventListener("DOMContentLoaded", function() { (function () {
     // Countdown auto-close 60s
     let sec = 60;
     const cdEl = document.getElementById('conn-countdown');
-    cdEl.textContent = 'Tự đóng sau ' + sec + 's';
+    cdEl.textContent = t('auto_close') + ' ' + sec + 's';
     const iv = setInterval(() => {
       sec--;
-      cdEl.textContent = 'Tự đóng sau ' + sec + 's';
+      cdEl.textContent = t('auto_close') + ' ' + sec + 's';
       if(sec <= 0) { clearInterval(iv); document.getElementById('conn-modal').classList.remove('open'); cdEl.textContent=''; }
     }, 1000);
   }
@@ -1024,7 +1305,7 @@ document.addEventListener("DOMContentLoaded", function() { (function () {
         renderScMsgs();
         if(!scOpen && payload.new.sender === 'admin') {
           document.getElementById('sc-badge').classList.add('show');
-          showToast('💬 Admin đã reply tin nhắn của bạn!', 3000, 'success');
+          showToast(t('toast_admin_reply'), 3000, 'success');
         }
       }).subscribe();
   }
@@ -1032,7 +1313,7 @@ document.addEventListener("DOMContentLoaded", function() { (function () {
   function renderScMsgs() {
     const body = document.getElementById('sc-body');
     if(!scMsgs.length) {
-      body.innerHTML='<div class="sc-empty">💬 Nhắn tin để được hỗ trợ.<br>Staff sẽ phản hồi sớm nhất có thể.</div>';
+      body.innerHTML='<div class="sc-empty">'+t('chat_empty')+'</div>';
       return;
     }
     body.innerHTML = scMsgs.map(m => {
@@ -1042,7 +1323,7 @@ document.addEventListener("DOMContentLoaded", function() { (function () {
         ? `<img class="sc-img" src="${m.message}" onclick="window.open(this.src)">`
         : String(m.message).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
       return `<div class="sc-msg ${mine?'mine':'theirs'}">
-        <div class="sc-meta">${mine?'Bạn':(m.alias||'Staff')} · ${time}</div>
+        <div class="sc-meta">${mine?t('chat_you'):(m.alias||'Staff')} · ${time}</div>
         <div class="sc-bubble-wrap"><div class="sc-bubble">${msgContent}</div></div>
       </div>`;
     }).join('');
@@ -1087,7 +1368,7 @@ document.addEventListener("DOMContentLoaded", function() { (function () {
   async function sendSupportImage(input) {
     if(!scUserId || !input.files[0]) return;
     const file = input.files[0];
-    if(file.size > 5*1024*1024) { showToast('File quá lớn (max 5MB)', 2000, 'error'); return; }
+    if(file.size > 5*1024*1024) { showToast(t('toast_file_big'), 2000, 'error'); return; }
     const reader = new FileReader();
     reader.onload = async (e) => {
       await sb.from('support_chat').insert({user_id: scUserId, sender:'user', message: e.target.result, is_image: true});
@@ -1112,11 +1393,11 @@ document.addEventListener("DOMContentLoaded", function() { (function () {
     const count = document.getElementById('historyCount');
 
     if(!data || data.length === 0) {
-      count.textContent = '0 phiên';
+      count.textContent = '0 ' + t('unit_sessions');
       return;
     }
 
-    count.textContent = data.length + ' phiên';
+    count.textContent = data.length + ' ' + t('unit_sessions');
     list.innerHTML = data.map(r => {
       const start = r.started_at ? new Date(r.started_at).toLocaleString('vi-VN') : '—';
       const end   = r.ended_at   ? new Date(r.ended_at).toLocaleString('vi-VN')   : '—';
@@ -1127,7 +1408,7 @@ document.addEventListener("DOMContentLoaded", function() { (function () {
           <div class="history-gpu">${r.gpu || '—'}</div>
           <div class="history-dates">${start} → ${end}</div>
         </div>
-        <div class="history-hours">${hrs}<span> giờ</span></div>
+        <div class="history-hours">${hrs}<span> ${t('unit_hours')}</span></div>
       </div>`;
     }).join('');
 
@@ -1181,7 +1462,7 @@ document.addEventListener("DOMContentLoaded", function() { (function () {
             bodyColor: '#e4e0f0',
             titleFont: { family: 'JetBrains Mono', size: 11 },
             bodyFont: { family: 'JetBrains Mono', size: 11 },
-            callbacks: { label: ctx => ctx.parsed.y + ' giờ' }
+            callbacks: { label: ctx => ctx.parsed.y + ' ' + t('unit_hours') }
           }
         },
         scales: {
@@ -1221,7 +1502,7 @@ document.addEventListener("DOMContentLoaded", function() { (function () {
     document.getElementById('userAvatar').textContent = newName[0].toUpperCase();
     if(currentUserId) localStorage.setItem('grimz_display_name_'+currentUserId, newName);
     closeProfileModal();
-    showToast('✓ Đã cập nhật tên', 2000, 'success');
+    showToast(t('toast_name_saved'), 2000, 'success');
   }
   // Close on overlay click
   document.getElementById('profileModal').addEventListener('click', function(e){ if(e.target===this) closeProfileModal(); });
@@ -1261,7 +1542,7 @@ document.addEventListener("DOMContentLoaded", function() { (function () {
     setTimeout(pingLoop,1500+Math.random()*1000);
   })();
 
-  const titles={dashboard:'Dashboard',machine:'Máy của tôi',time:'Thời gian',history:'Lịch sử thuê',connect:'Hướng dẫn kết nối',support:'Hỗ trợ'};
+  function getTitles(){ return (DT[dashLang]||DT.vi).titles; }
   function goTo(id,btn){
     document.getElementById('sidebar').classList.remove('open');
     document.getElementById('sidebar-overlay').classList.remove('open');
@@ -1273,7 +1554,7 @@ document.addEventListener("DOMContentLoaded", function() { (function () {
         document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
         document.getElementById('page-'+id).classList.add('active');
         if(btn) btn.classList.add('active');
-        document.getElementById('page-title').textContent=titles[id]||'';
+        document.getElementById('page-title').textContent=getTitles()[id]||'';
       }, 150);
     } else {
       document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
@@ -1297,11 +1578,11 @@ document.addEventListener("DOMContentLoaded", function() { (function () {
 
   function copyUuid(){
     navigator.clipboard.writeText(document.getElementById('userUuid').textContent)
-      .then(()=>showToast('✓ Đã copy User ID',2000,'success'));
+      .then(()=>showToast(t('toast_copied_id'),2000,'success'));
   }
 
   function copyIp(ip){
-    navigator.clipboard.writeText(ip).then(()=>showToast('✓ Đã copy IP: '+ip,2000,'success'));
+    navigator.clipboard.writeText(ip).then(()=>showToast(t('toast_copied')+' IP: '+ip,2000,'success'));
   }
 
   async function doLogout(){ await sb.auth.signOut(); window.location.href='grimz-login.html'; }
@@ -1343,7 +1624,7 @@ document.addEventListener("DOMContentLoaded", function() { (function () {
     nameEl.setAttribute('data-text',shortName);
     nameEl.classList.add('has-machine');
     document.getElementById('machineStatus').className='badge badge-online';
-    document.getElementById('machineStatus').textContent='Đang chạy';
+    document.getElementById('machineStatus').textContent=t('status_running');
     const connBtn=document.getElementById('show-conn-btn'); if(connBtn && m.plan!=='G-ADMIN') connBtn.style.display='inline-flex';
     document.getElementById('statPlan').textContent=m.plan||'ACTIVE';
     document.getElementById('statPlan').classList.remove('empty');
@@ -1358,7 +1639,7 @@ document.addEventListener("DOMContentLoaded", function() { (function () {
       el.textContent=m[key]||'—'; el.classList.remove('empty');
     });
     document.getElementById('m2Status').className='badge badge-online';
-    document.getElementById('m2Status').textContent='Đang chạy';
+    document.getElementById('m2Status').textContent=t('status_running');
 
     // Time
     if(m.expiry){
@@ -1371,7 +1652,7 @@ document.addEventListener("DOMContentLoaded", function() { (function () {
         const d=Math.floor(diff/86400000), h=Math.floor((diff%86400000)/3600000);
         const mn=Math.floor((diff%3600000)/60000), s=Math.floor((diff%60000)/1000);
         const txt=d>0?d+'n '+h+'g '+mn+'p':h>0?h+'g '+mn+'p '+s+'s':mn+'p '+s+'s';
-        document.getElementById('statTime').textContent=diff<=0?'Đã hết hạn':txt;
+        document.getElementById('statTime').textContent=diff<=0?t('status_expired'):txt;
         if(diff<=0) document.getElementById('statTime').style.color='var(--red)';
       }
       updateStatTime();
@@ -1420,10 +1701,10 @@ document.addEventListener("DOMContentLoaded", function() { (function () {
       })
       .on('postgres_changes',{event:'UPDATE',schema:'public',table:'machines',filter:'user_id=eq.'+session.user.id},payload=>{
         fillMachine(payload.new);
-        showToast('🖥️ Máy của bạn đã được cập nhật!', 4000, 'success');
+        showToast(t('toast_updated'), 4000, 'success');
       })
       .on('postgres_changes',{event:'DELETE',schema:'public',table:'machines',filter:'user_id=eq.'+session.user.id},payload=>{
-        showToast('⚠️ Máy của bạn đã bị thu hồi.', 5000, 'error');
+        showToast(t('toast_revoked'), 5000, 'error');
         setTimeout(()=>location.reload(), 1500);
       })
       .subscribe((status) => {
@@ -1432,8 +1713,8 @@ document.addEventListener("DOMContentLoaded", function() { (function () {
 
     if(machine?.expiry){
       const hours=(new Date(machine.expiry)-new Date())/3600000;
-      if(hours>0&&hours<=2) setTimeout(()=>showToast('⏰ Còn dưới 2 giờ! Gia hạn ngay.',6000,'warn'),3000);
-      else if(hours>0&&hours<=24) setTimeout(()=>showToast('⏰ Còn dưới 24 giờ.',5000,'warn'),3000);
+      if(hours>0&&hours<=2) setTimeout(()=>showToast(t('toast_warn_2h'),6000,'warn'),3000);
+      else if(hours>0&&hours<=24) setTimeout(()=>showToast(t('toast_warn_24h'),5000,'warn'),3000);
     }
   }
   init();
