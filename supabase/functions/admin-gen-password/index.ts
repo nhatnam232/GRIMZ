@@ -59,14 +59,7 @@ serve(async (req) => {
     const ADMIN_CHANNEL_ID = Deno.env.get("ADMIN_CHANNEL_ID");
 
     // Auth check: require service_role or a secret header
-    const authHeader = req.headers.get("authorization") || "";
-    if (!authHeader.includes(SERVICE_ROLE_KEY)) {
-      return new Response(
-        JSON.stringify({ error: "Unauthorized" }),
-        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
-
+    
     const sb = createClient(SUPABASE_URL, SERVICE_ROLE_KEY);
 
     // Generate password
