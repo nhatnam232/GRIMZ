@@ -556,8 +556,8 @@ document.addEventListener("DOMContentLoaded", function() { (function () {
       <div style="display:flex;justify-content:center;margin-bottom:0.75rem;"><div class="cf-turnstile" data-sitekey="0x4AAAAAACrS3npj6qFvSu2W" data-theme="dark"></div></div>
       <button onclick="checkPw()" style="width:100%;background:var(--accent);color:#fff;padding:0.7rem;font-family:'Rajdhani',sans-serif;font-size:0.9rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;border:none;cursor:pointer;transition:background 0.2s;">Đăng nhập</button>
       <div id="gen-pw-wrap" style="display:none;margin-top:0.75rem;">
-        <button onclick="genPassword()" id="gen-pw-btn" style="width:100%;background:rgba(74,222,128,0.1);border:1px solid rgba(74,222,128,0.3);color:#4ade80;padding:0.6rem;font-family:'JetBrains Mono',monospace;font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;transition:all 0.2s;">🔑 Gen Password mới → Discord</button>
-        <div id="gen-pw-msg" style="display:none;margin-top:0.5rem;font-family:'JetBrains Mono',monospace;font-size:0.65rem;text-align:center;letter-spacing:0.08em;"></div>
+        <button onclick="genPassword()" id="gen-pw-btn" style="width:100%;background:rgba(74,222,128,0.1);border:1px solid rgba(74,222,128,0.3);color:#4ade80;padding:0.6rem;font-family:'JetBrains Mono',monospace;font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;transition:all 0.2s;">🔑 Gen Password mới</button>
+        <div id="gen-pw-msg" style="display:none;margin-top:0.5rem;font-family:'JetBrains Mono',monospace;font-size:0.65rem;text-align:center;letter-spacing:0.08em;color:#4ade80;"></div>
       </div>
     </div>
     <div id="pw-err" style="display:none;margin-top:0.75rem;font-family:'JetBrains Mono',monospace;font-size:0.68rem;color:#f87171;text-align:center;letter-spacing:0.08em;"></div>
@@ -1648,29 +1648,81 @@ document.addEventListener("DOMContentLoaded", function() { (function () {
   }
 
 
-  // ===== GEN PASSWORD =====
+  // ===== GEN PASSWORD (client-side, no Edge Function needed) =====
   async function genPassword() {
     const btn = document.getElementById('gen-pw-btn');
     const msg = document.getElementById('gen-pw-msg');
     btn.textContent = '⏳ Đang gen...';
     btn.style.pointerEvents = 'none';
-    msg.style.display = 'none';
-    try {
-      const { data, error } = await sb.functions.invoke('admin-gen-password');
-      if (error) throw error;
-      msg.style.color = '#4ade80';
-      msg.textContent = '✓ Password đã gửi vào Discord!';
-      msg.style.display = 'block';
-      btn.textContent = '✓ Đã gửi → Discord';
-    } catch(e) {
+
+    // Gen password
+    const upper = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    const lower = 'abcdefghijklmnopqrstuvwxyz';
+    const digits = '0123456789';
+    const special = '!@#$%&*_+-=';
+    const all = upper + lower + digits + special;
+    const required = [
+      upper[Math.floor(Math.random()*upper.length)],
+      lower[Math.floor(Math.random()*lower.length)],
+      digits[Math.floor(Math.random()*digits.length)],
+      special[Math.floor(Math.random()*special.length)],
+    ];
+    const rest = Array.from({length:12}, () => all[Math.floor(Math.random()*all.length)]);
+    const chars = [...required, ...rest];
+    for(let i=chars.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[chars[i],chars[j]]=[chars[j],chars[i]];}
+    const password = chars.join('');
+
+    // Hash it
+    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(password));
+    const hash = Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+
+    // Save to Supabase
+    const { error } = await sb.from('admin_config').upsert(
+      { key: 'admin_pw_hash', value: hash, updated_at: new Date().toISOString() },
+      { onConflict: 'key' }
+    );
+
+    if(error) {
       msg.style.color = '#f87171';
-      msg.textContent = '✗ Lỗi: ' + (e.message || String(e));
+      msg.textContent = '✗ Lỗi lưu DB: ' + error.message;
       msg.style.display = 'block';
-      btn.textContent = '🔑 Gen Password mới → Discord';
+      btn.textContent = '🔑 Gen Password mới';
       btn.style.pointerEvents = 'auto';
+      return;
     }
+
+    // Send to Discord webhook
+    try {
+      await fetch('https://discord.com/api/webhooks/1484272817552883772/L22ILl-AckFGFheGkoimVmMOrKJKhFzDJWRM8UmiMfb40AP0s9u2Y5BPogGPRVzPxjYo', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          embeds: [{
+            title: '🔑 New Admin Password Generated',
+            color: 0x4ade80,
+            fields: [
+              { name: '🔐 Password', value: '```' + password + '```', inline: false },
+              { name: '⚠️ Warning', value: 'Save this password now. It will NOT be shown again.', inline: false },
+              { name: 'Generated At', value: `<t:${Math.floor(Date.now()/1000)}:F>`, inline: true },
+            ],
+            footer: { text: 'Grimz Admin Security' },
+            timestamp: new Date().toISOString(),
+          }]
+        })
+      });
+    } catch(e) { console.warn('Discord notify failed:', e); }
+
+    // Show password on screen (copy it!)
+    msg.style.color = '#4ade80';
+    msg.innerHTML = `✓ Password: <strong style="color:#fff;font-size:0.85rem;letter-spacing:0.05em;">${password}</strong><br><span style="color:#f87171">⚠ Copy ngay! Sẽ không hiện lại.</span>`;
+    msg.style.display = 'block';
+    btn.textContent = '✓ Đã gen!';
+
+    // Auto fill password field
+    document.getElementById('admin-pw').value = password;
   }
 
+  // ===== TOAST =====
   function showToast(msg,type,duration){
     const t=document.getElementById('toast');
     t.textContent=msg;
