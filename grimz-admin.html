@@ -1,0 +1,1799 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex,nofollow">
+<title>Grimz — Admin Panel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Poppins:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="grimz-base.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+<script src="https://cdn.jsdelivr.net/npm/@fingerprintjs/fingerprintjs@4/dist/fp.min.js"></script>
+<style>
+  body { background:var(--bg); color:var(--text); font-family:'Poppins',sans-serif; min-height:100vh; padding:0; }
+
+
+  /* ===== ADMIN LOADER ===== */
+  #admin-loader { position:fixed; inset:0; background:#09080f; z-index:10000; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:0; }
+  #admin-loader.fade-out { animation:loaderOut 0.5s ease forwards; }
+  @keyframes loaderOut { to { opacity:0; pointer-events:none; } }
+  .al-tag { font-family:'JetBrains Mono',monospace; font-size:0.65rem; color:#5a2020; letter-spacing:0.25em; text-transform:uppercase; margin-bottom:2rem; }
+  .al-title { font-family:'Rajdhani',sans-serif; font-size:clamp(2rem,7vw,3.5rem); font-weight:700; text-transform:uppercase; letter-spacing:0.2em; color:transparent; -webkit-text-stroke:1px #7f1d1d; margin-bottom:0.5rem; text-align:center; }
+  .al-title.lit { color:#f87171; -webkit-text-stroke:0; text-shadow:0 0 30px rgba(248,113,113,0.6),0 0 60px rgba(248,113,113,0.3); animation:alFlicker 0.08s 4; }
+  @keyframes alFlicker { 0%,100%{opacity:1} 50%{opacity:0.3} }
+  .al-sub { font-family:'JetBrains Mono',monospace; font-size:0.82rem; color:#5a5470; letter-spacing:0.2em; margin-bottom:2.5rem; min-height:1.4em; text-align:center; }
+  .al-sub.green { color:#f87171; font-size:0.9rem; letter-spacing:0.25em; }
+  .al-bar-wrap { width:min(320px,80vw); height:3px; background:rgba(248,113,113,0.12); position:relative; }
+  .al-bar-fill { height:100%; background:linear-gradient(90deg,#7f1d1d,#f87171); width:0%; transition:width 0.3s linear; box-shadow:0 0 8px rgba(248,113,113,0.5); }
+  .al-pct { font-family:'JetBrains Mono',monospace; font-size:0.75rem; color:#f87171; letter-spacing:0.15em; margin-top:0.75rem; }
+  .al-dots { display:flex; gap:0.4rem; margin-top:2rem; }
+  .al-dot { width:4px; height:4px; border-radius:50%; background:#3a3458; animation:alDot 1.2s infinite; }
+  .al-dot:nth-child(2) { animation-delay:0.2s; }
+  .al-dot:nth-child(3) { animation-delay:0.4s; }
+  @keyframes alDot { 0%,100%{background:#3a3458} 50%{background:#7c5cbf} }
+
+
+  /* ===== CHAT ===== */
+  .chat-fab { position:fixed; bottom:2rem; left:1.5rem; z-index:300; }
+  .chat-fab-btn { width:48px; height:48px; background:var(--accent); border:none; color:#fff; font-size:1.1rem; cursor:pointer; display:flex; align-items:center; justify-content:center; clip-path:polygon(6px 0,100% 0,100% calc(100% - 6px),calc(100% - 6px) 100%,0 100%,0 6px); transition:all 0.2s; position:relative; }
+  .chat-fab-btn:hover { background:var(--accent2); transform:scale(1.05); }
+  .chat-badge { position:absolute; top:-4px; right:-4px; background:var(--red); color:#fff; font-size:0.55rem; font-family:'JetBrains Mono',monospace; width:16px; height:16px; border-radius:50%; display:none; align-items:center; justify-content:center; }
+  .chat-badge.show { display:flex; }
+
+  .chat-panel { position:fixed; bottom:5rem; left:1.5rem; width:min(360px,calc(100vw - 2rem)); background:var(--bg2); border:1px solid rgba(124,92,191,0.3); z-index:299; display:none; flex-direction:column; box-shadow:0 8px 32px rgba(0,0,0,0.4); }
+  .chat-panel.open { display:flex; animation:chatIn 0.2s ease; }
+  @keyframes chatIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+  .chat-panel::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:linear-gradient(90deg,var(--accent3),var(--accent2)); }
+
+  .chat-tabs { display:flex; border-bottom:1px solid var(--border); }
+  .chat-tab { flex:1; padding:0.6rem; font-family:'JetBrains Mono',monospace; font-size:0.6rem; letter-spacing:0.1em; text-transform:uppercase; background:none; border:none; color:var(--muted); cursor:pointer; transition:all 0.2s; position:relative; }
+  .chat-tab.active { color:var(--accent2); background:rgba(124,92,191,0.06); }
+  .chat-tab.active::after { content:''; position:absolute; bottom:0; left:0; right:0; height:1px; background:var(--accent2); }
+  .chat-tab-badge { display:inline-flex; align-items:center; justify-content:center; background:var(--red); color:#fff; font-size:0.5rem; width:14px; height:14px; border-radius:50%; margin-left:4px; vertical-align:middle; }
+
+  .chat-body { height:280px; overflow-y:auto; padding:0.75rem; display:flex; flex-direction:column; gap:0.5rem; }
+  .chat-msg { display:flex; flex-direction:column; gap:0.15rem; max-width:85%; }
+  .chat-msg.mine { align-self:flex-end; align-items:flex-end; }
+  .chat-msg.theirs { align-self:flex-start; }
+  .chat-bubble { padding:0.45rem 0.7rem; font-size:0.8rem; line-height:1.5; word-break:break-word; }
+  .chat-msg.mine .chat-bubble { background:rgba(124,92,191,0.25); border:1px solid rgba(124,92,191,0.3); color:var(--text); }
+  .chat-msg.theirs .chat-bubble { background:var(--bg3); border:1px solid var(--border); color:var(--text); }
+  .chat-meta { font-family:'JetBrains Mono',monospace; font-size:0.55rem; color:var(--muted); }
+  .chat-alias { color:var(--accent2); font-weight:500; }
+  .chat-empty { text-align:center; font-family:'JetBrains Mono',monospace; font-size:0.65rem; color:var(--muted); padding:2rem; letter-spacing:0.1em; }
+
+  /* Support list */
+  .support-list { height:280px; overflow-y:auto; }
+  .support-item { padding:0.65rem 0.75rem; border-bottom:1px solid rgba(124,92,191,0.07); cursor:pointer; transition:background 0.15s; display:flex; align-items:center; justify-content:space-between; gap:0.5rem; }
+  .support-item:hover { background:rgba(124,92,191,0.05); }
+  .support-item.active { background:rgba(124,92,191,0.1); border-left:2px solid var(--accent2); }
+  .support-item-name { font-size:0.78rem; font-weight:500; color:var(--text); }
+  .support-item-preview { font-size:0.65rem; color:var(--muted); margin-top:0.1rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:180px; font-family:'JetBrains Mono',monospace; }
+  .support-item-time { font-family:'JetBrains Mono',monospace; font-size:0.55rem; color:var(--muted); flex-shrink:0; }
+  .support-unread { width:8px; height:8px; border-radius:50%; background:var(--accent2); flex-shrink:0; }
+
+  .chat-input-wrap { display:flex; gap:0; border-top:1px solid var(--border); }
+  .chat-input { flex:1; background:var(--bg3); border:none; color:var(--text); padding:0.65rem 0.75rem; font-family:'Poppins',sans-serif; font-size:0.82rem; outline:none; }
+  .chat-input::placeholder { color:var(--muted); }
+  .chat-send { background:var(--accent); border:none; color:#fff; padding:0 1rem; cursor:pointer; font-size:0.85rem; transition:background 0.2s; }
+  .chat-send:hover { background:var(--accent2); }
+
+  .chat-header { display:flex; align-items:center; justify-content:space-between; padding:0.6rem 0.75rem; border-bottom:1px solid var(--border); }
+  .chat-header-title { font-family:'JetBrains Mono',monospace; font-size:0.62rem; color:var(--accent2); letter-spacing:0.12em; text-transform:uppercase; }
+  .chat-close { background:none; border:none; color:var(--muted); cursor:pointer; font-size:0.85rem; transition:color 0.2s; }
+  .chat-close:hover { color:var(--text); }
+
+  .support-back { background:none; border:none; color:var(--muted); cursor:pointer; font-size:0.75rem; padding:0.4rem 0.6rem; font-family:'JetBrains Mono',monospace; letter-spacing:0.08em; transition:color 0.2s; display:none; }
+  .support-back:hover { color:var(--accent2); }
+  .support-back.show { display:inline-flex; align-items:center; gap:0.3rem; }
+
+
+  /* Typing indicator */
+  .typing-row { display:flex; align-items:center; gap:0.4rem; padding:0.3rem 0.5rem; opacity:0; transition:opacity 0.2s; min-height:24px; }
+  .typing-row.visible { opacity:1; }
+  .typing-who { font-family:'JetBrains Mono',monospace; font-size:0.55rem; color:var(--muted); }
+  .typing-dots { display:flex; gap:3px; align-items:center; }
+  .typing-dot { width:5px; height:5px; border-radius:50%; background:var(--accent); animation:typingBounce 1s infinite; }
+  .typing-dot:nth-child(2) { animation-delay:0.15s; }
+  .typing-dot:nth-child(3) { animation-delay:0.3s; }
+  @keyframes typingBounce { 0%,100%{transform:translateY(0);opacity:0.4} 50%{transform:translateY(-4px);opacity:1} }
+  /* Delete msg */
+  .chat-bubble-wrap { position:relative; }
+  .chat-bubble-wrap:hover .del-msg-btn { opacity:1; }
+  .del-msg-btn { position:absolute; top:-6px; right:-6px; background:rgba(248,113,113,0.15); border:1px solid rgba(248,113,113,0.3); color:var(--red); font-size:0.55rem; width:18px; height:18px; border-radius:50%; cursor:pointer; display:flex; align-items:center; justify-content:center; opacity:0; transition:opacity 0.2s; }
+  /* Image attachment */
+  .chat-attach-btn { background:none; border:none; color:var(--muted); cursor:pointer; padding:0 0.5rem; font-size:0.85rem; transition:color 0.2s; }
+  .chat-attach-btn:hover { color:var(--accent2); }
+  .chat-img { max-width:200px; max-height:200px; object-fit:cover; cursor:pointer; border:1px solid var(--border); display:block; margin-top:0.3rem; }
+  /* User info panel */
+  .user-info-panel { background:rgba(124,92,191,0.05); border-bottom:1px solid var(--border); padding:0.6rem 0.75rem; font-family:'JetBrains Mono',monospace; font-size:0.6rem; color:var(--muted); letter-spacing:0.08em; display:none; }
+  .user-info-panel.show { display:block; }
+  .user-info-row { display:flex; justify-content:space-between; padding:0.2rem 0; }
+  .user-info-row span:last-child { color:var(--accent2); text-align:right; }
+
+  /* ===== RATE LIMIT NOTICE ===== */
+  #rate-limit-msg { display:none; font-family:'JetBrains Mono',monospace; font-size:0.68rem; color:var(--red); text-align:center; letter-spacing:0.08em; margin-top:0.75rem; }
+
+  /* ===== LIGHT THEME ===== */
+  body.light {
+    --bg:#f0eef8; --bg2:#ffffff; --bg3:#e8e5f5; --bg4:#d8d4ec;
+    --text:#2a2440; --muted:#6b6585; --border:rgba(124,92,191,0.2);
+  }
+  body.light .card { box-shadow:0 4px 12px rgba(0,0,0,0.05); }
+  body.light input, body.light select { background:var(--bg3); }
+  body.light .topbar { background:rgba(240,238,248,0.95); }
+  body.light .qh { background:var(--bg3); }
+  body.light .modal-box { background:var(--bg2); }
+
+  /* ===== TOPBAR ===== */
+  .topbar { position:sticky; top:0; z-index:100; background:rgba(9,8,15,0.92); backdrop-filter:blur(12px); border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; padding:0 2rem; height:56px; }
+  .logo { font-family:'Rajdhani',sans-serif; font-size:1.15rem; font-weight:700; letter-spacing:0.15em; text-transform:uppercase; color:var(--accent2); display:flex; align-items:center; gap:0.6rem; }
+  .logo-badge { color:var(--red); font-size:0.65rem; border:1px solid rgba(248,113,113,0.35); padding:0.15rem 0.5rem; font-family:'JetBrains Mono',monospace; letter-spacing:0.1em; }
+  .topbar-actions { display:flex; align-items:center; gap:0.75rem; }
+  .theme-toggle { display:flex; align-items:center; gap:0.5rem; background:none; border:1px solid var(--border); color:var(--muted); padding:0.3rem 0.75rem; font-family:'JetBrains Mono',monospace; font-size:0.62rem; letter-spacing:0.1em; cursor:pointer; transition:all 0.2s; }
+  .theme-toggle:hover { border-color:var(--accent2); color:var(--accent2); }
+  .topbar-link { font-family:'JetBrains Mono',monospace; font-size:0.65rem; color:var(--muted); text-decoration:none; transition:color 0.2s; display:flex; align-items:center; gap:0.4rem; }
+  .topbar-link:hover { color:var(--accent2); }
+
+  /* ===== WRAP ===== */
+  .wrap { position:relative; z-index:1; max-width:980px; margin:0 auto; padding:2rem 1.5rem; }
+
+  /* ===== STATS CARDS ===== */
+  .stats-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:1rem; margin-bottom:1.75rem; }
+  .stat-card { background:var(--bg2); border:1px solid var(--border); padding:1.1rem 1.25rem; position:relative; overflow:hidden; transition:border-color 0.2s,transform 0.2s; }
+  .stat-card::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; }
+  .stat-card.sc-total::before  { background:linear-gradient(90deg,var(--accent3),var(--accent2)); }
+  .stat-card.sc-active::before { background:linear-gradient(90deg,#166534,var(--green)); }
+  .stat-card.sc-soon::before   { background:linear-gradient(90deg,#92400e,var(--yellow)); }
+  .stat-card.sc-expired::before{ background:linear-gradient(90deg,#7f1d1d,var(--red)); }
+  .stat-card:hover { transform:translateY(-2px); border-color:rgba(124,92,191,0.3); }
+  .sc-label { font-family:'JetBrains Mono',monospace; font-size:0.58rem; color:var(--muted); letter-spacing:0.15em; text-transform:uppercase; margin-bottom:0.5rem; display:flex; align-items:center; gap:0.4rem; }
+  .sc-val { font-family:'Rajdhani',sans-serif; font-size:2rem; font-weight:700; line-height:1; }
+  .sc-total .sc-val  { color:var(--accent2); }
+  .sc-active .sc-val { color:var(--green); }
+  .sc-soon .sc-val   { color:var(--yellow); }
+  .sc-expired .sc-val{ color:var(--red); }
+
+  /* ===== CARDS ===== */
+  .card { background:var(--bg2); border:1px solid var(--border); padding:1.5rem; margin-bottom:1.5rem; position:relative; overflow:hidden; }
+  .card::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:linear-gradient(90deg,var(--accent3),var(--accent2)); }
+  .card-title { font-family:'Rajdhani',sans-serif; font-size:1rem; font-weight:700; text-transform:uppercase; letter-spacing:0.1em; margin-bottom:1.25rem; display:flex; align-items:center; justify-content:space-between; gap:1rem; }
+  .card-title i { color:var(--accent2); margin-right:0.4rem; }
+
+  /* ===== FORM ===== */
+  .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+  .form-group { display:flex; flex-direction:column; gap:0.4rem; }
+  .form-group.full { grid-column:1/-1; }
+  label { font-family:'JetBrains Mono',monospace; font-size:0.6rem; color:var(--muted); letter-spacing:0.15em; text-transform:uppercase; }
+  input, select { background:var(--bg3); border:1px solid var(--border); color:var(--text); padding:0.6rem 0.75rem; font-family:'Poppins',sans-serif; font-size:0.85rem; outline:none; transition:border-color 0.2s,box-shadow 0.2s; width:100%; }
+  input:focus, select:focus { border-color:var(--accent); box-shadow:0 0 0 2px rgba(124,92,191,0.1); }
+  input::placeholder { color:var(--muted); }
+  select option { background:var(--bg3); }
+  .ip-err { font-family:'JetBrains Mono',monospace; font-size:0.6rem; color:var(--red); display:none; margin-top:0.2rem; }
+  .hours-hint { font-family:'JetBrains Mono',monospace; font-size:0.65rem; color:var(--accent2); margin-top:0.3rem; min-height:1.2em; }
+  .quick-hours { display:flex; gap:0.4rem; flex-wrap:wrap; margin-top:0.5rem; }
+  .qh { padding:0.25rem 0.65rem; background:var(--bg4); border:1px solid var(--border); color:var(--muted); font-family:'JetBrains Mono',monospace; font-size:0.65rem; cursor:pointer; transition:all 0.2s; }
+  .qh:hover { border-color:var(--accent); color:var(--accent2); }
+
+  /* ===== ASSIGN PREVIEW ===== */
+  .assign-preview { background:rgba(124,92,191,0.05); border:1px solid rgba(124,92,191,0.15); padding:0.85rem 1rem; margin:1rem 0 0; display:grid; grid-template-columns:1fr 1fr 1fr; gap:0.5rem; }
+  .preview-item { display:flex; flex-direction:column; gap:0.2rem; }
+  .preview-label { font-family:'JetBrains Mono',monospace; font-size:0.56rem; color:var(--muted); letter-spacing:0.12em; text-transform:uppercase; }
+  .preview-val { font-family:'JetBrains Mono',monospace; font-size:0.72rem; color:var(--accent2); }
+
+  /* ===== BUTTONS ===== */
+  .btn { display:inline-flex; align-items:center; gap:0.5rem; padding:0.65rem 1.4rem; font-family:'Rajdhani',sans-serif; font-size:0.875rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; cursor:pointer; border:none; transition:all 0.2s cubic-bezier(0.34,1.56,0.64,1); clip-path:polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,0 100%); }
+  .btn:disabled { opacity:0.6; cursor:not-allowed; transform:none !important; }
+  .btn-primary { background:var(--accent); color:#fff; }
+  .btn-primary:hover:not(:disabled) { background:var(--accent2); transform:translateY(-2px); box-shadow:0 6px 16px rgba(124,92,191,0.35); }
+  .btn-sm { padding:0.3rem 0.7rem; font-size:0.72rem; clip-path:none; letter-spacing:0.05em; }
+  .btn-danger  { background:rgba(248,113,113,0.12); color:var(--red);    border:1px solid rgba(248,113,113,0.3); }
+  .btn-danger:hover  { background:rgba(248,113,113,0.22); transform:none; }
+  .btn-warning { background:rgba(251,191,36,0.12);  color:var(--yellow); border:1px solid rgba(251,191,36,0.3); }
+  .btn-warning:hover { background:rgba(251,191,36,0.22); transform:none; }
+  .btn-green   { background:rgba(74,222,128,0.1);  color:var(--green);  border:1px solid rgba(74,222,128,0.25); }
+  .btn-green:hover   { background:rgba(74,222,128,0.2); transform:none; }
+  .btn-muted   { background:var(--bg3); color:var(--muted); border:1px solid var(--border); clip-path:none; }
+  .btn-muted:hover   { color:var(--accent2); border-color:var(--accent); }
+
+  /* ===== TABLE ===== */
+  .table-wrap { overflow-x:auto; }
+  table { width:100%; border-collapse:collapse; }
+  th { font-family:'JetBrains Mono',monospace; font-size:0.58rem; color:var(--muted); letter-spacing:0.12em; text-transform:uppercase; text-align:left; padding:0.6rem 0.75rem; border-bottom:1px solid var(--border); white-space:nowrap; }
+  td { padding:0.7rem 0.75rem; font-size:0.82rem; border-bottom:1px solid rgba(124,92,191,0.06); vertical-align:middle; transition:background 0.15s; }
+  tr:hover td { background:rgba(124,92,191,0.05); }
+  .mono { font-family:'JetBrains Mono',monospace; font-size:0.72rem; color:var(--accent2); }
+  .badge { display:inline-flex; align-items:center; gap:0.3rem; padding:0.2rem 0.55rem; font-family:'JetBrains Mono',monospace; font-size:0.58rem; letter-spacing:0.1em; text-transform:uppercase; white-space:nowrap; }
+  .badge-active  { background:rgba(74,222,128,0.1); border:1px solid rgba(74,222,128,0.25); color:var(--green); }
+  .badge-active::before { content:''; width:4px; height:4px; border-radius:50%; background:var(--green); animation:blink 1.5s infinite; }
+  .badge-expired { background:rgba(248,113,113,0.1); border:1px solid rgba(248,113,113,0.25); color:var(--red); }
+  .copy-btn { background:var(--bg3); border:1px solid var(--border); color:var(--accent2); font-family:'JetBrains Mono',monospace; font-size:0.62rem; padding:0.2rem 0.5rem; cursor:pointer; transition:all 0.2s; white-space:nowrap; }
+  .copy-btn:hover { border-color:var(--accent); background:rgba(124,92,191,0.1); }
+  .actions-cell { display:flex; gap:0.35rem; align-items:center; }
+  .empty { text-align:center; padding:2.5rem; font-family:'JetBrains Mono',monospace; font-size:0.72rem; color:var(--muted); letter-spacing:0.1em; }
+
+  /* ===== MSG ===== */
+  .msg { padding:0.6rem 0.75rem; font-family:'JetBrains Mono',monospace; font-size:0.7rem; letter-spacing:0.08em; margin-top:1rem; display:none; }
+  .msg-ok  { background:rgba(74,222,128,0.07);  border:1px solid rgba(74,222,128,0.2);  color:var(--green); display:block; }
+  .msg-err { background:rgba(248,113,113,0.07); border:1px solid rgba(248,113,113,0.2); color:var(--red);   display:block; }
+
+  /* ===== MODALS ===== */
+  .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.65); z-index:300; display:none; align-items:center; justify-content:center; backdrop-filter:blur(4px); padding:1rem; }
+  .modal-overlay.open { display:flex; animation:mIn 0.2s ease; }
+  @keyframes mIn { from{opacity:0;transform:scale(0.96)} to{opacity:1;transform:scale(1)} }
+  .modal-box { background:var(--bg2); border:1px solid rgba(124,92,191,0.3); padding:1.75rem; width:100%; max-width:420px; position:relative; }
+  .modal-box::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:linear-gradient(90deg,var(--accent3),var(--accent2)); }
+  .modal-title { font-family:'Rajdhani',sans-serif; font-size:1rem; font-weight:700; text-transform:uppercase; letter-spacing:0.1em; margin-bottom:1.25rem; color:var(--accent2); display:flex; align-items:center; gap:0.5rem; }
+  .modal-close { position:absolute; top:1rem; right:1rem; background:none; border:none; color:var(--muted); cursor:pointer; font-size:0.9rem; transition:color 0.2s; }
+  .modal-close:hover { color:var(--text); }
+  .modal-info { display:flex; flex-direction:column; gap:0.6rem; margin-bottom:1.25rem; }
+  .modal-row { display:flex; justify-content:space-between; padding:0.5rem 0.75rem; background:rgba(124,92,191,0.04); border-left:2px solid var(--accent3); }
+  .modal-row-label { font-family:'JetBrains Mono',monospace; font-size:0.6rem; color:var(--muted); letter-spacing:0.1em; text-transform:uppercase; }
+  .modal-row-val { font-family:'JetBrains Mono',monospace; font-size:0.72rem; color:var(--text); }
+  .modal-footer { display:flex; gap:0.75rem; justify-content:flex-end; margin-top:1.25rem; }
+  .modal-input { width:100%; background:var(--bg3); border:1px solid var(--border); color:var(--text); padding:0.6rem 0.75rem; font-family:'Poppins',sans-serif; font-size:0.85rem; outline:none; transition:border-color 0.2s; margin-bottom:0.6rem; }
+  .modal-input:focus { border-color:var(--accent2); }
+
+  /* ===== FAB ===== */
+  .fab-cluster { position:fixed; bottom:2rem; right:1.5rem; display:flex; flex-direction:column; gap:0.5rem; z-index:200; }
+  .fab-btn { width:40px; height:40px; background:rgba(9,8,15,0.9); border:1px solid rgba(124,92,191,0.3); color:var(--muted); cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:0.85rem; transition:all 0.2s; clip-path:polygon(6px 0,100% 0,100% calc(100% - 6px),calc(100% - 6px) 100%,0 100%,0 6px); }
+  .fab-btn:hover { border-color:var(--accent2); color:var(--accent2); background:rgba(124,92,191,0.12); box-shadow:0 0 12px rgba(124,92,191,0.25); }
+
+  /* ===== TOAST ===== */
+  #toast { position:fixed; bottom:2rem; left:50%; transform:translateX(-50%) translateY(10px); background:var(--bg3); border:1px solid var(--accent); color:var(--accent2); font-family:'JetBrains Mono',monospace; font-size:0.72rem; letter-spacing:0.08em; padding:0.6rem 1.5rem; z-index:999; opacity:0; transition:all 0.3s; pointer-events:none; white-space:nowrap; }
+  #toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+  #toast.toast-success { border-color:rgba(74,222,128,0.5); color:var(--green); }
+  #toast.toast-error   { border-color:rgba(248,113,113,0.5); color:var(--red); }
+  #toast.toast-warn    { border-color:rgba(251,191,36,0.5); color:var(--yellow); }
+
+  /* ===== RESPONSIVE ===== */
+  @media(max-width:768px) {
+    .wrap { padding:1rem; }
+    .stats-grid { grid-template-columns:1fr 1fr; }
+    .form-grid { grid-template-columns:1fr; }
+    .form-group.full { grid-column:1; }
+    .assign-preview { grid-template-columns:1fr; }
+    table { font-size:0.75rem; }
+    td { padding:0.5rem; }
+    .btn-sm { padding:0.25rem 0.5rem; font-size:0.65rem; }
+    .topbar { padding:0 1rem; }
+    .topbar-link span { display:none; }
+    .actions-cell { flex-wrap:wrap; }
+  }
+  @media(max-width:480px) {
+    .stats-grid { grid-template-columns:1fr 1fr; gap:0.6rem; }
+    .sc-val { font-size:1.5rem; }
+  }
+</style>
+
+<script>
+/**
+ * GRIMZ CLOUD PC — Page Guard
+ * Popup xác minh pass, lưu localStorage, countdown redirect
+ * Dùng chung cho tất cả trang cần bảo vệ
+ */
+document.addEventListener("DOMContentLoaded", function() { (function () {
+  // ── CONFIG ──────────────────────────────────────────────
+  const PASS_HASH   = '5c7bb507989ca82ca7591742fda70607a4d697097f31afc0d415ca3be45997fb';
+  const LAUNCH_DATE = new Date('2026-03-23T00:00:00+07:00');
+  // Tự động tắt guard sau ngày launch
+  if (new Date() >= LAUNCH_DATE) return;
+  const STORAGE_KEY = 'grimz_access';
+  const REDIRECT    = '/';          // redirect về đây nếu hết countdown
+  const COUNTDOWN   = 10;           // giây
+  // ────────────────────────────────────────────────────────
+
+  // Nếu đã có pass hợp lệ thì bỏ qua
+  if (localStorage.getItem(STORAGE_KEY) === PASS_HASH) return;
+
+  // Chặn scroll trang phía sau
+  document.documentElement.style.overflow = 'hidden';
+
+  // ── INJECT CSS ──────────────────────────────────────────
+  const style = document.createElement('style');
+  style.textContent = `
+    #grimz-guard-overlay {
+      position:fixed; inset:0; z-index:99999;
+      background:rgba(9,8,15,0.92);
+      backdrop-filter:blur(12px);
+      display:flex; align-items:center; justify-content:center;
+      padding:1.5rem;
+      animation:guardFadeIn 0.3s ease;
+    }
+    @keyframes guardFadeIn { from{opacity:0} to{opacity:1} }
+
+    #grimz-guard-box {
+      background:#100e1a;
+      border:1px solid rgba(124,92,191,0.25);
+      padding:2rem 2rem 1.75rem;
+      width:100%; max-width:380px;
+      position:relative;
+      clip-path:polygon(0 0,calc(100% - 16px) 0,100% 16px,100% 100%,16px 100%,0 calc(100% - 16px));
+      animation:guardSlideUp 0.35s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    @keyframes guardSlideUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+
+    #grimz-guard-box::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:2px;
+      background:linear-gradient(90deg,#5a3fa0,#9b7fe8,#5a3fa0);
+    }
+    #grimz-guard-box::after {
+      content:''; position:absolute; inset:0;
+      background:radial-gradient(ellipse at 50% 0%,rgba(124,92,191,0.06),transparent 60%);
+      pointer-events:none;
+    }
+
+    .gg-corner { position:absolute; width:7px; height:7px; }
+    .gg-corner-tl { top:4px; left:4px; border-top:1px solid #9b7fe8; border-left:1px solid #9b7fe8; }
+    .gg-corner-br { bottom:4px; right:4px; border-bottom:1px solid #9b7fe8; border-right:1px solid #9b7fe8; }
+
+    .gg-logo {
+      font-family:'Rajdhani',sans-serif; font-size:1rem; font-weight:700;
+      letter-spacing:0.2em; text-transform:uppercase; color:#7c5cbf;
+      text-shadow:0 0 16px rgba(124,92,191,0.5);
+      margin-bottom:1.25rem; position:relative; z-index:1;
+    }
+    .gg-logo span { color:#9b7fe8; }
+
+    .gg-title {
+      font-family:'Rajdhani',sans-serif; font-size:1rem; font-weight:700;
+      text-transform:uppercase; letter-spacing:0.08em; color:#e4e0f0;
+      margin-bottom:0.3rem; position:relative; z-index:1;
+    }
+    .gg-sub {
+      font-family:'JetBrains Mono',monospace; font-size:0.6rem;
+      color:#8a84a0; letter-spacing:0.12em; margin-bottom:1.5rem;
+      position:relative; z-index:1; line-height:1.8;
+    }
+
+    .gg-input-wrap {
+      position:relative; z-index:1; margin-bottom:0.75rem;
+    }
+    .gg-input-label {
+      font-family:'JetBrains Mono',monospace; font-size:0.58rem;
+      color:#8a84a0; letter-spacing:0.15em; text-transform:uppercase;
+      display:block; margin-bottom:0.4rem;
+    }
+    .gg-input-row { position:relative; }
+    #grimz-guard-input {
+      width:100%; padding:0.65rem 2.5rem 0.65rem 0.85rem;
+      background:#161323; border:1px solid rgba(124,92,191,0.18);
+      color:#e4e0f0; font-family:'JetBrains Mono',monospace; font-size:0.85rem;
+      outline:none; transition:border-color 0.2s, box-shadow 0.2s;
+      letter-spacing:0.1em;
+    }
+    #grimz-guard-input:focus {
+      border-color:#9b7fe8;
+      box-shadow:0 0 0 2px rgba(124,92,191,0.12);
+    }
+    #grimz-guard-input.shake {
+      animation:ggShake 0.35s ease;
+    }
+    @keyframes ggShake {
+      0%,100%{transform:translateX(0)}
+      20%{transform:translateX(-6px)}
+      40%{transform:translateX(6px)}
+      60%{transform:translateX(-4px)}
+      80%{transform:translateX(4px)}
+    }
+    #gg-toggle-pass {
+      position:absolute; right:0.65rem; top:50%; transform:translateY(-50%);
+      background:none; border:none; color:#8a84a0; cursor:pointer;
+      font-size:0.75rem; padding:0; transition:color 0.2s;
+    }
+    #gg-toggle-pass:hover { color:#9b7fe8; }
+
+    #grimz-guard-err {
+      font-family:'JetBrains Mono',monospace; font-size:0.6rem;
+      color:#f87171; letter-spacing:0.08em;
+      min-height:1.2em; margin-bottom:0.75rem;
+      position:relative; z-index:1;
+    }
+
+    #grimz-guard-btn {
+      width:100%; padding:0.7rem;
+      background:#7c5cbf; border:none; color:#fff;
+      font-family:'Rajdhani',sans-serif; font-size:0.95rem; font-weight:700;
+      letter-spacing:0.12em; text-transform:uppercase;
+      cursor:pointer; transition:all 0.2s cubic-bezier(0.34,1.56,0.64,1);
+      clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,0 100%);
+      position:relative; z-index:1; margin-bottom:1rem;
+    }
+    #grimz-guard-btn:hover { background:#9b7fe8; transform:translateY(-2px); box-shadow:0 6px 20px rgba(124,92,191,0.35); }
+    #grimz-guard-btn:active { transform:translateY(0); }
+
+    .gg-countdown-row {
+      display:flex; align-items:center; justify-content:space-between;
+      position:relative; z-index:1;
+    }
+    .gg-countdown-text {
+      font-family:'JetBrains Mono',monospace; font-size:0.58rem;
+      color:#5a5470; letter-spacing:0.1em;
+    }
+    .gg-countdown-text span { color:#f87171; font-weight:700; }
+
+    .gg-progress {
+      width:100%; height:1px; background:rgba(124,92,191,0.1);
+      margin-top:0.75rem; position:relative; z-index:1; overflow:hidden;
+    }
+    .gg-progress-fill {
+      height:100%; background:linear-gradient(90deg,#f87171,#fbbf24);
+      transition:width 1s linear;
+    }
+  `;
+  document.head.appendChild(style);
+
+  // ── INJECT HTML ─────────────────────────────────────────
+  const overlay = document.createElement('div');
+  overlay.id = 'grimz-guard-overlay';
+  overlay.innerHTML = `
+    <div id="grimz-guard-box">
+      <div class="gg-corner gg-corner-tl"></div>
+      <div class="gg-corner gg-corner-br"></div>
+      <div class="gg-logo">GRIMZ <span>CLOUD</span> PC</div>
+      <div class="gg-title">🔒 Khu vực giới hạn</div>
+      <div class="gg-sub">Trang này đang trong giai đoạn triển khai.<br>Nhập mật khẩu để tiếp tục.</div>
+      <div class="gg-input-wrap">
+        <label class="gg-input-label">// Mật khẩu truy cập</label>
+        <div class="gg-input-row">
+          <input id="grimz-guard-input" type="password" placeholder="••••••••" autocomplete="off" />
+          <button id="gg-toggle-pass" tabindex="-1">👁</button>
+        </div>
+      </div>
+      <div id="grimz-guard-err"></div>
+      <button id="grimz-guard-btn">Xác nhận</button>
+      <div class="gg-countdown-row">
+        <span class="gg-countdown-text">Tự động redirect sau <span id="gg-cd">${COUNTDOWN}</span>s</span>
+        <span class="gg-countdown-text" style="color:#5a5470">→ /home</span>
+      </div>
+      <div class="gg-progress">
+        <div class="gg-progress-fill" id="gg-progress" style="width:100%"></div>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+
+  // ── LOGIC ───────────────────────────────────────────────
+  const input   = document.getElementById('grimz-guard-input');
+  const btn     = document.getElementById('grimz-guard-btn');
+  const errEl   = document.getElementById('grimz-guard-err');
+  const cdEl    = document.getElementById('gg-cd');
+  const progEl  = document.getElementById('gg-progress');
+  const toggleBtn = document.getElementById('gg-toggle-pass');
+
+  // Show/hide password
+  toggleBtn.addEventListener('click', () => {
+    input.type = input.type === 'password' ? 'text' : 'password';
+    toggleBtn.textContent = input.type === 'password' ? '👁' : '🙈';
+  });
+
+  // Hash password (SHA-256 via Web Crypto)
+  async function hashPass(str) {
+    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+  }
+
+  async function verify() {
+    const val = input.value.trim();
+    if (!val) {
+      showErr('Vui lòng nhập mật khẩu.');
+      return;
+    }
+    const hash = await hashPass(val);
+    if (hash === PASS_HASH) {
+      localStorage.setItem(STORAGE_KEY, PASS_HASH);
+      errEl.textContent = '';
+      btn.textContent = '✓ Đúng rồi!';
+      btn.style.background = 'rgba(74,222,128,0.8)';
+      clearInterval(cdInterval);
+      setTimeout(() => {
+        overlay.style.animation = 'guardFadeIn 0.3s ease reverse forwards';
+        setTimeout(() => overlay.remove(), 300);
+        document.documentElement.style.overflow = '';
+      }, 500);
+    } else {
+      showErr('Mật khẩu không đúng.');
+      input.classList.add('shake');
+      setTimeout(() => input.classList.remove('shake'), 400);
+      input.value = '';
+      input.focus();
+    }
+  }
+
+  function showErr(msg) {
+    errEl.textContent = '⚠ ' + msg;
+  }
+
+  btn.addEventListener('click', verify);
+  input.addEventListener('keydown', e => { if (e.key === 'Enter') verify(); });
+  input.focus();
+
+  // Countdown
+  let remaining = COUNTDOWN;
+  const cdInterval = setInterval(() => {
+    remaining--;
+    cdEl.textContent = remaining;
+    progEl.style.width = (remaining / COUNTDOWN * 100) + '%';
+    if (remaining <= 0) {
+      clearInterval(cdInterval);
+      window.location.replace(REDIRECT);
+    }
+  }, 1000);
+
+})(); }, { once: true });
+
+</script>
+</head>
+<body>
+
+
+<!-- ADMIN LOADER -->
+<div id="admin-loader">
+  <div class="al-tag">// grimz system · restricted access</div>
+  <div class="al-title" id="al-title">Grimz Administrator Panel</div>
+  <div class="al-sub" id="al-sub">Đang khởi tạo...</div>
+  <div class="al-bar-wrap"><div class="al-bar-fill" id="al-fill"></div></div>
+  <div class="al-pct" id="al-pct">0%</div>
+  <div class="al-dots"><div class="al-dot"></div><div class="al-dot"></div><div class="al-dot"></div></div>
+</div>
+
+<!-- LOCK SCREEN -->
+<div id="lock-screen" style="position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:9999;">
+  <div style="background:var(--bg2);border:1px solid var(--border);padding:2.5rem 2rem;width:100%;max-width:340px;position:relative;clip-path:polygon(0 0,calc(100% - 16px) 0,100% 16px,100% 100%,0 100%);">
+    <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--accent3),var(--accent2));"></div>
+    <div style="font-family:'Rajdhani',sans-serif;font-size:1.1rem;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--accent2);text-align:center;margin-bottom:0.3rem;">Grimz Admin</div>
+    <div id="lock-status" style="font-family:'JetBrains Mono',monospace;font-size:0.62rem;color:var(--muted);text-align:center;letter-spacing:0.15em;margin-bottom:1.5rem;">// Đang kiểm tra thiết bị...</div>
+    <div id="lock-trusted" style="display:none;text-align:center;padding:1rem 0;">
+      <div style="font-size:2rem;margin-bottom:0.5rem;">🔓</div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:0.7rem;color:var(--green);letter-spacing:0.12em;">THIẾT BỊ TIN CẬY</div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:0.6rem;color:var(--muted);margin-top:0.3rem;">Đang đăng nhập tự động...</div>
+    </div>
+    <div id="lock-pw-form">
+      <input type="password" id="admin-pw" placeholder="Mật khẩu..." onkeydown="if(event.key==='Enter')checkPw()" style="width:100%;background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:0.7rem 0.75rem;font-family:'Poppins',sans-serif;font-size:0.875rem;outline:none;margin-bottom:0.75rem;transition:border-color 0.2s;">
+      <div style="display:flex;justify-content:center;margin-bottom:0.75rem;"><div class="cf-turnstile" data-sitekey="0x4AAAAAACrS3npj6qFvSu2W" data-theme="dark"></div></div>
+      <button onclick="checkPw()" style="width:100%;background:var(--accent);color:#fff;padding:0.7rem;font-family:'Rajdhani',sans-serif;font-size:0.9rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;border:none;cursor:pointer;transition:background 0.2s;">Đăng nhập</button>
+      <div id="gen-pw-wrap" style="display:none;margin-top:0.75rem;">
+        <button onclick="genPassword()" id="gen-pw-btn" style="width:100%;background:rgba(74,222,128,0.1);border:1px solid rgba(74,222,128,0.3);color:#4ade80;padding:0.6rem;font-family:'JetBrains Mono',monospace;font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;transition:all 0.2s;">🔑 Gen Password mới</button>
+        <div id="gen-pw-msg" style="display:none;margin-top:0.5rem;font-family:'JetBrains Mono',monospace;font-size:0.65rem;text-align:center;letter-spacing:0.08em;color:#4ade80;"></div>
+      </div>
+    </div>
+    <div id="pw-err" style="display:none;margin-top:0.75rem;font-family:'JetBrains Mono',monospace;font-size:0.68rem;color:#f87171;text-align:center;letter-spacing:0.08em;"></div>
+    <div id="rate-limit-msg" style="display:none;margin-top:0.75rem;font-family:'JetBrains Mono',monospace;font-size:0.68rem;color:#f87171;text-align:center;letter-spacing:0.08em;"></div>
+    <div id="lock-device-warning" style="display:none;margin-top:0.75rem;background:rgba(251,191,36,0.1);border:1px solid rgba(251,191,36,0.3);padding:0.5rem 0.75rem;font-family:'JetBrains Mono',monospace;font-size:0.6rem;color:#fbbf24;letter-spacing:0.08em;text-align:center;">⚠️ Thiết bị/IP mới — cần xác minh password</div>
+  </div>
+</div>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="logo">Grimz Cloud PC <span class="logo-badge">ADMIN</span></div>
+  <div class="topbar-actions">
+    <button class="theme-toggle" onclick="genPasswordPanel()" style="border-color:rgba(74,222,128,0.3);color:#4ade80;" title="Gen password mới"><i class="fas fa-key"></i> <span>Gen Pass</span></button>
+    <button class="theme-toggle" onclick="toggleTheme()"><i class="fas fa-circle-half-stroke"></i> <span>Theme</span></button>
+    <a href="grimz-dashboard.html" class="topbar-link"><i class="fas fa-tachometer-alt"></i> <span>Dashboard</span></a>
+    <a href="index.html" class="topbar-link"><i class="fas fa-home"></i> <span>Trang chủ</span></a>
+  </div>
+</div>
+
+<!-- GEN PASSWORD MODAL -->
+<div class="modal-overlay" id="gen-pw-modal">
+  <div class="modal-box" style="max-width:360px;">
+    <button class="modal-close" onclick="document.getElementById('gen-pw-modal').classList.remove('open')"><i class="fas fa-times"></i></button>
+    <div class="modal-title" style="color:#4ade80;"><i class="fas fa-key"></i> Gen Password Mới</div>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:0.65rem;color:var(--muted);margin-bottom:1.25rem;line-height:1.8;">Password mới sẽ được gen ngẫu nhiên, lưu vào Supabase và gửi vào Discord.</div>
+    <button onclick="doGenPassword()" id="do-gen-btn" class="btn btn-primary" style="width:100%;justify-content:center;background:rgba(74,222,128,0.15);border:1px solid rgba(74,222,128,0.3);color:#4ade80;">
+      <i class="fas fa-rotate"></i> Gen Password Mới
+    </button>
+    <div id="gen-result" style="display:none;margin-top:1rem;background:rgba(74,222,128,0.07);border:1px solid rgba(74,222,128,0.2);padding:0.75rem;font-family:'JetBrains Mono',monospace;font-size:0.72rem;color:#4ade80;word-break:break-all;text-align:center;"></div>
+  </div>
+</div>
+
+<div class="wrap">
+  <!-- STATS CARDS -->
+  <div class="stats-grid">
+    <div class="stat-card sc-total"><div class="sc-label"><i class="fas fa-server"></i> Tổng máy</div><div class="sc-val" id="stat-total">—</div></div>
+    <div class="stat-card sc-active"><div class="sc-label"><i class="fas fa-circle-check"></i> Đang chạy</div><div class="sc-val" id="stat-active">—</div></div>
+    <div class="stat-card sc-soon"><div class="sc-label"><i class="fas fa-clock"></i> Sắp hết (&lt;24h)</div><div class="sc-val" id="stat-soon">—</div></div>
+    <div class="stat-card sc-expired"><div class="sc-label"><i class="fas fa-triangle-exclamation"></i> Hết hạn</div><div class="sc-val" id="stat-expired">—</div></div>
+  </div>
+
+  <!-- ASSIGN CARD -->
+  <div class="card">
+    <div class="card-title">
+      <span><i class="fas fa-plus-circle"></i> Gán máy cho user</span>
+      <span id="assign-plan-badge" style="font-family:'JetBrains Mono',monospace;font-size:0.65rem;color:var(--muted);font-weight:400;letter-spacing:0.08em;">— Chưa chọn</span>
+    </div>
+    <div class="form-grid">
+      <div class="form-group full">
+        <label>User ID</label>
+        <input type="text" id="f-userid" placeholder="Paste UUID từ bảng bên dưới hoặc Discord...">
+      </div>
+      <div class="form-group">
+        <label>Địa chỉ IP</label>
+        <input type="text" id="f-ip" placeholder="IP máy Parsec (103.x.x.x)..." pattern="^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$">
+        <div class="ip-err" id="ip-err"><i class="fas fa-xmark"></i> IP không đúng định dạng</div>
+      </div>
+      <div class="form-group">
+        <label>Mật khẩu Parsec</label>
+        <input type="text" id="f-password" placeholder="Password Parsec (user nhập để kết nối)...">
+      </div>
+      <div class="form-group">
+        <label>GPU</label>
+        <select id="f-gpu">
+          <option value="NVIDIA RTX 3060 12GB">RTX 3060 12GB</option>
+          <option value="NVIDIA RTX 4060 8GB">RTX 4060 8GB</option>
+          <option value="NVIDIA RTX 4070">RTX 4070</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>CPU</label>
+        <select id="f-cpu">
+          <option value="Intel Core i5-10400F">i5-10400F</option>
+          <option value="Intel Core i7">Intel Core i7</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>RAM</label>
+        <input type="text" id="f-ram" value="32GB DDR4">
+      </div>
+      <div class="form-group">
+        <label>Storage</label>
+        <select id="f-storage">
+          <option value="2 x 1TB HDD">2 x 1TB HDD</option>
+          <option value="2TB SSD NVMe + 2TB HDD">2TB SSD NVMe + 2TB HDD</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>OS</label>
+        <select id="f-os">
+          <option>Windows 10</option>
+          <option>Windows 11</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Gói dịch vụ</label>
+        <select id="f-plan">
+          <option value="G-NOVA">G-NOVA · RTX 3060 · 3.000đ/h</option>
+          <option value="G-ORBIT">G-ORBIT · RTX 4060 · 5.000đ/h</option>
+          <option value="G-PULSAR">G-PULSAR · RTX 4070 · 6.000đ/h</option>
+        </select>
+      </div>
+      <div class="form-group full">
+        <label>Thời hạn thuê (giờ)</label>
+        <input type="number" id="f-hours" placeholder="Nhập số giờ..." min="1">
+        <div class="quick-hours">
+          <span class="qh" onclick="setHours(1)">1h</span>
+          <span class="qh" onclick="setHours(3)">3h</span>
+          <span class="qh" onclick="setHours(5)">5h</span>
+          <span class="qh" onclick="setHours(10)">10h</span>
+          <span class="qh" onclick="setHours(24)">1 ngày</span>
+          <span class="qh" onclick="setHours(72)">3 ngày</span>
+          <span class="qh" onclick="setHours(168)">1 tuần</span>
+          <span class="qh" onclick="setHours(720)">1 tháng</span>
+        </div>
+        <div class="hours-hint" id="expiry-preview">—</div>
+      </div>
+    </div>
+
+    <!-- ASSIGN PREVIEW -->
+    <div class="assign-preview" id="assign-preview">
+      <div class="preview-item"><div class="preview-label">User ID</div><div class="preview-val" id="pv-user">—</div></div>
+      <div class="preview-item"><div class="preview-label">IP</div><div class="preview-val" id="pv-ip">—</div></div>
+      <div class="preview-item"><div class="preview-label">Password</div><div class="preview-val" id="pv-pass">—</div></div>
+      <div class="preview-item"><div class="preview-label">Hết hạn</div><div class="preview-val" id="pv-expiry">—</div></div>
+    </div>
+
+    <div style="margin-top:1.25rem;display:flex;gap:0.75rem;align-items:center;">
+      <button class="btn btn-primary" id="assign-btn" onclick="assignMachine()">
+        <i class="fas fa-check"></i> Xác nhận gán
+      </button>
+      <button class="btn btn-muted btn-sm" onclick="clearForm()"><i class="fas fa-rotate-left"></i> Reset</button>
+    </div>
+    <div class="msg msg-ok" id="msg-ok" style="display:none;"><i class="fas fa-check-circle"></i> Gán máy thành công!</div>
+    <div class="msg msg-err" id="msg-err" style="display:none;"></div>
+  </div>
+
+  <!-- MACHINES TABLE -->
+  <div class="card">
+    <div class="card-title">
+      <span><i class="fas fa-list"></i> Danh sách máy</span>
+      <button class="btn btn-muted btn-sm" onclick="loadData()"><i class="fas fa-rotate-right"></i> Làm mới</button>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>User ID</th><th>IP</th><th>GPU</th><th>Gói</th><th>Hết hạn</th><th>Trạng thái</th><th></th></tr>
+        </thead>
+        <tbody id="machines-table">
+          <tr><td colspan="7" class="empty">Đang tải...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- EXTEND MODAL -->
+<div class="modal-overlay" id="extend-modal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeExtend()"><i class="fas fa-times"></i></button>
+    <div class="modal-title"><i class="fas fa-clock"></i> Gia hạn máy</div>
+    <div id="current-expiry-display" style="font-family:'JetBrains Mono',monospace;font-size:0.65rem;color:var(--accent2);margin-bottom:1rem;letter-spacing:0.08em;">—</div>
+    <input type="hidden" id="extend-id">
+    <label>Thêm số giờ</label>
+    <input type="number" class="modal-input" id="extend-hours" placeholder="Số giờ cần thêm..." min="1" style="margin-top:0.4rem;">
+    <div class="quick-hours" style="margin-bottom:1rem;">
+      <span class="qh" onclick="document.getElementById('extend-hours').value=1">1h</span>
+      <span class="qh" onclick="document.getElementById('extend-hours').value=5">5h</span>
+      <span class="qh" onclick="document.getElementById('extend-hours').value=10">10h</span>
+      <span class="qh" onclick="document.getElementById('extend-hours').value=24">1 ngày</span>
+      <span class="qh" onclick="document.getElementById('extend-hours').value=72">3 ngày</span>
+      <span class="qh" onclick="document.getElementById('extend-hours').value=168">1 tuần</span>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-muted btn-sm" onclick="closeExtend()">Huỷ</button>
+      <button class="btn btn-primary btn-sm" id="extend-confirm-btn" onclick="confirmExtend()"><i class="fas fa-check"></i> Xác nhận</button>
+    </div>
+  </div>
+</div>
+
+<!-- REVOKE MODAL -->
+<div class="modal-overlay" id="revoke-modal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeRevoke()"><i class="fas fa-times"></i></button>
+    <div class="modal-title" style="color:var(--yellow);"><i class="fas fa-triangle-exclamation"></i> Thu hồi máy</div>
+    <div class="modal-info">
+      <div class="modal-row"><span class="modal-row-label">User ID</span><span class="modal-row-val" id="rv-user">—</span></div>
+      <div class="modal-row"><span class="modal-row-label">GPU</span><span class="modal-row-val" id="rv-gpu">—</span></div>
+      <div class="modal-row"><span class="modal-row-label">Gói</span><span class="modal-row-val" id="rv-plan">—</span></div>
+      <div class="modal-row"><span class="modal-row-label">Bắt đầu</span><span class="modal-row-val" id="rv-start">—</span></div>
+      <div class="modal-row"><span class="modal-row-label">Tổng giờ đã dùng</span><span class="modal-row-val" id="rv-hours" style="color:var(--yellow);">—</span></div>
+    </div>
+    <div style="font-size:0.78rem;color:var(--muted);margin-bottom:0.5rem;">Dữ liệu sẽ được ghi vào lịch sử thuê của user trước khi xóa máy.</div>
+    <div class="modal-footer">
+      <button class="btn btn-muted btn-sm" onclick="closeRevoke()">Huỷ</button>
+      <button class="btn btn-warning btn-sm" id="revoke-confirm-btn" onclick="confirmRevoke()"><i class="fas fa-ban"></i> Xác nhận thu hồi</button>
+    </div>
+  </div>
+</div>
+
+<!-- FAB -->
+<div class="fab-cluster">
+  <button class="fab-btn" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Lên đầu"><i class="fas fa-arrow-up"></i></button>
+  <button class="fab-btn" onclick="loadData()" title="Làm mới"><i class="fas fa-rotate-right"></i></button>
+  <button class="fab-btn" onclick="document.getElementById('f-userid').focus();window.scrollTo({top:0,behavior:'smooth'})" title="Gán máy nhanh"><i class="fas fa-user-plus"></i></button>
+</div>
+
+
+<!-- CHAT FAB -->
+<div class="chat-fab">
+  <button class="chat-fab-btn" onclick="toggleChat()" title="Chat">
+    <i class="fas fa-comments"></i>
+    <span class="chat-badge" id="chat-badge">0</span>
+  </button>
+</div>
+
+<!-- CHAT PANEL -->
+<div class="chat-panel" id="chat-panel">
+  <div class="chat-header">
+    <span class="chat-header-title" id="chat-header-title">// GRIMZ CHAT</span>
+    <div style="display:flex;align-items:center;gap:0.5rem;">
+      <button class="support-back" id="support-back-btn" onclick="backToSupportList()"><i class="fas fa-arrow-left"></i> Danh sách</button>
+      <button class="chat-close" onclick="toggleChat()"><i class="fas fa-times"></i></button>
+    </div>
+  </div>
+  <div class="chat-tabs">
+    <button class="chat-tab active" id="tab-admin" onclick="switchChatTab('admin')"><i class="fas fa-users"></i> Admin <span id="admin-unread" class="chat-tab-badge" style="display:none;">0</span></button>
+    <button class="chat-tab" id="tab-support" onclick="switchChatTab('support')"><i class="fas fa-headset"></i> Support <span id="support-unread" class="chat-tab-badge" style="display:none;">0</span></button>
+  </div>
+
+  <!-- ADMIN CHAT -->
+  <div id="chat-admin-panel" style="display:flex;flex-direction:column;">
+    <div class="chat-body" id="admin-chat-body"><div class="chat-empty">Chưa có tin nhắn</div></div>
+    <div class="typing-row" id="admin-typing-row"><span class="typing-who" id="admin-typing-who"></span><div class="typing-dots"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div></div>
+    <div class="chat-input-wrap">
+      <input class="chat-input" id="admin-chat-input" placeholder="Nhắn cho team..." onkeydown="if(event.key==='Enter')sendAdminMsg()" oninput="adminTyping('admin')">
+      <label class="chat-attach-btn" title="Gửi ảnh"><i class="fas fa-image"></i><input type="file" accept="image/*" style="display:none;" onchange="sendAdminImage(this)"></label>
+      <button class="chat-send" onclick="sendAdminMsg()"><i class="fas fa-paper-plane"></i></button>
+    </div>
+  </div>
+
+  <!-- SUPPORT LIST / CHAT -->
+  <div id="chat-support-panel" style="display:none;">
+    <div id="support-user-list" class="support-list"><div class="chat-empty">Chưa có user nào nhắn</div></div>
+    <div id="support-user-chat" style="display:none; flex-direction:column;">
+      <div class="user-info-panel" id="user-info-panel"></div>
+      <div class="chat-body" id="support-chat-body"></div>
+      <div class="typing-row" id="support-typing-admin"><span class="typing-who" id="support-typing-who">User đang nhập</span><div class="typing-dots"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div></div>
+      <div class="chat-input-wrap">
+        <input class="chat-input" id="support-chat-input" placeholder="Reply user..." onkeydown="if(event.key==='Enter')sendSupportReply()" oninput="adminTyping('support')">
+        <label class="chat-attach-btn" title="Gửi ảnh"><i class="fas fa-image"></i><input type="file" accept="image/*" style="display:none;" onchange="sendSupportImage(this)"></label>
+        <button class="chat-send" onclick="sendSupportReply()"><i class="fas fa-paper-plane"></i></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+  const sb = window.supabase.createClient(
+    'https://vlwevojqfomophsdwsqd.supabase.co',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZsd2V2b2pxZm9tb3Boc2R3c3FkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM1NzE2NDgsImV4cCI6MjA4OTE0NzY0OH0.6NECwQqKKeZH2fIgqp8SkmA6kPAqtsc5dlhEdGVFgBE'
+  );
+
+
+  // ===== ADMIN LOADER =====
+  (function(){
+    const loader = document.getElementById('admin-loader');
+    const fill   = document.getElementById('al-fill');
+    const pct    = document.getElementById('al-pct');
+    const sub    = document.getElementById('al-sub');
+    const title  = document.getElementById('al-title');
+
+    // Smooth progress over 5 seconds
+    const steps = [
+      { at:800,  p:8,   msg:'Đang tải module...' },
+      { at:1400, p:18,  msg:'Khởi tạo Supabase...' },
+      { at:2000, p:32,  msg:'Xác thực phiên...' },
+      { at:2700, p:50,  msg:'Tải dữ liệu hệ thống...' },
+      { at:3400, p:67,  msg:'Kiểm tra quyền truy cập...' },
+      { at:4100, p:82,  msg:'Chuẩn bị giao diện...' },
+      { at:4700, p:95,  msg:'Hoàn tất...' },
+      { at:5200, p:100, msg:null },
+    ];
+    steps.forEach(({at, p, msg}) => {
+      setTimeout(() => {
+        fill.style.width = p + '%';
+        pct.textContent = p + '%';
+        if(msg) sub.textContent = msg;
+        if(p === 100) {
+          setTimeout(() => {
+            sub.textContent = '// ACCESS GRANTED';
+            sub.classList.add('green');
+            title.classList.add('lit');
+          }, 300);
+          setTimeout(() => {
+            loader.classList.add('fade-out');
+            setTimeout(() => loader.style.display = 'none', 500);
+          }, 2000);
+        }
+      }, at);
+    });
+  })();
+
+  // ===== FINGERPRINT & IP =====
+  let _fp = null;
+  let _ip = null;
+  const SUPABASE_FUNC_URL = 'https://vlwevojqfomophsdwsqd.supabase.co/functions/v1';
+
+  async function getFingerprint() {
+    if (_fp) return _fp;
+    try {
+      const agent = await FingerprintJS.load();
+      const result = await agent.get();
+      _fp = result.visitorId;
+    } catch { _fp = 'unknown'; }
+    return _fp;
+  }
+
+  async function getIP() {
+    if (_ip) return _ip;
+    try {
+      const res = await fetch('https://ipapi.co/json/', { signal: AbortSignal.timeout(3000) });
+      const data = await res.json();
+      _ip = data.ip || 'unknown';
+    } catch { _ip = 'unknown'; }
+    return _ip;
+  }
+
+  // ===== SUPABASE LOGGING =====
+  async function logAdmin(action, success) {
+    const fp = await getFingerprint();
+    const ip = await getIP();
+    await sb.from('admin_logs').insert({ fingerprint: fp, ip, action, success });
+  }
+
+  // ===== DISCORD NOTIFY (via Edge Function) =====
+  async function notifyDiscord(action, details, password) {
+    const fp = await getFingerprint();
+    const ip = await getIP();
+    try {
+      await sb.functions.invoke('admin-notify', {
+        body: { action, details, ip, fingerprint: fp, password: password || undefined }
+      });
+    } catch (e) { console.warn('Discord notify failed:', e); }
+  }
+
+  // ===== RATE LIMITING (Supabase-based) =====
+  const MAX_FAILS = 5;
+  const LOCK_MINUTES = 30;
+
+  async function checkRateLimit() {
+    const ip = await getIP();
+    const since = new Date(Date.now() - LOCK_MINUTES * 60 * 1000).toISOString();
+    const { count } = await sb.from('admin_logs')
+      .select('*', { count: 'exact', head: true })
+      .eq('ip', ip).eq('action', 'LOGIN_FAIL').eq('success', false)
+      .gte('created_at', since);
+    return (count || 0) < MAX_FAILS;
+  }
+
+  function showRateLimitMsg(msg) {
+    const el = document.getElementById('rate-limit-msg');
+    el.textContent = msg;
+    el.style.display = 'block';
+    document.getElementById('pw-err').style.display = 'none';
+    document.getElementById('lock-pw-form').style.opacity = '0.4';
+    document.getElementById('lock-pw-form').style.pointerEvents = 'none';
+  }
+
+  // ===== SESSION TIMEOUT (24 hours) =====
+  const SESSION_TIMEOUT = 24 * 60 * 60 * 1000;
+  const SESSION_KEY = 'grimz_admin_session';
+  let lastActivity = Date.now();
+  let sessionTimer = null;
+
+  function resetActivity() { lastActivity = Date.now(); }
+  ['click','keydown','mousemove','touchstart'].forEach(e => document.addEventListener(e, resetActivity, {passive:true}));
+
+  function startSessionTimer() {
+    // Save session start time
+    if (!sessionStorage.getItem(SESSION_KEY)) {
+      sessionStorage.setItem(SESSION_KEY, String(Date.now()));
+    }
+    if(sessionTimer) clearInterval(sessionTimer);
+    sessionTimer = setInterval(() => {
+      const start = parseInt(sessionStorage.getItem(SESSION_KEY) || '0');
+      if (Date.now() - start > SESSION_TIMEOUT) {
+        clearInterval(sessionTimer);
+        sessionStorage.removeItem('grimz-admin');
+        sessionStorage.removeItem(SESSION_KEY);
+        showToast('⏰ Phiên đã hết hạn (24h), vui lòng đăng nhập lại.', 'warn', 5000);
+        setTimeout(() => {
+          document.getElementById('lock-screen').style.display = 'flex';
+          document.getElementById('lock-pw-form').style.opacity = '1';
+          document.getElementById('lock-pw-form').style.pointerEvents = 'auto';
+          document.getElementById('admin-pw').value = '';
+          document.getElementById('lock-status').textContent = '// Phiên hết hạn — nhập lại mật khẩu';
+        }, 1500);
+      }
+    }, 60000);
+  }
+
+  // ===== AUDIT LOG (Supabase) =====
+  function auditLog(action, detail) {
+    logAdmin(action, true);
+  }
+
+  // ===== THEME =====
+  function toggleTheme(){
+    document.body.classList.toggle('light');
+    localStorage.setItem('grimz_admin_theme', document.body.classList.contains('light') ? 'light' : 'dark');
+  }
+  if(localStorage.getItem('grimz_admin_theme') === 'light') document.body.classList.add('light');
+
+  // ===== AUTH (Supabase + Fingerprint + IP) =====
+  async function hashPw(pw){
+    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(pw));
+    return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+  }
+
+  function showPwErr(msg){ const e=document.getElementById('pw-err'); e.style.display='block'; e.textContent=msg; }
+
+  function grantAccess(hash) {
+    document.getElementById('lock-screen').style.display='none';
+    sessionStorage.setItem('grimz-admin', hash || 'authenticated');
+    startSessionTimer();
+    loadData();
+  }
+
+  // Check if device is whitelisted (fingerprint + IP match)
+  async function checkDevice() {
+    const fp = await getFingerprint();
+    const ip = await getIP();
+
+    const { data: device } = await sb.from('admin_devices')
+      .select('id, fingerprint, ip')
+      .eq('fingerprint', fp)
+      .eq('ip', ip)
+      .maybeSingle();
+
+    return device;
+  }
+
+  // Whitelist current device
+  async function whitelistDevice() {
+    const fp = await getFingerprint();
+    const ip = await getIP();
+    const label = navigator.userAgent.slice(0, 120);
+
+    await sb.from('admin_devices').upsert(
+      { fingerprint: fp, ip, label, last_seen: new Date().toISOString() },
+      { onConflict: 'fingerprint,ip' }
+    );
+  }
+
+  // Check if fingerprint is known but IP changed (or vice versa)
+  async function checkPartialMatch() {
+    const fp = await getFingerprint();
+    const ip = await getIP();
+
+    const { data: fpMatch } = await sb.from('admin_devices')
+      .select('ip')
+      .eq('fingerprint', fp)
+      .limit(1);
+
+    const { data: ipMatch } = await sb.from('admin_devices')
+      .select('fingerprint')
+      .eq('ip', ip)
+      .limit(1);
+
+    const knownFp = fpMatch && fpMatch.length > 0;
+    const knownIp = ipMatch && ipMatch.length > 0;
+
+    if (knownFp && !knownIp) return 'new_ip';       // Known device, new IP
+    if (!knownFp && knownIp) return 'new_device';    // New device, known IP
+    if (!knownFp && !knownIp) return 'unknown';      // Completely new
+    return 'partial';                                  // Some partial match
+  }
+
+  async function checkPw(){
+    // Rate limit check
+    const allowed = await checkRateLimit();
+    if (!allowed) {
+      showRateLimitMsg(`🔒 IP bị khóa ${LOCK_MINUTES} phút do nhập sai quá ${MAX_FAILS} lần.`);
+      notifyDiscord('LOCKOUT', `IP locked out after ${MAX_FAILS} failed attempts`);
+      return;
+    }
+
+    const token = document.querySelector('[name="cf-turnstile-response"]')?.value;
+    if(!token){ showPwErr('Vui lòng xác minh bạn không phải bot.'); return; }
+
+    const pw = document.getElementById('admin-pw').value;
+    if (!pw.trim()) { showPwErr('Vui lòng nhập mật khẩu.'); return; }
+
+    const hash = await hashPw(pw);
+
+    // Fetch hash from Supabase
+    const { data: config } = await sb.from('admin_config')
+      .select('value')
+      .eq('key', 'admin_pw_hash')
+      .maybeSingle();
+
+    if (!config) {
+      showPwErr('Chưa có password trong hệ thống.');
+      document.getElementById('gen-pw-wrap').style.display = 'block';
+      return;
+    }
+
+    if (hash === config.value) {
+      // Success
+      await logAdmin('LOGIN_SUCCESS', true);
+      await whitelistDevice();
+      await notifyDiscord('LOGIN_SUCCESS', 'Admin logged in successfully');
+      grantAccess(hash);
+    } else {
+      // Fail
+      await logAdmin('LOGIN_FAIL', false);
+      showPwErr('Sai mật khẩu');
+      document.getElementById('admin-pw').value = '';
+
+      // Check if need to lock
+      const stillAllowed = await checkRateLimit();
+      if (!stillAllowed) {
+        showRateLimitMsg(`🔒 IP bị khóa ${LOCK_MINUTES} phút.`);
+        notifyDiscord('LOCKOUT', `IP locked after ${MAX_FAILS} fails`);
+      }
+    }
+  }
+
+  // ===== INIT: Auto-detect device & session =====
+  (async function initAuth(){
+    const statusEl = document.getElementById('lock-status');
+    const trustedEl = document.getElementById('lock-trusted');
+    const pwFormEl = document.getElementById('lock-pw-form');
+    const warningEl = document.getElementById('lock-device-warning');
+
+    // 1. Check existing session (24h)
+    const sessionStart = parseInt(sessionStorage.getItem(SESSION_KEY) || '0');
+    if (sessionStorage.getItem('grimz-admin') && (Date.now() - sessionStart < SESSION_TIMEOUT)) {
+      statusEl.textContent = '// Phiên đang hoạt động';
+      grantAccess();
+      return;
+    }
+
+    // 2. Get fingerprint + IP
+    statusEl.textContent = '// Đang kiểm tra thiết bị...';
+    const [fp, ip] = await Promise.all([getFingerprint(), getIP()]);
+
+    // 3. Rate limit check
+    const allowed = await checkRateLimit();
+    if (!allowed) {
+      showRateLimitMsg(`🔒 IP bị khóa ${LOCK_MINUTES} phút do nhập sai quá nhiều.`);
+      return;
+    }
+
+    // 4. Check device whitelist
+    const device = await checkDevice();
+    if (device) {
+      // Trusted device — auto-login
+      trustedEl.style.display = 'block';
+      pwFormEl.style.display = 'none';
+      statusEl.textContent = '// Thiết bị đã xác minh';
+
+      // Update last_seen
+      await sb.from('admin_devices').update({ last_seen: new Date().toISOString() }).eq('id', device.id);
+      await logAdmin('AUTO_LOGIN', true);
+
+      setTimeout(() => grantAccess(), 1200);
+      return;
+    }
+
+    // 5. Check partial match (suspicious)
+    const partial = await checkPartialMatch();
+    if (partial === 'new_ip') {
+      warningEl.style.display = 'block';
+      warningEl.textContent = '⚠️ IP mới từ thiết bị đã biết — cần xác minh';
+      notifyDiscord('SUSPICIOUS', `Known fingerprint (${fp.slice(0,8)}...) with new IP: ${ip}`);
+    } else if (partial === 'new_device') {
+      warningEl.style.display = 'block';
+      warningEl.textContent = '⚠️ Thiết bị mới từ IP đã biết — cần xác minh';
+      notifyDiscord('SUSPICIOUS', `New fingerprint from known IP: ${ip}`);
+    } else if (partial === 'unknown') {
+      warningEl.style.display = 'block';
+      warningEl.textContent = '🚨 Thiết bị & IP hoàn toàn mới';
+      notifyDiscord('SUSPICIOUS', `Completely unknown device+IP: ${ip}, fp: ${fp.slice(0,8)}...`);
+    }
+
+    // Show password form
+    statusEl.textContent = '// Nhập mật khẩu để tiếp tục';
+    pwFormEl.style.display = 'block';
+  })();
+
+  // ===== FORM HELPERS =====
+  function setHours(h){
+    document.getElementById('f-hours').value=h;
+    updatePreview();
+  }
+  function updatePreview(){
+    const h=parseFloat(document.getElementById('f-hours').value);
+    const uid=document.getElementById('f-userid').value.trim();
+    const ip=document.getElementById('f-ip').value.trim();
+    document.getElementById('pv-user').textContent = uid ? uid.slice(0,16)+'…' : '—';
+    document.getElementById('pv-ip').textContent = ip || '—';
+    document.getElementById('pv-pass').textContent = document.getElementById('f-password').value || '—';
+    if(!h||h<=0){ document.getElementById('expiry-preview').textContent='—'; document.getElementById('pv-expiry').textContent='—'; return; }
+    const expiry = new Date(Date.now()+h*3600000);
+    const str = expiry.toLocaleString('vi-VN',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
+    document.getElementById('expiry-preview').textContent='→ Hết hạn: '+str;
+    document.getElementById('pv-expiry').textContent=str;
+  }
+  document.getElementById('f-hours').addEventListener('input', updatePreview);
+  document.getElementById('f-userid').addEventListener('input', updatePreview);
+  document.getElementById('f-ip').addEventListener('input', updatePreview);
+  document.getElementById('f-password').addEventListener('input', updatePreview);
+
+  // Auto-select based on GPU
+  document.getElementById('f-gpu').addEventListener('change', function(){
+    const v=this.value;
+    document.getElementById('f-storage').value = v.includes('4070') ? '2TB SSD NVMe + 2TB HDD' : '2 x 1TB HDD';
+    document.getElementById('f-cpu').value = v.includes('4070') ? 'Intel Core i7' : 'Intel Core i5-10400F';
+    const p=document.getElementById('f-plan');
+    p.value = v.includes('4070') ? 'G-PULSAR' : v.includes('4060') ? 'G-ORBIT' : 'G-NOVA';
+    document.getElementById('assign-plan-badge').textContent = p.value;
+  });
+  document.getElementById('f-plan').addEventListener('change', function(){
+    document.getElementById('assign-plan-badge').textContent = this.value;
+  });
+
+  function validateIp(ip){ return /^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/.test(ip) && ip.split('.').every(n=>parseInt(n)<=255); }
+  document.getElementById('f-ip').addEventListener('blur', function(){
+    document.getElementById('ip-err').style.display = this.value && !validateIp(this.value) ? 'block' : 'none';
+  });
+
+  function clearForm(){
+    ['f-userid','f-ip','f-hours','f-password'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('expiry-preview').textContent='—';
+    document.getElementById('pv-user').textContent='—';
+    document.getElementById('pv-ip').textContent='—';
+    document.getElementById('pv-expiry').textContent='—';
+  }
+
+  // ===== STATS =====
+  function updateStats(machines){
+    const now=new Date();
+    document.getElementById('stat-total').textContent=machines.length;
+    document.getElementById('stat-active').textContent=machines.filter(m=>m.expiry&&new Date(m.expiry)>now).length;
+    document.getElementById('stat-soon').textContent=machines.filter(m=>{ const d=(new Date(m.expiry)-now)/3600000; return d>0&&d<=24; }).length;
+    document.getElementById('stat-expired').textContent=machines.filter(m=>m.expiry&&new Date(m.expiry)<now).length;
+  }
+
+  // ===== LOAD DATA =====
+  async function loadData(){
+    const{data:machines}=await sb.from('machines').select('*').order('created_at',{ascending:false});
+    const tbody=document.getElementById('machines-table');
+    if(!machines||machines.length===0){
+      tbody.innerHTML='<tr><td colspan="7" class="empty"><i class="fas fa-inbox"></i> Chưa có máy nào</td></tr>';
+      updateStats([]);
+      return;
+    }
+    updateStats(machines);
+    const now=new Date();
+    tbody.innerHTML=machines.map(m=>{
+      const expired=m.expiry&&new Date(m.expiry)<now;
+      const soon=!expired&&m.expiry&&(new Date(m.expiry)-now)/3600000<=24;
+      const expiryStr=m.expiry?new Date(m.expiry).toLocaleString('vi-VN',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}):'—';
+      return `<tr>
+        <td><button class="copy-btn" onclick="fillUserId('${m.user_id}')">${m.user_id?.slice(0,10)}… <i class="fas fa-copy" style="font-size:0.55rem;"></i></button></td>
+        <td class="mono">${m.ip||'—'}</td>
+        <td style="font-size:0.78rem;font-family:'JetBrains Mono',monospace;">${m.gpu?.replace('NVIDIA ','')||'—'}</td>
+        <td style="font-size:0.75rem;color:var(--accent2);font-family:'JetBrains Mono',monospace;">${m.plan||'—'}</td>
+        <td style="font-size:0.72rem;font-family:'JetBrains Mono',monospace;color:${expired?'var(--red)':soon?'var(--yellow)':'var(--muted)'}">${expiryStr}</td>
+        <td><span class="badge ${expired?'badge-expired':'badge-active'}">${expired?'HẾT HẠN':'ACTIVE'}</span></td>
+        <td><div class="actions-cell">
+          <button class="btn btn-sm btn-green"   onclick="openExtend('${m.id}','${m.expiry}')"><i class="fas fa-plus"></i> Giờ</button>
+          <button class="btn btn-sm btn-warning" onclick="openRevoke('${m.id}','${m.user_id}','${m.plan}','${m.gpu}','${m.created_at}','${m.expiry}')"><i class="fas fa-ban"></i> Thu hồi</button>
+          <button class="btn btn-sm btn-danger"  onclick="deleteMachine('${m.id}')"><i class="fas fa-trash"></i></button>
+        </div></td>
+      </tr>`;
+    }).join('');
+  }
+
+  function fillUserId(uid){
+    document.getElementById('f-userid').value=uid;
+    updatePreview();
+    window.scrollTo({top:0,behavior:'smooth'});
+    showToast('✓ Đã điền User ID','success');
+  }
+
+  // ===== ASSIGN =====
+  async function assignMachine(){
+    const userId=document.getElementById('f-userid').value.trim();
+    const ip=document.getElementById('f-ip').value.trim();
+    const hours=parseFloat(document.getElementById('f-hours').value);
+    if(!userId){ showMsg('err','Chưa điền User ID'); return; }
+    if(!ip){ showMsg('err','Chưa điền địa chỉ IP'); return; }
+    if(!validateIp(ip)){ showMsg('err','IP không đúng định dạng'); return; }
+    if(!hours||hours<=0){ showMsg('err','Chưa điền số giờ'); return; }
+    const btn=document.getElementById('assign-btn');
+    btn.disabled=true; btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Đang gán...';
+    const expiry=new Date(Date.now()+hours*3600000).toISOString();
+    const payload={ip,gpu:document.getElementById('f-gpu').value,cpu:document.getElementById('f-cpu').value,ram:document.getElementById('f-ram').value,storage:document.getElementById('f-storage').value,os:document.getElementById('f-os').value,expiry,plan:document.getElementById('f-plan').value,password:document.getElementById('f-password').value.trim()||null};
+    const{data:existing}=await sb.from('machines').select('id').eq('user_id',userId).single();
+    let error;
+    if(existing){ ({error}=await sb.from('machines').update(payload).eq('user_id',userId)); }
+    else { ({error}=await sb.from('machines').insert({user_id:userId,...payload})); }
+    btn.disabled=false; btn.innerHTML='<i class="fas fa-check"></i> Xác nhận gán';
+    if(error){ showMsg('err',error.message); return; }
+    auditLog('ASSIGN', 'Gán máy cho user '+userId+' IP:'+ip); showMsg('ok');
+    clearForm();
+    loadData();
+  }
+
+  // ===== DELETE =====
+  async function deleteMachine(id){
+    if(!confirm('Xóa máy này? (Không ghi lịch sử)')) return;
+    await sb.from('machines').delete().eq('id',id);
+    auditLog('DELETE', 'Xóa máy ID '+id); showToast('✓ Đã xóa','success');
+    loadData();
+  }
+
+  // ===== EXTEND =====
+  function openExtend(id,currentExpiry){
+    document.getElementById('extend-id').value=id;
+    document.getElementById('extend-hours').value='';
+    const str=currentExpiry&&currentExpiry!=='null'?new Date(currentExpiry).toLocaleString('vi-VN',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}):'—';
+    document.getElementById('current-expiry-display').textContent='Hết hạn hiện tại: '+str;
+    document.getElementById('extend-modal').classList.add('open');
+  }
+  function closeExtend(){ document.getElementById('extend-modal').classList.remove('open'); }
+  async function confirmExtend(){
+    const id=document.getElementById('extend-id').value;
+    const hours=parseFloat(document.getElementById('extend-hours').value);
+    if(!hours||hours<=0) return;
+    const{data:m}=await sb.from('machines').select('expiry').eq('id',id).single();
+    const base=m?.expiry&&new Date(m.expiry)>new Date()?new Date(m.expiry):new Date();
+    const newExpiry=new Date(base.getTime()+hours*3600000).toISOString();
+    const btn=document.getElementById('extend-confirm-btn');
+    btn.disabled=true; btn.innerHTML='<i class="fas fa-spinner fa-spin"></i>';
+    const{error}=await sb.from('machines').update({expiry:newExpiry}).eq('id',id);
+    btn.disabled=false; btn.innerHTML='<i class="fas fa-check"></i> Xác nhận';
+    if(error){ showToast('✗ Lỗi: '+error.message,'error'); return; }
+    closeExtend();
+    auditLog('EXTEND', 'Gia hạn máy ID '+id+' thêm '+hours+'h'); showToast('✓ Gia hạn thành công!','success');
+    loadData();
+  }
+
+  // ===== REVOKE =====
+  let revokeData = null;
+  function openRevoke(id,userId,plan,gpu,startedAt,expiry){
+    revokeData={id,userId,plan,gpu,startedAt,expiry};
+    const started=startedAt&&startedAt!=='null'?new Date(startedAt):new Date();
+    const totalHours=parseFloat(((new Date()-started)/3600000).toFixed(2));
+    document.getElementById('rv-user').textContent=userId?.slice(0,20)+'…';
+    document.getElementById('rv-gpu').textContent=gpu?.replace('NVIDIA ','')||'—';
+    document.getElementById('rv-plan').textContent=plan||'—';
+    document.getElementById('rv-start').textContent=started.toLocaleString('vi-VN',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
+    document.getElementById('rv-hours').textContent=totalHours+' giờ';
+    document.getElementById('revoke-modal').classList.add('open');
+  }
+  function closeRevoke(){ document.getElementById('revoke-modal').classList.remove('open'); revokeData=null; }
+  async function confirmRevoke(){
+    if(!revokeData) return;
+    const{id,userId,plan,gpu,startedAt}=revokeData;
+    const btn=document.getElementById('revoke-confirm-btn');
+    btn.disabled=true; btn.innerHTML='<i class="fas fa-spinner fa-spin"></i>';
+    const started=startedAt&&startedAt!=='null'?new Date(startedAt):new Date();
+    const ended=new Date();
+    const totalHours=parseFloat(((ended-started)/3600000).toFixed(2));
+    const{error:histErr}=await sb.from('rental_history').insert({user_id:userId,plan:plan||'G-NOVA',gpu:gpu||'—',started_at:started.toISOString(),ended_at:ended.toISOString(),total_hours:totalHours});
+    if(histErr){ showToast('✗ Lỗi ghi lịch sử: '+histErr.message,'error'); btn.disabled=false; btn.innerHTML='<i class="fas fa-ban"></i> Xác nhận thu hồi'; return; }
+    await sb.from('machines').delete().eq('id',id);
+    btn.disabled=false; btn.innerHTML='<i class="fas fa-ban"></i> Xác nhận thu hồi';
+    closeRevoke();
+    auditLog('REVOKE', 'Thu hồi máy user '+userId+' ('+totalHours+'h)'); showToast('✓ Thu hồi & ghi lịch sử ('+totalHours+'h)','success');
+    loadData();
+  }
+
+
+  // ===== CHAT SYSTEM =====
+  let chatOpen = false;
+  let currentChatTab = 'admin';
+  let currentSupportUserId = null;
+  let adminAlias = localStorage.getItem('grimz_admin_alias') || null;
+  let adminChatSub = null;
+  let supportChatSub = null;
+  let adminMsgs = [];
+  let supportConvos = {}; // userId -> [msgs]
+  let lastSeenAdmin = parseInt(localStorage.getItem('grimz_last_seen_admin') || '0');
+  let lastSeenSupport = {};
+
+  function getAdminAlias() {
+    if(!adminAlias) {
+      adminAlias = prompt('Nhập tên hiển thị của bạn (alias):') || 'Admin';
+      localStorage.setItem('grimz_admin_alias', adminAlias);
+    }
+    return adminAlias;
+  }
+
+  function toggleChat() {
+    chatOpen = !chatOpen;
+    document.getElementById('chat-panel').classList.toggle('open', chatOpen);
+    if(chatOpen) {
+      getAdminAlias();
+      initTypingChannels();
+      if(!adminChatSub) initAdminChat();
+      if(!supportChatSub) initSupportChat();
+      markAdminSeen();
+    }
+  }
+
+  function switchChatTab(tab) {
+    currentChatTab = tab;
+    document.getElementById('chat-admin-panel').style.display  = tab==='admin'   ? 'flex' : 'none';
+    document.getElementById('chat-support-panel').style.display= tab==='support' ? 'block': 'none';
+    document.getElementById('tab-admin').classList.toggle('active', tab==='admin');
+    document.getElementById('tab-support').classList.toggle('active', tab==='support');
+    document.getElementById('chat-header-title').textContent = tab==='admin' ? '// ADMIN CHAT' : '// SUPPORT';
+    document.getElementById('support-back-btn').classList.remove('show');
+    if(tab==='admin') { markAdminSeen(); document.getElementById('admin-chat-input').focus(); }
+    if(tab==='support') renderSupportList();
+  }
+
+  // ===== ADMIN CHAT =====
+  async function initAdminChat() {
+    const { data } = await sb.from('admin_chat').select('*').order('created_at', {ascending:true}).limit(50);
+    adminMsgs = data || [];
+    renderAdminChat();
+    adminChatSub = sb.channel('admin-chat-live')
+      .on('postgres_changes', {event:'INSERT', schema:'public', table:'admin_chat'}, payload => {
+        adminMsgs.push(payload.new);
+        renderAdminChat();
+        if(!chatOpen || currentChatTab !== 'admin') {
+          updateAdminUnread();
+          document.getElementById('chat-badge').classList.add('show');
+        } else markAdminSeen();
+      }).subscribe();
+  }
+
+  function renderAdminChat() {
+    const body = document.getElementById('admin-chat-body');
+    if(!adminMsgs.length) { body.innerHTML='<div class="chat-empty">Chưa có tin nhắn</div>'; return; }
+    body.innerHTML = adminMsgs.map(m => {
+      const mine = m.alias === adminAlias;
+      const time = new Date(m.created_at).toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'});
+      const content = m.is_image
+        ? `<img class="chat-img" src="${m.message}" onclick="window.open(this.src)">`
+        : `<span>${escHtml(m.message)}</span>`;
+      return `<div class="chat-msg ${mine?'mine':'theirs'}">
+        <div class="chat-meta"><span class="chat-alias">${m.alias}</span> · ${time}</div>
+        <div class="chat-bubble-wrap"><div class="chat-bubble">${content}</div><button class="del-msg-btn" onclick="deleteAdminMsg('${m.id}')" title="Xóa">✕</button></div>
+      </div>`;
+    }).join('');
+    body.scrollTop = body.scrollHeight;
+  }
+
+  async function sendAdminMsg() {
+    const input = document.getElementById('admin-chat-input');
+    const msg = input.value.trim();
+    if(!msg) return;
+    input.value = '';
+    await sb.from('admin_chat').insert({ alias: getAdminAlias(), message: msg });
+  }
+
+  function markAdminSeen() {
+    lastSeenAdmin = Date.now();
+    localStorage.setItem('grimz_last_seen_admin', lastSeenAdmin);
+    document.getElementById('admin-unread').style.display = 'none';
+    updateBadge();
+  }
+
+  function updateAdminUnread() {
+    const unseen = adminMsgs.filter(m => new Date(m.created_at).getTime() > lastSeenAdmin && m.alias !== adminAlias).length;
+    const el = document.getElementById('admin-unread');
+    if(unseen > 0) { el.textContent = unseen; el.style.display = 'inline-flex'; } else el.style.display = 'none';
+    updateBadge();
+  }
+
+  // ===== SUPPORT CHAT =====
+  async function initSupportChat() {
+    const { data } = await sb.from('support_chat').select('*').order('created_at', {ascending:true});
+    if(!data) return;
+    supportConvos = {};
+    data.forEach(m => {
+      if(!supportConvos[m.user_id]) supportConvos[m.user_id] = [];
+      supportConvos[m.user_id].push(m);
+    });
+    renderSupportList();
+    supportChatSub = sb.channel('support-chat-live')
+      .on('postgres_changes', {event:'INSERT', schema:'public', table:'support_chat'}, payload => {
+        const uid = payload.new.user_id;
+        if(!supportConvos[uid]) supportConvos[uid] = [];
+        supportConvos[uid].push(payload.new);
+        if(currentSupportUserId === uid) renderSupportMessages(uid);
+        renderSupportList();
+        if(payload.new.sender === 'user') {
+          updateSupportUnread();
+          document.getElementById('chat-badge').classList.add('show');
+        }
+      }).subscribe();
+  }
+
+  function renderSupportList() {
+    const list = document.getElementById('support-user-list');
+    const userIds = Object.keys(supportConvos);
+    if(!userIds.length) { list.innerHTML='<div class="chat-empty">Chưa có user nào nhắn</div>'; return; }
+    list.innerHTML = userIds.map(uid => {
+      const msgs = supportConvos[uid];
+      const last = msgs[msgs.length-1];
+      const time = new Date(last.created_at).toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'});
+      const unread = msgs.filter(m => m.sender==='user' && !m.alias).length;
+      const seen = parseInt(localStorage.getItem('grimz_seen_support_'+uid)||'0');
+      const hasNew = msgs.some(m => m.sender==='user' && new Date(m.created_at).getTime() > seen);
+      return `<div class="support-item ${currentSupportUserId===uid?'active':''}" onclick="openSupportChat('${uid}')">
+        <div style="flex:1;min-width:0;">
+          <div class="support-item-name">${uid.slice(0,16)}…</div>
+          <div class="support-item-preview">${escHtml(last.message)}</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:0.3rem;flex-shrink:0;">
+          <span class="support-item-time">${time}</span>
+          ${hasNew?'<span class="support-unread"></span>':''}
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  function openSupportChat(uid) {
+    currentSupportUserId = uid;
+    document.getElementById('support-user-list').style.display='none';
+    document.getElementById('support-user-chat').style.cssText='display:flex;flex-direction:column;';
+    document.getElementById('support-back-btn').classList.add('show');
+    localStorage.setItem('grimz_seen_support_'+uid, Date.now());
+    renderSupportMessages(uid);
+    renderSupportList();
+    updateSupportUnread();
+    loadUserInfo(uid);
+    setTimeout(()=>document.getElementById('support-chat-input').focus(),100);
+  }
+
+  function backToSupportList() {
+    currentSupportUserId = null;
+    document.getElementById('support-user-list').style.display='block';
+    document.getElementById('support-user-chat').style.cssText='display:none;';
+    document.getElementById('support-back-btn').classList.remove('show');
+    updateSupportUnread();
+    renderSupportList();
+  }
+
+  function renderSupportMessages(uid) {
+    const body = document.getElementById('support-chat-body');
+    const msgs = supportConvos[uid] || [];
+    body.innerHTML = msgs.map(m => {
+      const mine = m.sender === 'admin';
+      const time = new Date(m.created_at).toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'});
+      const msgContent = m.is_image
+        ? `<img class="chat-img" src="${m.message}" onclick="window.open(this.src)">`
+        : `<span>${escHtml(m.message)}</span>`;
+      return `<div class="chat-msg ${mine?'mine':'theirs'}">
+        <div class="chat-meta">${mine?('<span class="chat-alias">'+escHtml(m.alias||'Admin')+'</span> · '):'User · '}${time}</div>
+        <div class="chat-bubble-wrap"><div class="chat-bubble">${msgContent}</div><button class="del-msg-btn" onclick="deleteSupportMsg('${m.id}')" title="Xóa">✕</button></div>
+      </div>`;
+    }).join('');
+    body.scrollTop = body.scrollHeight;
+  }
+
+  async function sendSupportReply() {
+    if(!currentSupportUserId) return;
+    const input = document.getElementById('support-chat-input');
+    const msg = input.value.trim();
+    if(!msg) return;
+    input.value = '';
+    await sb.from('support_chat').insert({ user_id: currentSupportUserId, sender:'admin', alias: getAdminAlias(), message: msg });
+  }
+
+  function updateSupportUnread() {
+    let total = 0;
+    Object.entries(supportConvos).forEach(([uid, msgs]) => {
+      const seen = parseInt(localStorage.getItem('grimz_seen_support_'+uid)||'0');
+      total += msgs.filter(m => m.sender==='user' && new Date(m.created_at).getTime() > seen).length;
+    });
+    const el = document.getElementById('support-unread');
+    if(total > 0) { el.textContent = total; el.style.display='inline-flex'; } else el.style.display='none';
+    updateBadge();
+  }
+
+  function updateBadge() {
+    const adminUnseen = adminMsgs.filter(m => new Date(m.created_at).getTime() > lastSeenAdmin && m.alias !== adminAlias).length;
+    let supportUnseen = 0;
+    Object.entries(supportConvos).forEach(([uid, msgs]) => {
+      const seen = parseInt(localStorage.getItem('grimz_seen_support_'+uid)||'0');
+      supportUnseen += msgs.filter(m => m.sender==='user' && new Date(m.created_at).getTime() > seen).length;
+    });
+    const total = adminUnseen + supportUnseen;
+    const badge = document.getElementById('chat-badge');
+    if(total > 0) { badge.textContent = total; badge.classList.add('show'); } else badge.classList.remove('show');
+  }
+
+  function escHtml(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  // Init chat after login
+  const origLoadData = loadData;
+  // Chat auto-init after session check handled by toggleChat on open
+
+
+
+  // ===== TYPING INDICATOR =====
+  let typingTimers = {};
+  let TYPING_CHANNEL_ADMIN = null;
+  let TYPING_CHANNEL_SUPPORT = null;
+
+  function initTypingChannels() {
+    if(TYPING_CHANNEL_ADMIN) return;
+    TYPING_CHANNEL_ADMIN = sb.channel('typing-admin');
+    TYPING_CHANNEL_SUPPORT = sb.channel('typing-support');
+    TYPING_CHANNEL_ADMIN
+      .on('broadcast', {event:'typing'}, ({payload}) => {
+        if(payload.alias === adminAlias) return;
+        const row = document.getElementById('admin-typing-row');
+        document.getElementById('admin-typing-who').textContent = payload.alias + ' đang nhập';
+        row.classList.add('visible');
+        clearTimeout(typingTimers['admin_'+payload.alias]);
+        typingTimers['admin_'+payload.alias] = setTimeout(() => row.classList.remove('visible'), 2500);
+      }).subscribe();
+    TYPING_CHANNEL_SUPPORT
+      .on('broadcast', {event:'typing'}, ({payload}) => {
+        if(!currentSupportUserId || payload.userId !== currentSupportUserId) return;
+        const row = document.getElementById('support-typing-admin');
+        document.getElementById('support-typing-who').textContent = (payload.alias||'User') + ' đang nhập';
+        row.classList.add('visible');
+        clearTimeout(typingTimers['support_'+payload.userId]);
+        typingTimers['support_'+payload.userId] = setTimeout(() => row.classList.remove('visible'), 2500);
+      }).subscribe();
+  }
+
+  let typingCooldown = {};
+  function adminTyping(channel) {
+    const key = 'cooldown_'+channel;
+    if(typingCooldown[key]) return;
+    typingCooldown[key] = true;
+    setTimeout(() => delete typingCooldown[key], 1500);
+    if(channel === 'admin') {
+      TYPING_CHANNEL_ADMIN.send({type:'broadcast', event:'typing', payload:{alias: adminAlias}});
+    } else if(channel === 'support' && currentSupportUserId) {
+      TYPING_CHANNEL_SUPPORT.send({type:'broadcast', event:'typing', payload:{alias: adminAlias, userId: currentSupportUserId, isAdmin:true}});
+    }
+  }
+
+  // ===== USER INFO in Support Chat =====
+  async function loadUserInfo(uid) {
+    const panel = document.getElementById('user-info-panel');
+    const {data: machine} = await sb.from('machines').select('*').eq('user_id', uid).single();
+    if(!machine) { panel.innerHTML='<div style="color:var(--muted)">Chưa có máy gán</div>'; panel.classList.add('show'); return; }
+    const expiry = machine.expiry ? new Date(machine.expiry).toLocaleString('vi-VN',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}) : '—';
+    const expired = machine.expiry && new Date(machine.expiry) < new Date();
+    panel.innerHTML = `
+      <div class="user-info-row"><span>User</span><span>${uid.slice(0,16)}…</span></div>
+      <div class="user-info-row"><span>GPU</span><span>${machine.gpu?.replace('NVIDIA ','')||'—'}</span></div>
+      <div class="user-info-row"><span>Gói</span><span>${machine.plan||'—'}</span></div>
+      <div class="user-info-row"><span>Hết hạn</span><span style="color:${expired?'var(--red)':'var(--green)'}">${expiry}</span></div>
+      <div class="user-info-row"><span>IP</span><span>${machine.ip||'—'}</span></div>
+    `;
+    panel.classList.add('show');
+  }
+
+
+
+  // ===== DELETE MESSAGE =====
+  async function deleteAdminMsg(id) {
+    await sb.from('admin_chat').delete().eq('id', id);
+    adminMsgs = adminMsgs.filter(m => m.id !== id);
+    renderAdminChat();
+  }
+  async function deleteSupportMsg(id) {
+    await sb.from('support_chat').delete().eq('id', id);
+    if(currentSupportUserId) {
+      supportConvos[currentSupportUserId] = supportConvos[currentSupportUserId].filter(m => m.id !== id);
+      renderSupportMessages(currentSupportUserId);
+    }
+  }
+
+  // ===== IMAGE ATTACHMENT =====
+  async function uploadAndSend(file, table, extraData) {
+    if(!file || file.size > 5*1024*1024) { showToast('File quá lớn (max 5MB)', 'error'); return; }
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      const base64 = e.target.result;
+      await sb.from(table).insert({...extraData, message: base64, is_image: true});
+    };
+    reader.readAsDataURL(file);
+  }
+  function sendAdminImage(input) {
+    uploadAndSend(input.files[0], 'admin_chat', {alias: getAdminAlias()});
+    input.value = '';
+  }
+  function sendSupportImage(input) {
+    if(!currentSupportUserId) return;
+    uploadAndSend(input.files[0], 'support_chat', {user_id: currentSupportUserId, sender:'admin', alias: getAdminAlias()});
+    input.value = '';
+  }
+
+
+  // ===== GEN PASSWORD (client-side, no Edge Function needed) =====
+  async function genPassword() {
+    const btn = document.getElementById('gen-pw-btn');
+    const msg = document.getElementById('gen-pw-msg');
+    btn.textContent = '⏳ Đang gen...';
+    btn.style.pointerEvents = 'none';
+
+    // Gen password
+    const upper = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    const lower = 'abcdefghijklmnopqrstuvwxyz';
+    const digits = '0123456789';
+    const special = '!@#$%&*_+-=';
+    const all = upper + lower + digits + special;
+    const required = [
+      upper[Math.floor(Math.random()*upper.length)],
+      lower[Math.floor(Math.random()*lower.length)],
+      digits[Math.floor(Math.random()*digits.length)],
+      special[Math.floor(Math.random()*special.length)],
+    ];
+    const rest = Array.from({length:12}, () => all[Math.floor(Math.random()*all.length)]);
+    const chars = [...required, ...rest];
+    for(let i=chars.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[chars[i],chars[j]]=[chars[j],chars[i]];}
+    const password = chars.join('');
+
+    // Hash it
+    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(password));
+    const hash = Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+
+    // Save to Supabase
+    const { error } = await sb.from('admin_config').upsert(
+      { key: 'admin_pw_hash', value: hash, updated_at: new Date().toISOString() },
+      { onConflict: 'key' }
+    );
+
+    if(error) {
+      msg.style.color = '#f87171';
+      msg.textContent = '✗ Lỗi lưu DB: ' + error.message;
+      msg.style.display = 'block';
+      btn.textContent = '🔑 Gen Password mới';
+      btn.style.pointerEvents = 'auto';
+      return;
+    }
+
+    // Send to Discord webhook
+    try {
+      await fetch('https://discord.com/api/webhooks/1484272817552883772/L22ILl-AckFGFheGkoimVmMOrKJKhFzDJWRM8UmiMfb40AP0s9u2Y5BPogGPRVzPxjYo', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          embeds: [{
+            title: '🔑 New Admin Password Generated',
+            color: 0x4ade80,
+            fields: [
+              { name: '🔐 Password', value: '```' + password + '```', inline: false },
+              { name: '⚠️ Warning', value: 'Save this password now. It will NOT be shown again.', inline: false },
+              { name: 'Generated At', value: `<t:${Math.floor(Date.now()/1000)}:F>`, inline: true },
+            ],
+            footer: { text: 'Grimz Admin Security' },
+            timestamp: new Date().toISOString(),
+          }]
+        })
+      });
+    } catch(e) { console.warn('Discord notify failed:', e); }
+
+    // Show password on screen (copy it!)
+    msg.style.color = '#4ade80';
+    msg.innerHTML = `✓ Password: <strong style="color:#fff;font-size:0.85rem;letter-spacing:0.05em;">${password}</strong><br><span style="color:#f87171">⚠ Copy ngay! Sẽ không hiện lại.</span>`;
+    msg.style.display = 'block';
+    btn.textContent = '✓ Đã gen!';
+
+    // Auto fill password field
+    document.getElementById('admin-pw').value = password;
+  }
+
+  // ===== GEN PASSWORD PANEL =====
+  function genPasswordPanel() {
+    document.getElementById('gen-pw-modal').classList.add('open');
+    document.getElementById('gen-result').style.display = 'none';
+    document.getElementById('do-gen-btn').innerHTML = '<i class="fas fa-rotate"></i> Gen Password Mới';
+    document.getElementById('do-gen-btn').style.pointerEvents = 'auto';
+  }
+
+  async function doGenPassword() {
+    const btn = document.getElementById('do-gen-btn');
+    const result = document.getElementById('gen-result');
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang gen...';
+    btn.style.pointerEvents = 'none';
+
+    const upper='ABCDEFGHIJKLMNOPQRSTUVWXYZ',lower='abcdefghijklmnopqrstuvwxyz',digits='0123456789',special='!@#$%&*_+-=';
+    const all=upper+lower+digits+special;
+    const required=[upper[Math.floor(Math.random()*upper.length)],lower[Math.floor(Math.random()*lower.length)],digits[Math.floor(Math.random()*digits.length)],special[Math.floor(Math.random()*special.length)]];
+    const rest=Array.from({length:12},()=>all[Math.floor(Math.random()*all.length)]);
+    const chars=[...required,...rest];
+    for(let i=chars.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[chars[i],chars[j]]=[chars[j],chars[i]];}
+    const password=chars.join('');
+
+    const buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(password));
+    const hash=Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+
+    const{error}=await sb.from('admin_config').upsert({key:'admin_pw_hash',value:hash,updated_at:new Date().toISOString()},{onConflict:'key'});
+    if(error){showToast('✗ Lỗi: '+error.message,'error');btn.innerHTML='<i class="fas fa-rotate"></i> Gen Password Mới';btn.style.pointerEvents='auto';return;}
+
+    // Gửi Discord webhook
+    try {
+      await fetch('https://discord.com/api/webhooks/1484272817552883772/L22ILl-AckFGFheGkoimVmMOrKJKhFzDJWRM8UmiMfb40AP0s9u2Y5BPogGPRVzPxjYo',{
+        method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({embeds:[{title:'🔑 New Admin Password Generated',color:0x4ade80,fields:[{name:'🔐 Password',value:'```'+password+'```',inline:false},{name:'⚠️ Warning',value:'Save this password. It will NOT be shown again.',inline:false},{name:'Generated At',value:`<t:${Math.floor(Date.now()/1000)}:F>`,inline:true}],footer:{text:'Grimz Admin Security'},timestamp:new Date().toISOString()}]})
+      });
+    } catch(e){console.warn('Discord notify failed:',e);}
+
+    result.innerHTML = `✓ Password mới đã gửi vào Discord!<br><br><strong style="font-size:1rem;color:#fff;">${password}</strong><br><br><span style="color:#f87171;font-size:0.6rem;">⚠ Copy ngay! Sẽ không hiện lại.</span>`;
+    result.style.display = 'block';
+    btn.innerHTML = '✓ Đã gen!';
+    showToast('✓ Password mới đã gửi Discord!', 'success');
+  }
+
+  // ===== TOAST =====
+  function showToast(msg,type,duration){
+    const t=document.getElementById('toast');
+    t.textContent=msg;
+    t.className='show'+(type?' toast-'+type:'');
+    clearTimeout(t._t);
+    t._t=setTimeout(()=>t.classList.remove('show'),duration||2500);
+  }
+
+  // ===== MSG =====
+  function showMsg(type,text){
+    const ok=document.getElementById('msg-ok'),err=document.getElementById('msg-err');
+    ok.style.display='none'; err.style.display='none';
+    if(type==='ok'){ ok.style.display='block'; setTimeout(()=>ok.style.display='none',3000); }
+    else { err.innerHTML='<i class="fas fa-xmark"></i> '+text; err.style.display='block'; }
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex,nofollow">
+<title>Grimz Cloud PC — Xác minh</title>
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&family=Share+Tech+Mono&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="grimz-base.css">
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+<style>
+  body {
+    background:var(--bg); color:var(--text);
+    font-family:'JetBrains Mono',monospace;
+    min-height:100vh; display:flex; align-items:center; justify-content:center;
+    overflow-x:hidden;
+  }
+
+  .wrap {
+    position:relative; z-index:2;
+    display:flex; flex-direction:column; align-items:center;
+    text-align:center; padding:2rem; gap:2rem;
+    animation:fadeIn 0.6s ease forwards;
+  }
+  @keyframes fadeIn { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+
+  /* Logo */
+  .logo {
+    font-family:'Rajdhani',sans-serif; font-size:1.5rem; font-weight:700;
+    letter-spacing:0.2em; text-transform:uppercase;
+    color:var(--accent); text-shadow:0 0 20px rgba(124,92,191,0.5);
+  }
+  .logo span { color:var(--accent2); }
+
+  /* Card */
+  .card {
+    background:var(--bg2); border:1px solid var(--border);
+    padding:2.5rem 2rem; width:100%; max-width:380px;
+    position:relative; overflow:hidden;
+    clip-path:polygon(0 0,calc(100% - 16px) 0,100% 16px,100% 100%,16px 100%,0 calc(100% - 16px));
+  }
+  .card::before {
+    content:''; position:absolute; top:0; left:0; right:0; height:2px;
+    background:linear-gradient(90deg,var(--accent3),var(--accent2),var(--accent3));
+  }
+  .card::after {
+    content:''; position:absolute; inset:0;
+    background:radial-gradient(ellipse at 50% 0%,rgba(124,92,191,0.05),transparent 60%);
+    pointer-events:none;
+  }
+
+  /* Corner decorations */
+  .corner { position:absolute; width:8px; height:8px; }
+  .corner-tl { top:4px; left:4px; border-top:1px solid var(--accent2); border-left:1px solid var(--accent2); }
+  .corner-br { bottom:4px; right:4px; border-bottom:1px solid var(--accent2); border-right:1px solid var(--accent2); }
+
+  /* Icon */
+  .shield-icon {
+    width:56px; height:56px;
+    background:rgba(124,92,191,0.1); border:1px solid rgba(124,92,191,0.25);
+    display:flex; align-items:center; justify-content:center;
+    font-size:1.5rem; margin:0 auto 1.25rem;
+    clip-path:polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,8px 100%,0 calc(100% - 8px));
+    animation:iconPulse 2s ease-in-out infinite;
+  }
+  @keyframes iconPulse { 0%,100%{box-shadow:0 0 0 0 rgba(124,92,191,0.3)} 50%{box-shadow:0 0 0 8px rgba(124,92,191,0)} }
+
+  .card-title {
+    font-family:'Rajdhani',sans-serif; font-size:1.1rem; font-weight:700;
+    text-transform:uppercase; letter-spacing:0.1em; color:var(--text);
+    margin-bottom:0.4rem; position:relative; z-index:1;
+  }
+  .card-sub {
+    font-size:0.62rem; color:var(--muted); letter-spacing:0.12em;
+    line-height:1.8; margin-bottom:1.5rem; position:relative; z-index:1;
+  }
+
+  /* Turnstile wrapper */
+  .turnstile-wrap {
+    display:flex; justify-content:center;
+    margin-bottom:1.25rem; position:relative; z-index:1;
+    min-height:65px;
+  }
+
+  /* Status */
+  .status {
+    font-size:0.6rem; letter-spacing:0.15em; text-transform:uppercase;
+    color:var(--muted); display:flex; align-items:center; gap:0.5rem;
+    justify-content:center; position:relative; z-index:1;
+    transition:all 0.3s;
+  }
+  .status-dot {
+    width:5px; height:5px; border-radius:50%;
+    background:var(--muted); flex-shrink:0;
+  }
+  .status.checking .status-dot { background:var(--yellow); animation:blink 0.8s infinite; }
+  .status.success .status-dot { background:var(--green); box-shadow:0 0 6px var(--green); }
+  .status.success { color:var(--green); }
+  .status.error   { color:var(--red); }
+  .status.error .status-dot { background:var(--red); }
+
+  /* Progress bar */
+  .progress-wrap {
+    width:100%; height:1px; background:rgba(124,92,191,0.1);
+    margin-top:1.25rem; overflow:hidden; position:relative; z-index:1;
+    opacity:0; transition:opacity 0.3s;
+  }
+  .progress-wrap.show { opacity:1; }
+  .progress-fill {
+    height:100%; width:0%;
+    background:linear-gradient(90deg,var(--accent3),var(--accent2));
+    transition:width 0.4s ease;
+  }
+
+  /* Footer note */
+  .footer-note {
+    font-size:0.58rem; color:var(--bg4); letter-spacing:0.1em;
+    margin-top:1rem;
+  }
+  .footer-note a { color:var(--muted); text-decoration:none; transition:color 0.2s; }
+  .footer-note a:hover { color:var(--accent2); }
+</style>
+</head>
+<body>
+<div class="scanline"></div>
+<div class="glow-orb glow-orb-1"></div>
+<div class="glow-orb glow-orb-2"></div>
+
+<div class="wrap">
+  <div class="logo">GRIMZ <span>CLOUD</span> PC</div>
+
+  <div class="card">
+    <div class="corner corner-tl"></div>
+    <div class="corner corner-br"></div>
+
+    <div class="shield-icon">🛡️</div>
+    <div class="card-title">Xác minh bảo mật</div>
+    <div class="card-sub">
+      Hệ thống đang kiểm tra kết nối của bạn.<br>
+      Vui lòng hoàn thành xác minh để tiếp tục.
+    </div>
+
+    <div class="turnstile-wrap">
+      <div class="cf-turnstile"
+        data-sitekey="0x4AAAAAACrS3npj6qFvSu2W"
+        data-theme="dark"
+        data-callback="onVerified"
+        data-error-callback="onError"
+        data-expired-callback="onExpired">
+      </div>
+    </div>
+
+    <div class="status" id="status">
+      <div class="status-dot"></div>
+      <span id="status-text">Đang chờ xác minh...</span>
+    </div>
+
+    <div class="progress-wrap" id="progress-wrap">
+      <div class="progress-fill" id="progress-fill"></div>
+    </div>
+  </div>
+
+  <div class="footer-note">
+    © <span id="yr"></span> GRIMZ CLOUD PC ·
+    <a href="privacy.html">Chính sách bảo mật</a>
+  </div>
+</div>
+
+<script>
+  document.getElementById('yr').textContent = new Date().getFullYear();
+
+  // Trang đích sau khi verify — mặc định là index.html
+  // Có thể truyền ?next=grimz-cloud-pc.html để redirect đến trang khác
+  function getRedirectTarget() {
+    const params = new URLSearchParams(window.location.search);
+    const next = params.get('next');
+    // Whitelist các trang được phép redirect đến
+    const allowed = ['index.html', 'grimz-cloud-pc.html', 'grimz-login.html'];
+    return allowed.includes(next) ? next : 'index.html';
+  }
+
+  // Kiểm tra nếu đã verify trong session rồi thì skip gate
+  if (sessionStorage.getItem('grimz_verified') === '1') {
+    window.location.replace(getRedirectTarget());
+  }
+
+  function setStatus(type, text) {
+    const el = document.getElementById('status');
+    const textEl = document.getElementById('status-text');
+    el.className = 'status ' + type;
+    textEl.textContent = text;
+  }
+
+  function onVerified(token) {
+    setStatus('checking', 'Đang xác thực...');
+
+    // Animate progress bar
+    const wrap = document.getElementById('progress-wrap');
+    const fill = document.getElementById('progress-fill');
+    wrap.classList.add('show');
+
+    let pct = 0;
+    const interval = setInterval(() => {
+      pct += Math.random() * 18 + 8;
+      if (pct >= 95) { pct = 95; clearInterval(interval); }
+      fill.style.width = pct + '%';
+    }, 120);
+
+    // Simulate server-side verify delay (hoặc gọi API thật nếu có)
+    setTimeout(() => {
+      clearInterval(interval);
+      fill.style.width = '100%';
+      setStatus('success', 'Xác minh thành công! Đang chuyển hướng...');
+
+      // Lưu vào sessionStorage để không hỏi lại trong cùng tab
+      sessionStorage.setItem('grimz_verified', '1');
+
+      setTimeout(() => {
+        window.location.replace(getRedirectTarget());
+      }, 800);
+    }, 1500);
+  }
+
+  function onError() {
+    setStatus('error', 'Xác minh thất bại. Vui lòng thử lại.');
+  }
+
+  function onExpired() {
+    setStatus('error', 'Đã hết hạn. Vui lòng xác minh lại.');
+  }
+</script>
+</body>
+</html>

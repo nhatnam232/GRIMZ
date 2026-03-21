@@ -1,0 +1,1411 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Grimz Cloud PC - Dịch vụ cloud gaming tại Việt Nam, server Singapore, RTX 3060, 32GB RAM, giá 3.000đ/giờ. Hỗ trợ 24/7 qua Discord.">
+<title id="page-title">Grimz CLOUD PC — Cloud Gaming Vietnam</title>
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Exo+2:wght@300;400;500;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="grimz-base.css">
+<style>
+  body { background:var(--bg); color:var(--text); font-family:'Exo 2',sans-serif; overflow-x:hidden; }
+
+  /* NAV */
+  nav { position:fixed; top:0; left:0; right:0; z-index:100; padding:0 5%; height:64px; display:flex; align-items:center; justify-content:space-between; background:rgba(8,12,16,0.85); backdrop-filter:blur(12px); border-bottom:1px solid var(--border); }
+  .logo { font-family:'Rajdhani',sans-serif; font-size:1.4rem; font-weight:700; letter-spacing:0.15em; text-transform:uppercase; color:var(--accent); text-shadow:0 0 20px rgba(124,92,191,0.5); }
+  .logo span { color:var(--accent2); }
+  nav ul { display:flex; gap:2.5rem; list-style:none; }
+  nav ul a { color:var(--muted); text-decoration:none; font-size:0.85rem; font-weight:500; letter-spacing:0.1em; text-transform:uppercase; transition:color 0.2s; }
+  nav ul a:hover { color:var(--accent); }
+  .nav-cta { background:transparent; border:1px solid var(--accent); color:var(--accent) !important; padding:0.4rem 1rem; font-family:'Rajdhani',sans-serif; font-weight:600; letter-spacing:0.12em; text-transform:uppercase; cursor:pointer; transition:all 0.2s; text-decoration:none; font-size:0.85rem; }
+  .nav-cta:hover { background:var(--accent); color:var(--bg) !important; box-shadow:var(--glow); }
+
+  /* HERO */
+  .hero { position:relative; min-height:100vh; display:flex; align-items:center; padding:0 5%; padding-top:64px; overflow:hidden; }
+  .hero-glow-1 { position:absolute; width:600px; height:600px; border-radius:50%; background:radial-gradient(circle,rgba(124,92,191,0.1) 0%,transparent 70%); top:-100px; right:-100px; animation:pulse 4s ease-in-out infinite; }
+  .hero-glow-2 { position:absolute; width:400px; height:400px; border-radius:50%; background:radial-gradient(circle,rgba(90,63,160,0.08) 0%,transparent 70%); bottom:0; left:20%; animation:pulse 6s ease-in-out infinite reverse; }
+  .hero-content { position:relative; z-index:1; max-width:700px; }
+  .hero-tag { display:inline-flex; align-items:center; gap:0.5rem; font-family:'Share Tech Mono',monospace; font-size:0.75rem; color:var(--accent); letter-spacing:0.2em; text-transform:uppercase; margin-bottom:1.5rem; border:1px solid var(--border); padding:0.35rem 0.75rem; background:rgba(124,92,191,0.07); }
+  .hero-tag::before { content:''; width:6px; height:6px; border-radius:50%; background:var(--accent); box-shadow:0 0 6px var(--accent); animation:blink 1.2s ease-in-out infinite; }
+  .hero h1 { font-family:'Rajdhani',sans-serif; font-size:clamp(3rem,7vw,6rem); font-weight:700; line-height:0.95; letter-spacing:-0.01em; text-transform:uppercase; margin-bottom:1.5rem; }
+  .hero h1 .line1 { color:var(--text); }
+  .hero h1 .line2 { color:var(--accent); text-shadow:0 0 30px rgba(124,92,191,0.5); display:block; }
+  .hero h1 .line3 { color:var(--muted); font-size:0.55em; letter-spacing:0.2em; font-weight:400; display:block; margin-top:0.3em; }
+  .hero-desc { color:var(--muted); font-size:1rem; line-height:1.7; max-width:480px; margin-bottom:2.5rem; font-weight:300; }
+  .hero-desc strong { color:var(--text); font-weight:500; }
+  .hero-btns { display:flex; gap:1rem; flex-wrap:wrap; align-items:center; }
+  .btn-primary { display:inline-flex; align-items:center; gap:0.6rem; background:var(--accent); color:var(--bg); padding:0.85rem 2rem; font-family:'Rajdhani',sans-serif; font-size:1rem; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; text-decoration:none; border:none; cursor:pointer; transition:all 0.2s; clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,0 100%); }
+  .btn-primary { transition:all 0.2s cubic-bezier(0.34,1.56,0.64,1); }
+  .btn-primary:hover { background:var(--accent2); box-shadow:var(--glow); transform:translateY(-3px) scale(1.02); }
+  .btn-secondary { display:inline-flex; align-items:center; gap:0.6rem; border:1px solid var(--border); color:var(--text); padding:0.85rem 2rem; font-family:'Rajdhani',sans-serif; font-size:1rem; font-weight:600; letter-spacing:0.12em; text-transform:uppercase; text-decoration:none; cursor:pointer; transition:all 0.2s; background:transparent; clip-path:polygon(10px 0,100% 0,100% 100%,0 100%,0 10px); }
+  .btn-secondary:hover { border-color:var(--accent2); color:var(--accent2); }
+
+  /* STATS */
+  .stats-bar { position:relative; z-index:1; background:var(--bg2); border-top:1px solid var(--border); border-bottom:1px solid var(--border); padding:2rem 5%; display:grid; grid-template-columns:repeat(4,1fr); gap:2rem; }
+  .stat { text-align:center; position:relative; }
+  .stat+.stat::before { content:''; position:absolute; left:0; top:10%; bottom:10%; width:1px; background:var(--border); }
+  .stat-num { font-family:'Rajdhani',sans-serif; font-size:2.2rem; font-weight:700; color:var(--accent); text-shadow:0 0 16px rgba(124,92,191,0.4); line-height:1; margin-bottom:0.3rem; }
+  .stat-label { font-size:0.75rem; color:var(--muted); letter-spacing:0.12em; text-transform:uppercase; font-weight:500; }
+
+  /* SECTION */
+  section { position:relative; z-index:1; padding:6rem 5%; }
+  .section-tag { font-family:'Share Tech Mono',monospace; font-size:0.7rem; color:var(--accent2); letter-spacing:0.25em; text-transform:uppercase; margin-bottom:0.75rem; }
+  .section-title { font-family:'Rajdhani',sans-serif; font-size:clamp(2rem,4vw,3rem); font-weight:700; text-transform:uppercase; letter-spacing:0.02em; margin-bottom:1rem; }
+  .section-title span { color:var(--accent); }
+  .section-sub { color:var(--muted); font-size:0.95rem; max-width:500px; line-height:1.7; margin-bottom:3rem; font-weight:300; }
+
+  /* FEATURES */
+  .features-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:1.5px; background:var(--border); border:1px solid var(--border); }
+  .feature-card { background:var(--bg2); padding:2rem; transition:background 0.2s; position:relative; overflow:hidden; }
+  .feature-card::before { content:''; position:absolute; top:0; left:0; width:3px; height:0; background:var(--accent); transition:height 0.3s; }
+  .feature-card:hover::before { height:100%; }
+  .feature-card:hover { background:var(--bg3); }
+  .feature-icon { font-size:2rem; margin-bottom:1rem; display:block; }
+  .feature-title { font-family:'Rajdhani',sans-serif; font-size:1.2rem; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:var(--text); margin-bottom:0.5rem; }
+  .feature-desc { color:var(--muted); font-size:0.875rem; line-height:1.65; font-weight:300; }
+
+  /* PRICING */
+  #pricing { background:var(--bg2); }
+  .plans-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1.5rem; }
+  .plan-card { border:1px solid var(--border); background:var(--bg); padding:2rem; position:relative; transition:all 0.3s; clip-path:polygon(0 0,calc(100% - 16px) 0,100% 16px,100% 100%,0 100%); display:flex; flex-direction:column; justify-content:space-between; }
+  .plan-card.featured { border-color:var(--accent); background:rgba(124,92,191,0.03); }
+  .plan-card.featured::after { content:'PHỔ BIẾN NHẤT'; position:absolute; top:-1px; right:2rem; background:var(--accent); color:var(--bg); font-family:'Share Tech Mono',monospace; font-size:0.65rem; letter-spacing:0.15em; padding:0.2rem 0.6rem; }
+  .plan-card.soon { opacity:0.7; }
+  .plan-card:hover { transform:translateY(-6px); box-shadow:0 20px 40px rgba(0,0,0,0.4), 0 0 20px rgba(124,92,191,0.1); }
+  .plan-name { font-family:'Rajdhani',sans-serif; font-size:0.78rem; font-weight:600; letter-spacing:0.2em; text-transform:uppercase; margin-bottom:0.85rem; display:flex; align-items:center; gap:0.5rem; }
+  .plan-num { color:var(--muted); font-size:0.72rem; }
+  .plan-codename { color:var(--accent2); font-size:0.95rem; font-weight:700; letter-spacing:0.15em; text-shadow:0 0 10px rgba(155,127,232,0.5); }
+  .plan-card.featured .plan-codename { color:#fff; text-shadow:0 0 12px rgba(124,92,191,0.8); }
+  .plan-price { font-family:'Rajdhani',sans-serif; font-size:2.8rem; font-weight:700; color:var(--accent); line-height:1; margin-bottom:0.3rem; }
+  .plan-price span { font-size:1rem; color:var(--muted); font-weight:400; }
+  .plan-price.soon-price { font-size:1rem; color:var(--muted); font-weight:400; margin-top:0.5rem; }
+  .soon-tag { display:inline-block; font-family:'Share Tech Mono',monospace; font-size:0.65rem; color:var(--muted); border:1px solid var(--border); padding:0.2rem 0.5rem; letter-spacing:0.1em; margin-bottom:0.3rem; }
+  .plan-divider { height:1px; background:var(--border); margin:1.5rem 0; }
+  .plan-specs { list-style:none; display:flex; flex-direction:column; gap:0.65rem; margin-bottom:2rem; }
+  .plan-specs li { display:flex; align-items:flex-start; gap:0.6rem; font-size:0.95rem; color:#a09ab8; font-weight:400; }
+  .plan-specs li::before { content:'▸'; color:var(--accent); font-size:0.7rem; flex-shrink:0; margin-top:0.15rem; }
+  .plan-specs li strong { color:var(--text); font-weight:500; }
+  .plan-btn { display:block; width:100%; text-align:center; padding:0.75rem; border:1px solid var(--border); background:transparent; color:var(--text); font-family:'Rajdhani',sans-serif; font-size:0.9rem; font-weight:600; letter-spacing:0.12em; text-transform:uppercase; cursor:pointer; transition:all 0.2s; text-decoration:none; margin-top:auto; }
+  .plan-btn:hover, .plan-card.featured .plan-btn { background:var(--accent); border-color:var(--accent); color:var(--bg); }
+  .plan-btn.disabled { opacity:0.5; cursor:default; pointer-events:none; }
+
+  /* STEPS */
+  .steps { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:0; position:relative; margin-top:1rem; }
+  .steps::before { content:''; position:absolute; top:2.5rem; left:10%; right:10%; height:1px; background:linear-gradient(90deg,transparent,rgba(124,92,191,0.4),transparent); }
+  .step { text-align:center; padding:2rem 1.5rem; }
+  .step-num { width:48px; height:48px; border:1px solid var(--accent); background:var(--bg); color:var(--accent); font-family:'Share Tech Mono',monospace; font-size:1rem; display:flex; align-items:center; justify-content:center; margin:0 auto 1.25rem; position:relative; z-index:1; }
+  .step-title { font-family:'Rajdhani',sans-serif; font-size:1rem; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; margin-bottom:0.5rem; }
+  .step-desc { font-size:0.825rem; color:var(--muted); line-height:1.6; font-weight:300; }
+
+  /* FAQ */
+  #faq { background:var(--bg2); }
+  .faq-list { display:flex; flex-direction:column; gap:0; border:1px solid var(--border); }
+  .faq-item { border-bottom:1px solid var(--border); }
+  .faq-item:last-child { border-bottom:none; }
+  .faq-q { width:100%; text-align:left; padding:1.25rem 1.5rem; background:none; border:none; color:var(--text); font-family:'Exo 2',sans-serif; font-size:0.95rem; font-weight:500; cursor:pointer; display:flex; justify-content:space-between; align-items:center; gap:1rem; transition:background 0.2s; }
+  .faq-q:hover { background:rgba(124,92,191,0.05); }
+  .faq-q .arrow { font-family:'Share Tech Mono',monospace; color:var(--accent); font-size:0.8rem; transition:transform 0.3s; flex-shrink:0; }
+  .faq-q.open .arrow { transform:rotate(90deg); }
+  .faq-a { display:none; padding:0 1.5rem 1.25rem; color:var(--muted); font-size:0.875rem; line-height:1.7; font-weight:300; }
+  .faq-a.open { display:block; }
+
+  /* TESTIMONIALS */
+  .testimonials-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:1.25rem; }
+  .testimonial-card { background:var(--bg2); border:1px solid var(--border); padding:1.5rem; position:relative; }
+  .testimonial-card::before { content:'"'; position:absolute; top:0.5rem; right:1rem; font-size:4rem; color:rgba(124,92,191,0.15); font-family:'Rajdhani',sans-serif; line-height:1; }
+  .testimonial-text { font-size:0.875rem; color:var(--muted); line-height:1.7; font-weight:300; margin-bottom:1rem; }
+  .testimonial-author { font-family:'Share Tech Mono',monospace; font-size:0.68rem; color:var(--accent2); letter-spacing:0.1em; }
+
+  /* CTA */
+  .cta-section { text-align:center; padding:7rem 5%; background:var(--bg2); position:relative; overflow:hidden; }
+  .cta-section::before { content:'GRIMZ'; position:absolute; font-family:'Rajdhani',sans-serif; font-size:20vw; font-weight:700; color:rgba(124,92,191,0.02); top:50%; left:50%; transform:translate(-50%,-50%); letter-spacing:0.2em; white-space:nowrap; pointer-events:none; }
+  .cta-section h2 { font-family:'Rajdhani',sans-serif; font-size:clamp(2rem,5vw,4rem); font-weight:700; text-transform:uppercase; line-height:1.1; margin-bottom:1rem; position:relative; z-index:1; }
+  .cta-section h2 span { color:var(--accent); }
+  .cta-section p { color:var(--muted); margin-bottom:2.5rem; font-size:1rem; position:relative; z-index:1; font-weight:300; }
+  .cta-section .hero-btns { justify-content:center; position:relative; z-index:1; }
+  .discord-btn { display:inline-flex; align-items:center; gap:0.75rem; background:#5865F2; color:white; padding:0.85rem 2rem; font-family:'Rajdhani',sans-serif; font-size:1rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; text-decoration:none; transition:all 0.2s; clip-path:polygon(10px 0,100% 0,100% 100%,0 100%,0 10px); }
+  .discord-btn { transition:all 0.2s cubic-bezier(0.34,1.56,0.64,1); }
+  .discord-btn:hover { background:#4752c4; transform:translateY(-3px) scale(1.02); box-shadow:0 10px 30px rgba(88,101,242,0.4); }
+
+
+
+  /* FOOTER */
+  footer { position:relative; z-index:1; padding:2rem 5%; border-top:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:1rem; }
+  .footer-logo { font-family:'Rajdhani',sans-serif; font-size:1.1rem; font-weight:700; letter-spacing:0.15em; color:var(--accent); }
+  .footer-logo span { color:var(--accent2); }
+  .footer-links { display:flex; gap:1.5rem; }
+  .footer-links a { color:var(--muted); font-size:0.78rem; text-decoration:none; transition:color 0.2s; }
+  .footer-links a:hover { color:var(--accent2); }
+  footer p { color:var(--muted); font-size:0.8rem; font-weight:300; }
+
+  /* SCANLINE */
+  @keyframes scanline { 0%{transform:translateY(-100%)} 100%{transform:translateY(100vh)} }
+  .scanline { position:fixed; top:0; left:0; right:0; height:2px; background:linear-gradient(90deg,transparent,rgba(124,92,191,0.08),transparent); animation:scanline 6s linear infinite; pointer-events:none; z-index:9999; }
+
+  /* FADE UP */
+  .fade-up { opacity:0; transform:translateY(20px); transition:opacity 0.6s ease,transform 0.6s ease; }
+  .fade-up.visible { opacity:1; transform:translateY(0); }
+
+
+  /* Hide cursor on touch/mobile */
+  @media (hover: none) {
+    * { cursor: auto !important; }
+    .cursor, .cursor-ring { display: none !important; }
+  }
+
+  /* Custom Cursor */
+  * { cursor: none !important; }
+  .cursor { position:fixed; width:12px; height:12px; background:var(--accent); border-radius:50%; pointer-events:none; z-index:99999; transform:translate(-50%,-50%); transition:width 0.15s, height 0.15s, background 0.15s; box-shadow:0 0 10px var(--accent), 0 0 20px rgba(124,92,191,0.4); }
+  .cursor-ring { position:fixed; width:32px; height:32px; border:1px solid rgba(124,92,191,0.5); border-radius:50%; pointer-events:none; z-index:99998; transform:translate(-50%,-50%); transition:all 0.08s ease-out; }
+  .cursor.clicking { width:6px; height:6px; background:var(--accent2); }
+  .cursor-ring.clicking { width:20px; height:20px; border-color:var(--accent2); }
+  a:hover ~ .cursor, button:hover ~ .cursor { width:20px; height:20px; }
+
+  /* Mouse Glow */
+  .mouse-glow { position:fixed; width:400px; height:400px; border-radius:50%; background:radial-gradient(circle, rgba(124,92,191,0.06) 0%, transparent 70%); pointer-events:none; z-index:0; transform:translate(-50%,-50%); transition:left 0.1s ease-out, top 0.1s ease-out; }
+
+  /* Typing cursor blink */
+  .typing-cursor { display:inline-block; width:2px; height:1em; background:var(--accent); margin-left:2px; animation:blink 0.8s infinite; vertical-align:middle; }
+
+  /* Pricing Toggle */
+  .price-toggle { display:flex; align-items:center; gap:0; border:1px solid var(--border); width:fit-content; margin-bottom:2rem; }
+  .price-toggle-btn { padding:0.5rem 1.2rem; font-family:'Share Tech Mono',monospace; font-size:0.7rem; letter-spacing:0.1em; color:var(--muted); cursor:pointer; background:transparent; border:none; text-transform:uppercase; transition:all 0.2s; min-height:44px; }
+  @media(max-width:768px) { .price-toggle { width:100%; } .price-toggle-btn { flex:1; text-align:center; font-size:0.8rem; } }
+  .price-toggle-btn.active { background:var(--accent); color:#fff; }
+
+  /* Ping test */
+  .ping-section { background:var(--bg2); border:1px solid var(--border); padding:1.5rem; margin-top:1.5rem; display:flex; align-items:center; gap:1.5rem; flex-wrap:wrap; }
+  .ping-btn { display:inline-flex; align-items:center; gap:0.5rem; background:transparent; border:1px solid var(--accent); color:var(--accent); padding:0.5rem 1.2rem; font-family:'Rajdhani',sans-serif; font-size:0.9rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; cursor:pointer; transition:all 0.2s; }
+  .ping-btn:hover { background:var(--accent); color:var(--bg); }
+  .ping-result { font-family:'Share Tech Mono',monospace; font-size:1.1rem; color:var(--accent2); }
+  .ping-bar { display:flex; gap:3px; align-items:flex-end; height:24px; }
+  .ping-bar-item { width:6px; background:var(--accent3); border-radius:1px; transition:height 0.3s, background 0.3s; }
+
+  /* Discord counter */
+  .discord-counter { display:inline-flex; align-items:center; gap:0.5rem; font-family:'Share Tech Mono',monospace; font-size:0.72rem; color:var(--muted); letter-spacing:0.1em; }
+  .discord-counter .dot { width:8px; height:8px; border-radius:50%; background:#4ade80; box-shadow:0 0 6px #4ade80; animation:blink 2s infinite; }
+
+  /* Confetti canvas */
+  #confetti-canvas { position:fixed; inset:0; pointer-events:none; z-index:9998; }
+
+  /* Floating action buttons - cyberpunk cluster */
+  .fab-cluster { position:fixed; right:1.5rem; bottom:1.5rem; z-index:200; display:flex; flex-direction:column; align-items:center; gap:0.5rem; }
+  .fab-btn {
+    width:40px; height:40px; background:rgba(9,8,15,0.9);
+    border:1px solid rgba(124,92,191,0.3);
+    cursor:pointer; display:flex; align-items:center; justify-content:center;
+    transition:all 0.2s; position:relative;
+    clip-path:polygon(6px 0,100% 0,100% calc(100% - 6px),calc(100% - 6px) 100%,0 100%,0 6px);
+  }
+  .fab-btn:hover { border-color:var(--accent2); background:rgba(124,92,191,0.15); box-shadow:0 0 12px rgba(124,92,191,0.3); }
+  .fab-btn:hover svg { filter:drop-shadow(0 0 4px var(--accent2)); }
+  .fab-btn.active svg .wave-bar { animation:waveActive 0.5s ease infinite alternate; }
+  .fab-btn svg { width:20px; height:20px; }
+  /* Tooltip */
+  .fab-btn::after { content:attr(data-tip); position:absolute; right:calc(100% + 10px); top:50%; transform:translateY(-50%); background:var(--bg2); border:1px solid var(--border); color:var(--accent2); font-family:'Share Tech Mono',monospace; font-size:0.6rem; letter-spacing:0.1em; padding:0.25rem 0.6rem; white-space:nowrap; opacity:0; pointer-events:none; transition:opacity 0.2s; }
+  .fab-btn::before { content:'▶'; position:absolute; right:calc(100% + 4px); top:50%; transform:translateY(-50%); color:var(--border); font-size:0.5rem; opacity:0; transition:opacity 0.2s; }
+  .fab-btn:hover::after, .fab-btn:hover::before { opacity:1; }
+  @keyframes waveActive { 0%{transform:scaleY(0.4)} 100%{transform:scaleY(1.2)} }
+  @media(max-width:768px) { .fab-cluster { right:1rem; bottom:1rem; } }
+
+  /* Cookie Banner */
+  .cookie-banner { position:fixed; bottom:0; left:0; right:0; z-index:9997; background:rgba(9,8,15,0.97); border-top:1px solid rgba(124,92,191,0.3); padding:1rem 5%; display:flex; align-items:center; justify-content:space-between; gap:1.5rem; flex-wrap:wrap; backdrop-filter:blur(12px); transform:translateY(100%); transition:transform 0.4s ease; }
+  .cookie-banner.show { transform:translateY(0); }
+  .cookie-text { font-size:0.82rem; color:#8a84a0; font-weight:400; flex:1; min-width:200px; }
+  .cookie-text a { color:var(--accent2); text-decoration:none; }
+  .cookie-text a:hover { text-decoration:underline; }
+  .cookie-btns { display:flex; gap:0.75rem; flex-shrink:0; }
+  .cookie-accept { background:var(--accent); color:#fff; border:none; padding:0.5rem 1.25rem; font-family:'Rajdhani',sans-serif; font-size:0.875rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; cursor:pointer; transition:background 0.2s; clip-path:polygon(0 0,calc(100% - 6px) 0,100% 6px,100% 100%,0 100%); }
+  .cookie-accept:hover { background:var(--accent2); }
+  .cookie-decline { background:transparent; color:var(--muted); border:1px solid var(--border); padding:0.5rem 1rem; font-family:'Rajdhani',sans-serif; font-size:0.875rem; font-weight:600; letter-spacing:0.1em; text-transform:uppercase; cursor:pointer; transition:all 0.2s; }
+  .cookie-decline:hover { border-color:var(--muted); color:var(--text); }
+
+
+  /* Lang Switcher */
+  .lang-switcher { position:relative; }
+  .lang-trigger { display:flex; align-items:center; gap:0.4rem; padding:0.35rem 0.75rem; background:rgba(9,8,15,0.85); border:1px solid rgba(124,92,191,0.25); color:var(--accent2); font-family:'Share Tech Mono',monospace; font-size:0.65rem; letter-spacing:0.1em; text-transform:uppercase; cursor:pointer; transition:all 0.2s; backdrop-filter:blur(10px); user-select:none; height:32px; }
+  .lang-trigger:hover { border-color:var(--accent); background:rgba(124,92,191,0.1); }
+  .lang-trigger .arr { font-size:0.45rem; transition:transform 0.2s; margin-left:2px; }
+  .lang-trigger.open .arr { transform:rotate(180deg); }
+  .lang-dropdown { position:absolute; top:calc(100% + 6px); right:0; background:rgba(9,8,15,0.97); border:1px solid rgba(124,92,191,0.25); backdrop-filter:blur(12px); min-width:170px; display:none; flex-direction:column; z-index:300; max-height:320px; overflow-y:auto; }
+  .lang-dropdown.open { display:flex; }
+  .lang-opt { display:flex; align-items:center; gap:0.6rem; padding:0.55rem 0.85rem; font-family:'Share Tech Mono',monospace; font-size:0.62rem; letter-spacing:0.08em; color:#8a84a0; cursor:pointer; transition:all 0.15s; border:none; background:none; width:100%; text-align:left; }
+  .lang-opt:hover { background:rgba(124,92,191,0.08); color:var(--accent2); }
+  .lang-opt.sel { color:var(--accent2); background:rgba(124,92,191,0.1); }
+  .lang-opt.sel::after { content:'✓'; margin-left:auto; color:var(--accent); font-size:0.7rem; }
+  .lang-opt-flag { font-size:0.95rem; line-height:1; }
+  .lang-sep { height:1px; background:rgba(124,92,191,0.1); }
+
+  /* RESPONSIVE */
+  @media(max-width:768px) {
+    nav ul { display:none; }
+    nav { padding:0 3%; height:56px; }
+    .logo { font-size:1rem; }
+    .nav-cta { padding:0.3rem 0.6rem; font-size:0.75rem; letter-spacing:0.05em; }
+    .lang-trigger { padding:0.25rem 0.5rem; font-size:0.6rem; height:28px; }
+    .stats-bar { grid-template-columns:repeat(2,1fr); }
+    .plans-grid { grid-template-columns:1fr; }
+    .steps::before { display:none; }
+    .footer-links { display:none; }
+  }
+  @media(max-width:400px) {
+    .logo { font-size:0.85rem; letter-spacing:0.08em; }
+    .nav-cta { padding:0.25rem 0.5rem; font-size:0.7rem; }
+  }
+</style>
+
+<script>
+/**
+ * GRIMZ CLOUD PC — Page Guard
+ * Popup xác minh pass, lưu localStorage, countdown redirect
+ * Dùng chung cho tất cả trang cần bảo vệ
+ */
+document.addEventListener("DOMContentLoaded", function() { (function () {
+  // ── CONFIG ──────────────────────────────────────────────
+  const PASS_HASH   = '5c7bb507989ca82ca7591742fda70607a4d697097f31afc0d415ca3be45997fb';
+  const LAUNCH_DATE = new Date('2026-03-23T00:00:00+07:00');
+  // Tự động tắt guard sau ngày launch
+  if (new Date() >= LAUNCH_DATE) return;
+  const STORAGE_KEY = 'grimz_access';
+  const REDIRECT    = '/';          // redirect về đây nếu hết countdown
+  const COUNTDOWN   = 10;           // giây
+  // ────────────────────────────────────────────────────────
+
+  // Nếu đã có pass hợp lệ thì bỏ qua
+  if (localStorage.getItem(STORAGE_KEY) === PASS_HASH) return;
+
+  // Chặn scroll trang phía sau
+  document.documentElement.style.overflow = 'hidden';
+
+  // ── INJECT CSS ──────────────────────────────────────────
+  const style = document.createElement('style');
+  style.textContent = `
+    #grimz-guard-overlay {
+      position:fixed; inset:0; z-index:99999;
+      background:rgba(9,8,15,0.92);
+      backdrop-filter:blur(12px);
+      display:flex; align-items:center; justify-content:center;
+      padding:1.5rem;
+      animation:guardFadeIn 0.3s ease;
+    }
+    @keyframes guardFadeIn { from{opacity:0} to{opacity:1} }
+
+    #grimz-guard-box {
+      background:#100e1a;
+      border:1px solid rgba(124,92,191,0.25);
+      padding:2rem 2rem 1.75rem;
+      width:100%; max-width:380px;
+      position:relative;
+      clip-path:polygon(0 0,calc(100% - 16px) 0,100% 16px,100% 100%,16px 100%,0 calc(100% - 16px));
+      animation:guardSlideUp 0.35s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    @keyframes guardSlideUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+
+    #grimz-guard-box::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:2px;
+      background:linear-gradient(90deg,#5a3fa0,#9b7fe8,#5a3fa0);
+    }
+    #grimz-guard-box::after {
+      content:''; position:absolute; inset:0;
+      background:radial-gradient(ellipse at 50% 0%,rgba(124,92,191,0.06),transparent 60%);
+      pointer-events:none;
+    }
+
+    .gg-corner { position:absolute; width:7px; height:7px; }
+    .gg-corner-tl { top:4px; left:4px; border-top:1px solid #9b7fe8; border-left:1px solid #9b7fe8; }
+    .gg-corner-br { bottom:4px; right:4px; border-bottom:1px solid #9b7fe8; border-right:1px solid #9b7fe8; }
+
+    .gg-logo {
+      font-family:'Rajdhani',sans-serif; font-size:1rem; font-weight:700;
+      letter-spacing:0.2em; text-transform:uppercase; color:#7c5cbf;
+      text-shadow:0 0 16px rgba(124,92,191,0.5);
+      margin-bottom:1.25rem; position:relative; z-index:1;
+    }
+    .gg-logo span { color:#9b7fe8; }
+
+    .gg-title {
+      font-family:'Rajdhani',sans-serif; font-size:1rem; font-weight:700;
+      text-transform:uppercase; letter-spacing:0.08em; color:#e4e0f0;
+      margin-bottom:0.3rem; position:relative; z-index:1;
+    }
+    .gg-sub {
+      font-family:'JetBrains Mono',monospace; font-size:0.6rem;
+      color:#8a84a0; letter-spacing:0.12em; margin-bottom:1.5rem;
+      position:relative; z-index:1; line-height:1.8;
+    }
+
+    .gg-input-wrap {
+      position:relative; z-index:1; margin-bottom:0.75rem;
+    }
+    .gg-input-label {
+      font-family:'JetBrains Mono',monospace; font-size:0.58rem;
+      color:#8a84a0; letter-spacing:0.15em; text-transform:uppercase;
+      display:block; margin-bottom:0.4rem;
+    }
+    .gg-input-row { position:relative; }
+    #grimz-guard-input {
+      width:100%; padding:0.65rem 2.5rem 0.65rem 0.85rem;
+      background:#161323; border:1px solid rgba(124,92,191,0.18);
+      color:#e4e0f0; font-family:'JetBrains Mono',monospace; font-size:0.85rem;
+      outline:none; transition:border-color 0.2s, box-shadow 0.2s;
+      letter-spacing:0.1em;
+    }
+    #grimz-guard-input:focus {
+      border-color:#9b7fe8;
+      box-shadow:0 0 0 2px rgba(124,92,191,0.12);
+    }
+    #grimz-guard-input.shake {
+      animation:ggShake 0.35s ease;
+    }
+    @keyframes ggShake {
+      0%,100%{transform:translateX(0)}
+      20%{transform:translateX(-6px)}
+      40%{transform:translateX(6px)}
+      60%{transform:translateX(-4px)}
+      80%{transform:translateX(4px)}
+    }
+    #gg-toggle-pass {
+      position:absolute; right:0.65rem; top:50%; transform:translateY(-50%);
+      background:none; border:none; color:#8a84a0; cursor:pointer;
+      font-size:0.75rem; padding:0; transition:color 0.2s;
+    }
+    #gg-toggle-pass:hover { color:#9b7fe8; }
+
+    #grimz-guard-err {
+      font-family:'JetBrains Mono',monospace; font-size:0.6rem;
+      color:#f87171; letter-spacing:0.08em;
+      min-height:1.2em; margin-bottom:0.75rem;
+      position:relative; z-index:1;
+    }
+
+    #grimz-guard-btn {
+      width:100%; padding:0.7rem;
+      background:#7c5cbf; border:none; color:#fff;
+      font-family:'Rajdhani',sans-serif; font-size:0.95rem; font-weight:700;
+      letter-spacing:0.12em; text-transform:uppercase;
+      cursor:pointer; transition:all 0.2s cubic-bezier(0.34,1.56,0.64,1);
+      clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,0 100%);
+      position:relative; z-index:1; margin-bottom:1rem;
+    }
+    #grimz-guard-btn:hover { background:#9b7fe8; transform:translateY(-2px); box-shadow:0 6px 20px rgba(124,92,191,0.35); }
+    #grimz-guard-btn:active { transform:translateY(0); }
+
+    .gg-countdown-row {
+      display:flex; align-items:center; justify-content:space-between;
+      position:relative; z-index:1;
+    }
+    .gg-countdown-text {
+      font-family:'JetBrains Mono',monospace; font-size:0.58rem;
+      color:#5a5470; letter-spacing:0.1em;
+    }
+    .gg-countdown-text span { color:#f87171; font-weight:700; }
+
+    .gg-progress {
+      width:100%; height:1px; background:rgba(124,92,191,0.1);
+      margin-top:0.75rem; position:relative; z-index:1; overflow:hidden;
+    }
+    .gg-progress-fill {
+      height:100%; background:linear-gradient(90deg,#f87171,#fbbf24);
+      transition:width 1s linear;
+    }
+  `;
+  document.head.appendChild(style);
+
+  // ── INJECT HTML ─────────────────────────────────────────
+  const overlay = document.createElement('div');
+  overlay.id = 'grimz-guard-overlay';
+  overlay.innerHTML = `
+    <div id="grimz-guard-box">
+      <div class="gg-corner gg-corner-tl"></div>
+      <div class="gg-corner gg-corner-br"></div>
+      <div class="gg-logo">GRIMZ <span>CLOUD</span> PC</div>
+      <div class="gg-title">🔒 Khu vực giới hạn</div>
+      <div class="gg-sub">Trang này đang trong giai đoạn triển khai.<br>Nhập mật khẩu để tiếp tục.</div>
+      <div class="gg-input-wrap">
+        <label class="gg-input-label">// Mật khẩu truy cập</label>
+        <div class="gg-input-row">
+          <input id="grimz-guard-input" type="password" placeholder="••••••••" autocomplete="off" />
+          <button id="gg-toggle-pass" tabindex="-1">👁</button>
+        </div>
+      </div>
+      <div id="grimz-guard-err"></div>
+      <button id="grimz-guard-btn">Xác nhận</button>
+      <div class="gg-countdown-row">
+        <span class="gg-countdown-text">Tự động redirect sau <span id="gg-cd">${COUNTDOWN}</span>s</span>
+        <span class="gg-countdown-text" style="color:#5a5470">→ /home</span>
+      </div>
+      <div class="gg-progress">
+        <div class="gg-progress-fill" id="gg-progress" style="width:100%"></div>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+
+  // ── LOGIC ───────────────────────────────────────────────
+  const input   = document.getElementById('grimz-guard-input');
+  const btn     = document.getElementById('grimz-guard-btn');
+  const errEl   = document.getElementById('grimz-guard-err');
+  const cdEl    = document.getElementById('gg-cd');
+  const progEl  = document.getElementById('gg-progress');
+  const toggleBtn = document.getElementById('gg-toggle-pass');
+
+  // Show/hide password
+  toggleBtn.addEventListener('click', () => {
+    input.type = input.type === 'password' ? 'text' : 'password';
+    toggleBtn.textContent = input.type === 'password' ? '👁' : '🙈';
+  });
+
+  // Hash password (SHA-256 via Web Crypto)
+  async function hashPass(str) {
+    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+  }
+
+  async function verify() {
+    const val = input.value.trim();
+    if (!val) {
+      showErr('Vui lòng nhập mật khẩu.');
+      return;
+    }
+    const hash = await hashPass(val);
+    if (hash === PASS_HASH) {
+      localStorage.setItem(STORAGE_KEY, PASS_HASH);
+      errEl.textContent = '';
+      btn.textContent = '✓ Đúng rồi!';
+      btn.style.background = 'rgba(74,222,128,0.8)';
+      clearInterval(cdInterval);
+      setTimeout(() => {
+        overlay.style.animation = 'guardFadeIn 0.3s ease reverse forwards';
+        setTimeout(() => overlay.remove(), 300);
+        document.documentElement.style.overflow = '';
+      }, 500);
+    } else {
+      showErr('Mật khẩu không đúng.');
+      input.classList.add('shake');
+      setTimeout(() => input.classList.remove('shake'), 400);
+      input.value = '';
+      input.focus();
+    }
+  }
+
+  function showErr(msg) {
+    errEl.textContent = '⚠ ' + msg;
+  }
+
+  btn.addEventListener('click', verify);
+  input.addEventListener('keydown', e => { if (e.key === 'Enter') verify(); });
+  input.focus();
+
+  // Countdown
+  let remaining = COUNTDOWN;
+  const cdInterval = setInterval(() => {
+    remaining--;
+    cdEl.textContent = remaining;
+    progEl.style.width = (remaining / COUNTDOWN * 100) + '%';
+    if (remaining <= 0) {
+      clearInterval(cdInterval);
+      window.location.replace(REDIRECT);
+    }
+  }, 1000);
+
+})(); }, { once: true });
+
+</script>
+</head>
+<body>
+
+<div class="scanline"></div>
+<canvas id="confetti-canvas"></canvas>
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+<div class="mouse-glow" id="mouseGlow"></div>
+<div class="fab-cluster">
+  <!-- Back to top: stacked triangles -->
+  <button class="fab-btn" id="backTop" data-tip="VỀ ĐẦU TRANG" onclick="window.scrollTo({top:0,behavior:'smooth'})" style="display:none;">
+    <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <polygon points="10,2 16,8 13,8 13,9 7,9 7,8 4,8" fill="#9b7fe8"/>
+      <polygon points="10,7 16,13 13,13 13,14 7,14 7,13 4,13" fill="#5a3fa0" opacity="0.7"/>
+      <polygon points="10,12 16,18 13,18 13,19 7,19 7,18 4,18" fill="#3d2a6e" opacity="0.4"/>
+    </svg>
+  </button>
+  <!-- Confetti toggle: firework burst -->
+  <button class="fab-btn" id="confettiToggle" data-tip="HIỆU ỨNG: BẬT">
+    <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" id="confetti-icon">
+      <circle cx="10" cy="10" r="2" fill="#9b7fe8"/>
+      <line x1="10" y1="2" x2="10" y2="5" stroke="#9b7fe8" stroke-width="1.5" stroke-linecap="round"/>
+      <line x1="10" y1="15" x2="10" y2="18" stroke="#9b7fe8" stroke-width="1.5" stroke-linecap="round"/>
+      <line x1="2" y1="10" x2="5" y2="10" stroke="#9b7fe8" stroke-width="1.5" stroke-linecap="round"/>
+      <line x1="15" y1="10" x2="18" y2="10" stroke="#9b7fe8" stroke-width="1.5" stroke-linecap="round"/>
+      <line x1="4" y1="4" x2="6.5" y2="6.5" stroke="#7c5cbf" stroke-width="1.5" stroke-linecap="round"/>
+      <line x1="13.5" y1="13.5" x2="16" y2="16" stroke="#7c5cbf" stroke-width="1.5" stroke-linecap="round"/>
+      <line x1="16" y1="4" x2="13.5" y2="6.5" stroke="#7c5cbf" stroke-width="1.5" stroke-linecap="round"/>
+      <line x1="6.5" y1="13.5" x2="4" y2="16" stroke="#7c5cbf" stroke-width="1.5" stroke-linecap="round"/>
+    </svg>
+  </button>
+  <!-- Sound toggle: waveform bars -->
+  <button class="fab-btn" id="soundToggle" data-tip="ÂM THANH: TẮT">
+    <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" id="sound-icon">
+      <rect class="wave-bar" x="3" y="7" width="2.5" height="6" rx="1" fill="#9b7fe8" style="transform-origin:3px 10px"/>
+      <rect class="wave-bar" x="7" y="4" width="2.5" height="12" rx="1" fill="#9b7fe8" style="transform-origin:7px 10px;animation-delay:0.1s"/>
+      <rect class="wave-bar" x="11" y="6" width="2.5" height="8" rx="1" fill="#9b7fe8" style="transform-origin:11px 10px;animation-delay:0.2s"/>
+      <rect class="wave-bar" x="15" y="8" width="2.5" height="4" rx="1" fill="#9b7fe8" style="transform-origin:15px 10px;animation-delay:0.15s"/>
+      <!-- X overlay when muted -->
+      <line id="sound-mute-x1" x1="2" y1="2" x2="18" y2="18" stroke="#f87171" stroke-width="2" stroke-linecap="round" display="none"/>
+      <line id="sound-mute-x2" x1="18" y1="2" x2="2" y2="18" stroke="#f87171" stroke-width="2" stroke-linecap="round" display="none"/>
+    </svg>
+  </button>
+</div>
+
+
+<!-- NAV -->
+<nav>
+  <div class="logo">GRIMZ <span>CLOUD</span> PC</div>
+  <ul>
+    <li><a href="#features" data-i18n="nav_features">Tính năng</a></li>
+    <li><a href="#pricing" data-i18n="nav_pricing">Bảng giá</a></li>
+    <li><a href="#faq">FAQ</a></li>
+    <li><a href="#how" data-i18n="nav_how">Cách mua</a></li>
+  </ul>
+  <div style="display:flex;gap:0.75rem;align-items:center;">
+    <div class="lang-switcher" id="langSwitcher">
+      <div class="lang-trigger" id="langTrigger" onclick="toggleLang()">
+        <span id="curFlag">🇻🇳</span>
+        <span id="curCode">VI</span>
+        <span class="arr">▼</span>
+      </div>
+      <div class="lang-dropdown" id="langDropdown">
+        <button class="lang-opt sel" id="lbtn-vi" onclick="pickLang('vi')"><span class="lang-opt-flag">🇻🇳</span>Tiếng Việt</button>
+        <div class="lang-sep"></div>
+        <button class="lang-opt" id="lbtn-en" onclick="pickLang('en')"><span class="lang-opt-flag">🇬🇧</span>English</button>
+        <div class="lang-sep"></div>
+        <button class="lang-opt" id="lbtn-hi" onclick="pickLang('hi')"><span class="lang-opt-flag">🇮🇳</span>HI</button>
+      </div>
+    </div>
+    <a href="grimz-login.html" class="nav-cta" style="border-color:var(--border);color:var(--muted) !important;">Dashboard</a>
+    <a href="https://discord.gg/Ct4Gw7GwJJ" target="_blank" rel="noopener" class="nav-cta" id="nav-buy-btn">Mua ngay</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-glow-1"></div>
+  <div class="hero-glow-2"></div>
+  <div class="hero-content">
+    <div class="hero-tag" data-i18n="hero_tag">Server Singapore · Ping &lt;30ms</div>
+    <h1>
+      <span class="line1">Cloud PC Gaming</span>
+      <span class="line2" data-i18n="hero_country">Việt Nam</span>
+      <span class="line3">Grimz Cloud PC</span>
+    </h1>
+    <p class="hero-desc">
+      <span data-i18n="hero_desc1">Chơi game trên bất kỳ thiết bị nào, không cần PC mạnh.</span><br>
+      <span id="typing-text"></span><span class="typing-cursor"></span>
+    </p>
+    <div class="hero-btns">
+      <a href="https://discord.gg/Ct4Gw7GwJJ" target="_blank" rel="noopener" class="btn-primary">
+        <svg width="18" height="14" viewBox="0 0 71 55" fill="currentColor"><path d="M60.1 4.9A58.5 58.5 0 0 0 45.4.9a40 40 0 0 0-1.8 3.6 54 54 0 0 0-16.2 0A38.4 38.4 0 0 0 25.6.9 58.4 58.4 0 0 0 10.9 5C1.6 18.7-1 32 .3 45a58.7 58.7 0 0 0 17.9 9 44 44 0 0 0 3.8-6.2 38.3 38.3 0 0 1-6-2.9l1.4-1.1a41.9 41.9 0 0 0 35.7 0l1.5 1.1a38.2 38.2 0 0 1-6 2.9 43.6 43.6 0 0 0 3.8 6.2 58.5 58.5 0 0 0 17.9-9C71.8 30 68.2 16.8 60.1 4.9ZM23.7 37.3c-3.5 0-6.4-3.2-6.4-7.1s2.8-7.2 6.4-7.2 6.5 3.2 6.4 7.2c0 3.9-2.8 7.1-6.4 7.1Zm23.6 0c-3.5 0-6.4-3.2-6.4-7.1s2.8-7.2 6.4-7.2 6.5 3.2 6.4 7.2c0 3.9-2.8 7.1-6.4 7.1Z"/></svg>
+        <span data-i18n="join_discord">Tham gia Discord</span>
+      </a>
+      <a href="#pricing" class="btn-secondary" data-i18n="view_price">Xem bảng giá</a>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="stats-bar">
+  <div class="stat"><div class="stat-num">&lt;30ms</div><div class="stat-label" data-i18n="stat1">Ping Singapore</div></div>
+  <div class="stat"><div class="stat-num">24/7</div><div class="stat-label" data-i18n="stat2">Hỗ trợ online</div></div>
+  <div class="stat"><div class="stat-num">GPU</div><div class="stat-label" data-i18n="stat3">Dedicated card đồ họa</div></div>
+  <div class="stat"><div class="stat-num">Win11</div><div class="stat-label" data-i18n="stat4">Windows VM thực sự</div></div>
+</div>
+
+<!-- PING + DISCORD -->
+<div class="ping-section" style="position:relative;z-index:1;">
+  <div>
+    <div style="font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:var(--muted);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:0.5rem;" data-i18n="ping_label">// Test ping tới server</div>
+    <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap;">
+      <button class="ping-btn" id="ping-btn" onclick="testPing()"><span data-i18n="ping_btn">⚡ Đo Ping</span></button>
+      <div class="ping-result" id="ping-result">—</div>
+      <div class="ping-bar" id="ping-bar">
+        <div class="ping-bar-item" style="height:4px"></div>
+        <div class="ping-bar-item" style="height:4px"></div>
+        <div class="ping-bar-item" style="height:4px"></div>
+        <div class="ping-bar-item" style="height:4px"></div>
+        <div class="ping-bar-item" style="height:4px"></div>
+      </div>
+    </div>
+  </div>
+  <div style="margin-left:auto;">
+    <div style="font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:var(--muted);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:0.5rem;" data-i18n="dc_label">// Discord community</div>
+    <div class="discord-counter"><span class="dot"></span><span id="discord-count">...</span></div>
+  </div>
+</div>
+
+<!-- FEATURES -->
+<section id="features">
+  <div class="section-tag" data-i18n="tag_why">// WHY GRIMZ</div>
+  <h2 class="section-title"><span data-i18n="why_title_1">Tại sao chọn</span> <span>Grimz</span>?</h2>
+  <p class="section-sub" data-i18n="why_sub">Dịch vụ cloud PC gaming, server Singapore.</p>
+  <div class="features-grid">
+    <div class="feature-card fade-up"><span class="feature-icon">⚡</span><div class="feature-title"><span data-i18n="feat1">Ping siêu thấp</span></div><p class="feature-desc" data-i18n="feat1_desc">Server đặt tại Singapore, ping dưới 30ms từ Việt Nam. Kết nối ổn định, ít giật lag.</p></div>
+    <div class="feature-card fade-up"><span class="feature-icon">🎮</span><div class="feature-title"><span data-i18n="feat2">GPU cao cấp</span></div><p class="feature-desc" data-i18n="feat2_desc">RTX 3060, 4060, 4070 dedicated. Chạy được hầu hết game hiện tại ở mức cài đặt cao.</p></div>
+    <div class="feature-card fade-up"><span class="feature-icon">🖥️</span><div class="feature-title"><span data-i18n="feat3">Windows VM thực</span></div><p class="feature-desc" data-i18n="feat3_desc">Windows 10/11, cài được phần mềm bình thường, có quyền admin.</p></div>
+    <div class="feature-card fade-up"><span class="feature-icon">💸</span><div class="feature-title"><span data-i18n="feat4">Giá phải chăng</span></div><p class="feature-desc" data-i18n="feat4_desc">3.000đ/giờ, tính theo giờ thực tế dùng. Không cần đăng ký gói dài hạn.</p></div>
+    <div class="feature-card fade-up"><span class="feature-icon">🛡️</span><div class="feature-title"><span data-i18n="feat5">Hỗ trợ 24/7</span></div><p class="feature-desc" data-i18n="feat5_desc">Hỗ trợ qua Discord ticket. Phản hồi trong vài phút.</p></div>
+    <div class="feature-card fade-up"><span class="feature-icon">🔧</span><div class="feature-title"><span data-i18n="feat6">Dễ sử dụng</span></div><p class="feature-desc" data-i18n="feat6_desc">Kết nối qua Parsec hoặc Moonlight. Chạy được trên laptop yếu, điện thoại, TV box.</p></div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section id="pricing">
+  <div class="section-tag" data-i18n="tag_price">// CẤU HÌNH & GIÁ</div>
+  <h2 class="section-title"><span data-i18n="price_title">Cấu hình &amp;</span> <span data-i18n="price_title2">Giá thuê</span></h2>
+  <p class="section-sub" data-i18n="price_sub">Tính tiền theo giờ thực tế sử dụng, không cần đặt cọc.</p>
+  <div class="price-toggle">
+    <button class="price-toggle-btn active" onclick="setPriceMode('hour',this)" data-i18n="toggle_hour">Giờ</button>
+    <button class="price-toggle-btn" onclick="setPriceMode('day',this)" data-i18n="toggle_day">Ngày (8h)</button>
+    <button class="price-toggle-btn" onclick="setPriceMode('week',this)" data-i18n="toggle_week">Tuần</button>
+  </div>
+  <div class="plans-grid">
+
+    <!-- RTX 3060 -->
+    <div class="plan-card featured fade-up">
+      <div>
+        <div class="plan-name"><span class="plan-num"><span data-i18n="plan_label">GÓI</span> 1 ·</span><span class="plan-codename">G-NOVA</span></div>
+        <div class="plan-price" id="price-nova">3.000<span id="price-nova-unit"> đ/giờ</span></div>
+        <div class="plan-divider"></div>
+        <ul class="plan-specs">
+          <li><strong>CPU:</strong> i5-10400F</li>
+          <li><strong>GPU:</strong> RTX 3060 12GB</li>
+          <li><strong>RAM:</strong> 32GB DDR4</li>
+          <li><strong>Storage:</strong> 2 x 1TB HDD</li>
+          <li><strong>OS:</strong> Windows 10/11</li>
+          <li data-i18n="spec_ping">Ping Singapore &lt;30ms</li>
+          <li data-i18n="spec_support">Hỗ trợ 24/7</li>
+        </ul>
+      </div>
+      <a href="https://discord.gg/Ct4Gw7GwJJ" target="_blank" rel="noopener" class="plan-btn"><span data-i18n="rent_btn">Thuê qua Discord →</span></a>
+    </div>
+
+    <!-- RTX 4060 -->
+    <div class="plan-card fade-up">
+      <div>
+        <div class="plan-name"><span class="plan-num"><span data-i18n="plan_label">GÓI</span> 2 ·</span><span class="plan-codename">G-ORBIT</span></div>
+        <div style="margin:0.5rem 0;">
+          <div class="plan-price" id="price-orbit" style="font-size:2.2rem;margin:0.5rem 0;">5.000<span id="price-orbit-unit" style="font-size:0.9rem"> đ/giờ</span></div>
+        </div>
+        <div class="plan-divider"></div>
+        <ul class="plan-specs">
+          <li><strong>CPU:</strong> i5-10400F</li>
+          <li><strong>GPU:</strong> RTX 4060 8GB</li>
+          <li><strong>RAM:</strong> 32GB DDR4</li>
+          <li><strong>Storage:</strong> 2 x 1TB HDD</li>
+          <li><strong>OS:</strong> Windows 10/11</li>
+          <li data-i18n="spec_ping">Ping Singapore &lt;30ms</li>
+          <li data-i18n="spec_support">Hỗ trợ 24/7</li>
+        </ul>
+      </div>
+      <a href="https://discord.gg/Ct4Gw7GwJJ" target="_blank" rel="noopener" class="plan-btn"><span data-i18n="rent_btn">Thuê qua Discord →</span></a>
+    </div>
+
+    <!-- RTX 4070 -->
+    <div class="plan-card fade-up">
+      <div>
+        <div class="plan-name"><span class="plan-num"><span data-i18n="plan_label">GÓI</span> 3 ·</span><span class="plan-codename">G-PULSAR</span></div>
+        <div style="margin:0.5rem 0;">
+          <div class="plan-price" id="price-pulsar" style="font-size:2.2rem;margin:0.5rem 0;">6.000<span id="price-pulsar-unit" style="font-size:0.9rem"> đ/giờ</span></div>
+        </div>
+        <div class="plan-divider"></div>
+        <ul class="plan-specs">
+          <li><strong>CPU:</strong> Intel Core i7</li>
+          <li><strong>GPU:</strong> RTX 4070</li>
+          <li><strong>RAM:</strong> 32GB DDR4</li>
+          <li><strong>Storage:</strong> 2TB SSD NVMe + 2TB HDD</li>
+          <li><strong>OS:</strong> Windows 10/11</li>
+          <li data-i18n="spec_ping">Ping Singapore &lt;30ms</li>
+          <li data-i18n="spec_support">Hỗ trợ 24/7</li>
+        </ul>
+      </div>
+      <a href="https://discord.gg/Ct4Gw7GwJJ" target="_blank" rel="noopener" class="plan-btn"><span data-i18n="rent_btn">Thuê qua Discord →</span></a>
+    </div>
+
+  </div>
+</section>
+
+<!-- HOW -->
+<section id="how">
+  <div class="section-tag" data-i18n="tag_how">// CÁCH MUA</div>
+  <h2 class="section-title" data-i18n="steps_heading">Chỉ 3 bước để bắt đầu</h2>
+  <p class="section-sub" data-i18n="steps_sub">Mua và bắt đầu sử dụng trong vài phút.</p>
+  <div class="steps">
+    <div class="step fade-up"><div class="step-num">01</div><div class="step-title" data-i18n="step1_title">Vào Discord</div><p class="step-desc" data-i18n="step1_desc">Vào Discord server của Grimz Cloud PC.</p></div>
+    <div class="step fade-up"><div class="step-num">02</div><div class="step-title" data-i18n="step2_title">Tạo Ticket</div><p class="step-desc" data-i18n="step2_desc">Tạo ticket, cho staff biết muốn thuê bao nhiêu giờ, thanh toán qua chuyển khoản hoặc MoMo.</p></div>
+    <div class="step fade-up"><div class="step-num">03</div><div class="step-title" data-i18n="step3_title">Nhận máy &amp; chơi</div><p class="step-desc" data-i18n="step3_desc">Staff gửi thông tin kết nối. Cài Parsec hoặc Moonlight là dùng được.</p></div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section id="faq">
+  <div class="section-tag" data-i18n="tag_faq">// FAQ</div>
+  <h2 class="section-title"><span data-i18n="faq_title">Câu hỏi</span> <span data-i18n="faq_title2">thường gặp</span></h2>
+  <p class="section-sub" data-i18n="faq_sub">Giải đáp nhanh các thắc mắc phổ biến.</p>
+  <div class="faq-list fade-up">
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)"><span data-i18n="faq_q1">Sau khi mua bao lâu thì nhận được máy?</span> <span class="arrow">▸</span></button>
+      <div class="faq-a" data-i18n="faq_a1">Thường trong vòng 5-15 phút sau khi thanh toán và staff xác nhận. Nếu quá 30 phút chưa nhận được, ping staff trong Discord ticket.</div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)"><span data-i18n="faq_q2">Cần phần mềm gì để kết nối?</span> <span class="arrow">▸</span></button>
+      <div class="faq-a" data-i18n="faq_a2">Dùng Parsec (parsec.app) hoặc Moonlight (moonlight-stream.org), đều miễn phí. Chạy được trên Windows, Mac, Android, iOS, TV box.</div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)"><span data-i18n="faq_q3">Máy tôi cần cấu hình gì để dùng được?</span> <span class="arrow">▸</span></button>
+      <div class="faq-a" data-i18n="faq_a3">Không cần máy mạnh. Chỉ cần kết nối internet ổn định (tối thiểu 10 Mbps) và cài Parsec hoặc Moonlight. Laptop cũ, điện thoại, TV box đều dùng được.</div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)"><span data-i18n="faq_q4">Ping có ổn định không? Chơi game có lag không?</span> <span class="arrow">▸</span></button>
+      <div class="faq-a" data-i18n="faq_a4">Server đặt tại Singapore, ping trung bình dưới 30ms từ Việt Nam. Đủ để chơi hầu hết thể loại game, kể cả FPS và MOBA.</div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)"><span data-i18n="faq_q5">Thanh toán bằng gì?</span> <span class="arrow">▸</span></button>
+      <div class="faq-a" data-i18n="faq_a5">Chuyển khoản ngân hàng hoặc MoMo. Staff sẽ gửi thông tin thanh toán trong Discord ticket.</div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)"><span data-i18n="faq_q6">Tôi có thể cài game và phần mềm không?</span> <span class="arrow">▸</span></button>
+      <div class="faq-a" data-i18n="faq_a6">Được. Bạn có quyền admin đầy đủ, cài đặt phần mềm và game bình thường như PC thật.</div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)"><span data-i18n="faq_q7">Dữ liệu có được lưu giữa các phiên không?</span> <span class="arrow">▸</span></button>
+      <div class="faq-a" data-i18n="faq_a7">Có, dữ liệu được giữ trong suốt thời gian thuê. Tuy nhiên sau khi hết hạn và không gia hạn, máy có thể được reset. Nên backup dữ liệu quan trọng.</div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section id="reviews">
+  <div class="section-tag" data-i18n="tag_review">// ĐÁNH GIÁ</div>
+  <h2 class="section-title"><span data-i18n="review_title">Khách hàng</span> <span data-i18n="review_title2">nói gì</span></h2>
+  <p class="section-sub" data-i18n="review_sub">Phản hồi từ cộng đồng Discord của Grimz.</p>
+  <div class="testimonials-grid">
+    <div class="testimonial-card fade-up">
+      <div class="testimonial-text">Ping cực thấp, chơi Valorant mượt hơn cả máy tự build. Staff hỗ trợ nhanh lắm, hỏi là trả lời ngay.</div>
+      <div class="testimonial-author">— kobitnx223 · Discord</div>
+    </div>
+    <div class="testimonial-card fade-up">
+      <div class="testimonial-text">Giá 3k/h mà chơi được RTX 3060 thì quá ngon. Laptop mình yếu mà stream game vẫn mượt.</div>
+      <div class="testimonial-author">— Thành · Discord</div>
+    </div>
+    <div class="testimonial-card fade-up">
+      <div class="testimonial-text">Setup nhanh, 10 phút là có máy chơi ngay. Recommend cho mấy đứa bạn rồi, ai cũng thích.</div>
+      <div class="testimonial-author">— Minh · Discord</div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <h2><span data-i18n="cta_title">Muốn thử</span> <span>Grimz Cloud PC</span>?</h2>
+  <p data-i18n="cta_sub">Vào Discord để đặt máy hoặc hỏi thêm thông tin.</p>
+  <div class="hero-btns">
+    <a href="https://discord.gg/Ct4Gw7GwJJ" target="_blank" rel="noopener" class="discord-btn">
+      <svg width="22" height="17" viewBox="0 0 71 55" fill="currentColor"><path d="M60.1 4.9A58.5 58.5 0 0 0 45.4.9a40 40 0 0 0-1.8 3.6 54 54 0 0 0-16.2 0A38.4 38.4 0 0 0 25.6.9 58.4 58.4 0 0 0 10.9 5C1.6 18.7-1 32 .3 45a58.7 58.7 0 0 0 17.9 9 44 44 0 0 0 3.8-6.2 38.3 38.3 0 0 1-6-2.9l1.4-1.1a41.9 41.9 0 0 0 35.7 0l1.5 1.1a38.2 38.2 0 0 1-6 2.9 43.6 43.6 0 0 0 3.8 6.2 58.5 58.5 0 0 0 17.9-9C71.8 30 68.2 16.8 60.1 4.9ZM23.7 37.3c-3.5 0-6.4-3.2-6.4-7.1s2.8-7.2 6.4-7.2 6.5 3.2 6.4 7.2c0 3.9-2.8 7.1-6.4 7.1Zm23.6 0c-3.5 0-6.4-3.2-6.4-7.1s2.8-7.2 6.4-7.2 6.5 3.2 6.4 7.2c0 3.9-2.8 7.1-6.4 7.1Z"/></svg>
+      <span data-i18n="join_discord_now">Tham gia Discord ngay</span>
+    </a>
+    <a href="#pricing" class="btn-secondary" data-i18n="view_price">Xem bảng giá</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">GRIMZ <span>CLOUD</span> PC</div>
+  <div class="footer-links">
+    <a href="terms.html" data-i18n="footer_terms">Điều khoản dịch vụ</a>
+    <a href="privacy.html" data-i18n="footer_privacy">Chính sách bảo mật</a>
+    <a href="https://discord.gg/Ct4Gw7GwJJ" target="_blank" rel="noopener">Discord</a>
+  </div>
+  <p>© <span id="footer-year"></span> Grimz Cloud PC · Vietnam · <span data-i18n="footer_support">Hỗ trợ qua Discord</span></p>
+</footer>
+
+<script>
+
+  // ===== LANG SWITCHER =====
+  const LANGS = {
+    vi: { flag:'🇻🇳', code:'VI', country:['VN'] },
+    en: { flag:'🇬🇧', code:'EN', country:[] },
+    hi: { flag:'🇮🇳', code:'HI', country:['IN'] },
+  };
+
+  const T = {
+    vi: {
+      why_title_1:'Tại sao chọn', why_sub:'Dịch vụ cloud PC gaming, server Singapore.',
+      price_title:'Cấu hình &', price_title2:'Giá thuê', price_sub:'Tính tiền theo giờ thực tế sử dụng, không cần đặt cọc.',
+      steps_title:'Chỉ', steps_title2:'để bắt đầu', steps_sub:'Mua và bắt đầu sử dụng trong vài phút.',
+      faq_title:'Câu hỏi', faq_title2:'thường gặp',
+      review_title:'Khách hàng', review_title2:'nói gì',
+      join_discord:'Join Discord', join_discord_now:'Join Discord Now', view_price:'View Pricing',
+      cta_title:'Muốn thử', cta_sub:'Vào Discord để đặt máy hoặc hỏi thêm thông tin.',
+      feat1:'Ping siêu thấp', feat2:'GPU cao cấp', feat3:'Windows VM thực', feat4:'Giá phải chăng', feat5:'Hỗ trợ 24/7', feat6:'Dễ sử dụng',
+      rent_btn:'Thuê qua Discord →',
+      hero_desc1:'Play games on any device, no powerful PC required.',
+      steps_heading:'Just 3 Steps to Start',
+      ping_btn:'⚡ Đo Ping',
+      ping_retry:'⚡ Đo lại',
+      ping_good:'Tốt',
+      ping_high:'Cao',
+      members:'thành viên',
+      loading:'Đang tải...',
+      cookie_text:'Chúng tôi dùng cookie để duy trì đăng nhập và cải thiện trải nghiệm.',
+      cookie_accept:'Đồng ý', cookie_decline:'Từ chối',
+    // Extra keys
+    feat1_desc:'Server đặt tại Singapore, ping dưới 30ms từ Việt Nam. Kết nối ổn định, ít giật lag.',
+    feat2_desc:'RTX 3060, 4060, 4070 dedicated. Chạy được hầu hết game hiện tại ở mức cài đặt cao.',
+    feat3_desc:'Windows 10/11, cài được phần mềm bình thường, có quyền admin.',
+    feat4_desc:'3.000đ/giờ, tính theo giờ thực tế dùng. Không cần đăng ký gói dài hạn.',
+    feat5_desc:'Hỗ trợ qua Discord ticket. Phản hồi trong vài phút.',
+    feat6_desc:'Kết nối qua Parsec hoặc Moonlight. Chạy được trên laptop yếu, điện thoại, TV box.',
+    toggle_hour:'Giờ', toggle_day:'Ngày (8h)', toggle_week:'Tuần',
+    spec_ping:'Ping Singapore <30ms', spec_support:'Hỗ trợ 24/7',
+    step1_title:'Vào Discord', step1_desc:'Vào Discord server của Grimz Cloud PC.',
+    step2_title:'Tạo Ticket', step2_desc:'Tạo ticket, cho staff biết muốn thuê bao nhiêu giờ, thanh toán qua chuyển khoản hoặc MoMo.',
+    step3_title:'Nhận máy & chơi', step3_desc:'Staff gửi thông tin kết nối. Cài Parsec hoặc Moonlight là dùng được.',
+    ping_label:'// Test ping tới server', dc_label:'// Discord community',
+    tag_why:'// WHY GRIMZ', tag_price:'// CẤU HÌNH & GIÁ', tag_how:'// CÁCH MUA', tag_faq:'// FAQ', tag_review:'// ĐÁNH GIÁ',
+    faq_sub:'Giải đáp nhanh các thắc mắc phổ biến.', review_sub:'Phản hồi từ cộng đồng Discord của Grimz.',
+    faq_q1:'Sau khi mua bao lâu thì nhận được máy?', faq_q2:'Cần phần mềm gì để kết nối?',
+    faq_q3:'Máy tôi cần cấu hình gì để dùng được?', faq_q4:'Ping có ổn định không? Chơi game có lag không?',
+    faq_q5:'Thanh toán bằng gì?', faq_q6:'Tôi có thể cài game và phần mềm không?',
+    faq_q7:'Dữ liệu có được lưu giữa các phiên không?',
+    faq_a1:'Thường trong vòng 5-15 phút sau khi thanh toán và staff xác nhận. Nếu quá 30 phút chưa nhận được, ping staff trong Discord ticket.',
+    faq_a2:'Dùng Parsec (parsec.app) hoặc Moonlight (moonlight-stream.org), đều miễn phí. Chạy được trên Windows, Mac, Android, iOS, TV box.',
+    faq_a3:'Không cần máy mạnh. Chỉ cần kết nối internet ổn định (tối thiểu 10 Mbps) và cài Parsec hoặc Moonlight. Laptop cũ, điện thoại, TV box đều dùng được.',
+    faq_a4:'Server đặt tại Singapore, ping trung bình dưới 30ms từ Việt Nam. Đủ để chơi hầu hết thể loại game, kể cả FPS và MOBA.',
+    faq_a5:'Chuyển khoản ngân hàng hoặc MoMo. Staff sẽ gửi thông tin thanh toán trong Discord ticket.',
+    faq_a6:'Được. Bạn có quyền admin đầy đủ, cài đặt phần mềm và game bình thường như PC thật.',
+    faq_a7:'Có, dữ liệu được giữ trong suốt thời gian thuê. Tuy nhiên sau khi hết hạn và không gia hạn, máy có thể được reset. Nên backup dữ liệu quan trọng.',
+    nav_dashboard:'Dashboard', nav_buy:'Buy Now',
+    },
+    en: {
+      why_title_1:'Why choose', why_sub:'Cloud PC gaming service, Singapore server.',
+      price_title:'Specs &', price_title2:'Pricing', price_sub:'Pay only for hours used, no deposit required.',
+      steps_title:'Just', steps_title2:'to get started', steps_sub:'Purchase and start playing in minutes.',
+      faq_title:'Frequently', faq_title2:'Asked Questions',
+      review_title:'What', review_title2:'customers say',
+      join_discord:'Join Discord', join_discord_now:'Join Discord Now', view_price:'View Pricing',
+      cta_title:'Want to try', cta_sub:'Join Discord to order or ask for more info.',
+      feat1:'Ultra Low Ping', feat2:'High-end GPU', feat3:'Real Windows VM', feat4:'Affordable Price', feat5:'24/7 Support', feat6:'Easy to Use',
+      rent_btn:'Rent via Discord →',
+      cookie_text:'We use cookies to maintain login and improve your experience.',
+      cookie_accept:'Accept', cookie_decline:'Decline',
+    feat1_desc:'Singapore server, ping under 30ms from Vietnam. Stable connection, minimal lag.',
+    feat2_desc:'RTX 3060, 4060, 4070 dedicated. Runs most current games at high settings.',
+    feat3_desc:'Windows 10/11, install any software, full admin rights.',
+    feat4_desc:'3,000 VND/hour, pay for actual usage only. No long-term subscription needed.',
+    feat5_desc:'Support via Discord ticket. Response within minutes.',
+    feat6_desc:'Connect via Parsec or Moonlight. Works on weak laptops, phones, TV boxes.',
+    toggle_hour:'Hour', toggle_day:'Day (8h)', toggle_week:'Week',
+    spec_ping:'Singapore Ping <30ms', spec_support:'24/7 Support',
+    step1_title:'Join Discord', step1_desc:'Join the Grimz Cloud PC Discord server.',
+    step2_title:'Create Ticket', step2_desc:'Create a ticket, tell staff how many hours, pay via bank transfer or e-wallet.',
+    step3_title:'Get machine & play', step3_desc:'Staff sends connection info. Install Parsec or Moonlight and you are ready.',
+    ping_label:'// Test ping to server', dc_label:'// Discord community',
+    tag_why:'// WHY GRIMZ', tag_price:'// SPECS & PRICING', tag_how:'// HOW TO BUY', tag_faq:'// FAQ', tag_review:'// REVIEWS',
+    faq_sub:'Quick answers to common questions.', review_sub:'Feedback from the Grimz Discord community.',
+    faq_q1:'How long until I receive my machine?', faq_q2:'What software do I need to connect?',
+    faq_q3:'What specs does my device need?', faq_q4:'Is the ping stable? Will there be lag?',
+    faq_q5:'What payment methods are accepted?', faq_q6:'Can I install games and software?',
+    faq_q7:'Is data saved between sessions?',
+    faq_a1:'Usually within 5-15 minutes after payment and staff confirmation. If not received after 30 minutes, ping staff in the Discord ticket.',
+    faq_a2:'Use Parsec (parsec.app) or Moonlight (moonlight-stream.org), both free. Works on Windows, Mac, Android, iOS, TV box.',
+    faq_a3:'No powerful device needed. Just a stable internet connection (min 10 Mbps) and Parsec or Moonlight installed. Old laptops, phones, TV boxes all work.',
+    faq_a4:'Server in Singapore, average ping under 30ms from Vietnam. Enough for most game types including FPS and MOBA.',
+    faq_a5:'Bank transfer or MoMo. Staff will send payment details in the Discord ticket.',
+    faq_a6:'Yes. You have full admin rights, install software and games just like a real PC.',
+    faq_a7:'Yes, data is kept throughout your rental period. However after expiry without renewal, the machine may be reset. Please backup important data.',
+    nav_dashboard:'Dashboard', nav_buy:'Buy Now',
+    },
+    hi: {
+      why_title_1:'क्यों चुनें', why_sub:'क्लाउड PC गेमिंग, सिंगापुर सर्वर।',
+      price_title:'स्पेक्स &', price_title2:'मूल्य', price_sub:'सिर्फ इस्तेमाल के घंटों का भुगतान।',
+      steps_title:'बस', steps_title2:'शुरू करें', steps_sub:'खरीदें और मिनटों में खेलें।',
+      faq_title:'अक्सर पूछे', faq_title2:'जाने वाले सवाल',
+      review_title:'ग्राहक', review_title2:'क्या कहते हैं',
+      join_discord:'Discord जॉइन करें', join_discord_now:'Discord जॉइन करें', view_price:'मूल्य देखें',
+      cta_title:'आज़माएं', cta_sub:'Discord जॉइन करें ऑर्डर या जानकारी के लिए।',
+      feat1:'बहुत कम Ping', feat2:'हाई-एंड GPU', feat3:'असली Windows VM', feat4:'किफायती मूल्य', feat5:'24/7 सपोर्ट', feat6:'आसान उपयोग',
+      rent_btn:'Discord से किराए पर →',
+      hero_desc1:'Play games on any device, no powerful PC required.',
+      steps_heading:'Just 3 Steps to Start',
+      ping_btn:'⚡ Ping टेस्ट',
+      ping_retry:'⚡ दोबारा',
+      ping_good:'अच्छा',
+      ping_high:'ज़्यादा',
+      members:'सदस्य',
+      loading:'लोड हो रहा...',
+      cookie_text:'हम लॉगिन और अनुभव बेहतर बनाने के लिए कुकी उपयोग करते हैं।',
+      cookie_accept:'स्वीकार', cookie_decline:'अस्वीकार',
+    feat1_desc:'सिंगापुर सर्वर, भारत से 50ms से कम ping। स्थिर कनेक्शन।',
+    feat2_desc:'RTX 3060, 4060, 4070 dedicated। हाई सेटिंग पर गेम चलाएं।',
+    feat3_desc:'Windows 10/11, कोई भी सॉफ्टवेयर इंस्टॉल करें, पूर्ण एडमिन।',
+    feat4_desc:'$0.50/घंटा, सिर्फ उपयोग का भुगतान। कोई सब्सक्रिप्शन नहीं।',
+    feat5_desc:'Discord टिकट से सपोर्ट। मिनटों में जवाब।',
+    feat6_desc:'Parsec या Moonlight से कनेक्ट। पुराने लैपटॉप, फोन पर भी चले।',
+    toggle_hour:'घंटा', toggle_day:'दिन (8h)', toggle_week:'सप्ताह',
+    spec_ping:'Singapore Ping <50ms', spec_support:'24/7 सपोर्ट',
+    step1_title:'Discord जॉइन करें', step1_desc:'Grimz Cloud PC Discord सर्वर जॉइन करें।',
+    step2_title:'टिकट बनाएं', step2_desc:'टिकट बनाएं, स्टाफ को बताएं कितने घंटे चाहिए, UPI/PayPal से भुगतान।',
+    step3_title:'मशीन पाएं और खेलें', step3_desc:'स्टाफ कनेक्शन भेजेगा। Parsec या Moonlight इंस्टॉल करें।',
+    ping_label:'// सर्वर ping टेस्ट', dc_label:'// Discord कम्युनिटी',
+    tag_why:'// WHY GRIMZ', tag_price:'// स्पेक्स & मूल्य', tag_how:'// कैसे खरीदें', tag_faq:'// FAQ', tag_review:'// रिव्यू',
+    faq_sub:'आम सवालों के त्वरित उत्तर।', review_sub:'Grimz Discord कम्युनिटी की प्रतिक्रिया।',
+    faq_q1:'मशीन कब तक मिलेगी?', faq_q2:'कनेक्ट करने के लिए क्या चाहिए?',
+    faq_q3:'मेरे डिवाइस में क्या स्पेक्स चाहिए?', faq_q4:'क्या ping स्थिर है? लैग होगा?',
+    faq_q5:'भुगतान कैसे करें?', faq_q6:'क्या गेम और सॉफ्टवेयर इंस्टॉल कर सकते हैं?',
+    faq_q7:'क्या डेटा सेशन में सेव रहता है?',
+    faq_a1:'भुगतान के 5-15 मिनट बाद। 30 मिनट से ज़्यादा हो तो Discord टिकट में स्टाफ को ping करें।',
+    faq_a2:'Parsec (parsec.app) या Moonlight (moonlight-stream.org), दोनों फ्री। Windows, Mac, Android, iOS पर चलते हैं।',
+    faq_a3:'शक्तिशाली डिवाइस नहीं चाहिए। बस स्थिर इंटरनेट (10 Mbps+) और Parsec/Moonlight। पुराने लैपटॉप, फोन सब चलेगा।',
+    faq_a4:'सिंगापुर सर्वर, भारत से ~50ms। FPS और MOBA सहित अधिकांश गेम के लिए पर्याप्त।',
+    faq_a5:'UPI, PayPal या क्रिप्टो। स्टाफ Discord टिकट में भुगतान विवरण भेजेगा।',
+    faq_a6:'हाँ। पूर्ण एडमिन अधिकार, असली PC जैसे सॉफ्टवेयर और गेम इंस्टॉल करें।',
+    faq_a7:'हाँ, किराये की अवधि तक डेटा रहता है। समाप्ति के बाद मशीन रीसेट हो सकती है। महत्वपूर्ण डेटा बैकअप करें।',
+    nav_dashboard:'Dashboard', nav_buy:'अभी खरीदें',
+    },
+  };
+
+  let activeLang = localStorage.getItem('grimz_lang') || 'vi';
+
+
+  const CURRENCY = {
+    vi:{nova:'3.000',orbit:'5.000',pulsar:'6.000',unit:' đ/giờ'},
+    en:{nova:'$0.50',orbit:'$0.60',pulsar:'$0.70',unit:'/hr'},
+    hi:{nova:'$0.50',orbit:'$0.60',pulsar:'$0.70',unit:'/hr'},
+  };
+  function updateCurrency(lang) {
+    // Use setPriceMode to update all prices consistently
+    setPriceMode(priceMode, null);
+  }
+  function applyLang(lang) {
+    const t = T[lang];
+    if (!t) return;
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const k = el.getAttribute('data-i18n');
+      if (t[k] !== undefined) el.innerHTML = t[k];
+    });
+    // Cookie banner
+    const cb = document.getElementById('cookie-text-span');
+    const ca = document.getElementById('cookie-accept-btn');
+    const cd = document.getElementById('cookie-decline-btn');
+    if (cb) cb.innerHTML = t.cookie_text + ' <a href="privacy.html">' + (t.footer_privacy || 'Privacy Policy') + '</a>.';
+    if (ca) ca.textContent = t.cookie_accept;
+    if (cd) cd.textContent = t.cookie_decline;
+    // Update nav buy button
+    const nb = document.getElementById('nav-buy-btn');
+    if (nb && t.nav_buy) nb.textContent = t.nav_buy;
+    document.documentElement.lang = lang;
+    updateCurrency(lang);
+    updateTypingLines();
+    // Update page title
+    if (t.page_title) document.title = t.page_title;
+    // Update discord counter text (number stays, just update unit word)
+    const dc = document.getElementById('discord-count');
+    if (dc) {
+      const txt = dc.textContent;
+      const num = txt.match(/[\d,\.]+/);
+      if (num) {
+        dc.textContent = num[0] + ' ' + (t.members || 'members');
+      } else {
+        dc.textContent = t.loading || 'Loading...';
+      }
+    }
+  }
+
+  function setActiveLang(lang) {
+    activeLang = lang;
+    localStorage.setItem('grimz_lang', lang);
+    const info = LANGS[lang];
+    document.getElementById('curFlag').textContent = info.flag;
+    document.getElementById('curCode').textContent = info.code;
+    document.querySelectorAll('.lang-opt').forEach(b => b.classList.remove('sel'));
+    const btn = document.getElementById('lbtn-' + lang);
+    if (btn) btn.classList.add('sel');
+    document.getElementById('langTrigger').classList.remove('open');
+    document.getElementById('langDropdown').classList.remove('open');
+    applyLang(lang);
+    setPriceMode(priceMode, null);
+  }
+
+  function pickLang(lang) {
+    localStorage.setItem('grimz_lang_manual', '1');
+    setActiveLang(lang);
+  }
+
+  function toggleLang() {
+    document.getElementById('langTrigger').classList.toggle('open');
+    document.getElementById('langDropdown').classList.toggle('open');
+  }
+
+  document.addEventListener('click', e => {
+    if (!document.getElementById('langSwitcher').contains(e.target)) {
+      document.getElementById('langTrigger').classList.remove('open');
+      document.getElementById('langDropdown').classList.remove('open');
+    }
+  });
+
+  // Auto detect by IP
+  async function autoDetectLang() {
+    if (localStorage.getItem('grimz_lang_manual')) {
+      setActiveLang(activeLang);
+      return;
+    }
+    try {
+      const res = await fetch('https://ipapi.co/json/', { signal: AbortSignal.timeout(3000) });
+      const data = await res.json();
+      const cc = data.country_code;
+      let lang = 'en';
+      if (cc === 'VN') lang = 'vi';
+      else if (cc === 'IN') lang = 'hi';
+      setActiveLang(lang);
+    } catch {
+      setActiveLang(activeLang);
+    }
+  }
+  // Run after everything loads
+  window.addEventListener('load', autoDetectLang);
+
+  // Footer year
+  document.getElementById('footer-year').textContent = new Date().getFullYear();
+
+  // Back to top
+  window.addEventListener('scroll', () => {
+    const bt = document.getElementById('backTop'); if(bt) bt.style.display = window.scrollY > 400 ? 'flex' : 'none';
+
+    // Active nav on scroll
+    const sections = ['features','pricing','faq','how'];
+    let current = '';
+    sections.forEach(id => {
+      const el = document.getElementById(id);
+      if (el && window.scrollY >= el.offsetTop - 100) current = id;
+    });
+    document.querySelectorAll('nav ul a').forEach(a => {
+      a.style.color = a.getAttribute('href') === '#'+current ? 'var(--accent)' : '';
+    });
+  });
+
+  // Fade up
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) setTimeout(() => entry.target.classList.add('visible'), i * 80);
+    });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+
+
+  // ===== CUSTOM CURSOR (desktop only) =====
+  if (window.matchMedia('(hover: hover)').matches) {
+  const cursor = document.getElementById('cursor');
+  const cursorRing = document.getElementById('cursorRing');
+  const mouseGlow = document.getElementById('mouseGlow');
+  document.addEventListener('mousemove', e => {
+    cursor.style.left = e.clientX + 'px';
+    cursor.style.top = e.clientY + 'px';
+    cursorRing.style.left = e.clientX + 'px';
+    cursorRing.style.top = e.clientY + 'px';
+    mouseGlow.style.left = e.clientX + 'px';
+    mouseGlow.style.top = e.clientY + 'px';
+  });
+  document.addEventListener('mousedown', () => { cursor.classList.add('clicking'); cursorRing.classList.add('clicking'); });
+  document.addEventListener('mouseup', () => { cursor.classList.remove('clicking'); cursorRing.classList.remove('clicking'); });
+  }
+
+  // ===== TYPING EFFECT =====
+  const typingLinesByLang = {
+    vi: ['RTX 3060, 32GB RAM, Windows 10/11','Ping <30ms từ Việt Nam','Giá chỉ 3.000đ/giờ','Kết nối qua Parsec hoặc Moonlight','Hỗ trợ 24/7 qua Discord'],
+    en: ['RTX 3060, 32GB RAM, Windows 10/11','Ping <30ms from anywhere','From $0.50/hr only','Connect via Parsec or Moonlight','24/7 Discord support'],
+  };
+  let typingLines = typingLinesByLang['vi'];
+  let tIdx = 0, tChar = 0, tDeleting = false;
+  function updateTypingLines() {
+    typingLines = typingLinesByLang[activeLang] || typingLinesByLang.en;
+    tIdx = 0; tChar = 0; tDeleting = false;
+    if (tEl) { tEl.textContent = ''; }
+    clearTimeout(window._typeTimeout);
+    window._typeTimeout = setTimeout(typeLoop, 100);
+  }
+  const tEl = document.getElementById('typing-text');
+  function typeLoop() {
+    if (!tEl) return;
+    const cur = typingLines[tIdx];
+    tEl.textContent = tDeleting ? cur.slice(0, --tChar) : cur.slice(0, ++tChar);
+    if (!tDeleting && tChar === cur.length) { tDeleting = true; setTimeout(typeLoop, 1800); return; }
+    if (tDeleting && tChar === 0) { tDeleting = false; tIdx = (tIdx + 1) % typingLines.length; }
+    window._typeTimeout = setTimeout(typeLoop, tDeleting ? 35 : 75);
+  }
+  typeLoop();
+
+  // ===== PRICING TOGGLE =====
+  const prices = {
+    '3060': { hour: '3.000', day: 'N/A', week: 'N/A' },
+    '4060': { hour: '5.000', day: 'N/A', week: 'N/A' },
+    '4070': { hour: '6.000', day: 'N/A', week: 'N/A' },
+  };
+  const units = { hour: 'đ/giờ', day: 'đ/ngày', week: 'đ/tuần' };
+  const pricesByLang = {
+    vi: { '3060':{hour:'3.000',day:'N/A',week:'N/A'}, '4060':{hour:'5.000',day:'N/A',week:'N/A'}, '4070':{hour:'6.000',day:'N/A',week:'N/A'} },
+    en: { '3060':{hour:'$0.50',day:'N/A',week:'N/A'}, '4060':{hour:'$0.60',day:'N/A',week:'N/A'}, '4070':{hour:'$0.70',day:'N/A',week:'N/A'} },
+    hi: { '3060':{hour:'$0.50',day:'N/A',week:'N/A'}, '4060':{hour:'$0.60',day:'N/A',week:'N/A'}, '4070':{hour:'$0.70',day:'N/A',week:'N/A'} },
+  };
+  const unitsByLang = {
+    vi: {hour:' đ/giờ', day:' đ/ngày', week:' đ/tuần'},
+    en: {hour:'/hr', day:'/day', week:'/week'},
+    hi: {hour:'/hr', day:'/day', week:'/week'},
+  };
+  let priceMode = 'hour';
+  function setPriceMode(mode, btn) {
+    priceMode = mode;
+    document.querySelectorAll('.price-toggle-btn').forEach(b => b.classList.remove('active'));
+    if (btn) btn.classList.add('active');
+    const lang = activeLang || 'vi';
+    const prices = pricesByLang[lang] || pricesByLang.vi;
+    const units = unitsByLang[lang] || unitsByLang.vi;
+    document.querySelectorAll('.plan-price').forEach(el => {
+      const card = el.closest('.plan-card');
+      if (!card) return;
+      const name = card.querySelector('.plan-codename')?.textContent?.trim();
+      const key = name?.includes('PULSAR') ? '4070' : name?.includes('ORBIT') ? '4060' : '3060';
+      const span = el.querySelector('span');
+      if (span) { el.childNodes[0].textContent = prices[key][mode]; span.textContent = units[mode]; }
+    });
+  }
+
+  // ===== PING TEST =====
+  async function testPing() {
+    const btn = document.querySelector('.ping-btn');
+    const result = document.getElementById('ping-result');
+    const bars = document.querySelectorAll('.ping-bar-item');
+    btn.textContent = '⏳ Đang đo...'; btn.disabled = true;
+    result.textContent = '—';
+    const pings = [];
+    for (let i = 0; i < 5; i++) {
+      const t = Date.now();
+      try { await fetch('https://vlwevojqfomophsdwsqd.supabase.co/rest/v1/', { method:'HEAD', cache:'no-store' }); }
+      catch {}
+      pings.push(Date.now() - t);
+      await new Promise(r => setTimeout(r, 200));
+    }
+    const avg = Math.round(pings.reduce((a,b) => a+b) / pings.length);
+    result.textContent = avg + 'ms';
+    result.style.color = avg < 50 ? '#4ade80' : avg < 100 ? '#fbbf24' : '#f87171';
+    const pingHigh = T[activeLang]?.ping_high || 'High';
+    const pingGood = T[activeLang]?.ping_good || 'Good';
+    if (avg > 150) result.textContent = avg + 'ms ⚠️ ' + pingHigh;
+    else if (avg < 50) result.textContent = avg + 'ms ✓ ' + pingGood;
+    const max = Math.max(...pings);
+    bars.forEach((b, i) => {
+      const h = Math.max(4, Math.round((pings[i] / max) * 24));
+      b.style.height = h + 'px';
+      b.style.background = pings[i] < 50 ? '#4ade80' : pings[i] < 100 ? '#fbbf24' : '#f87171';
+    });
+    btn.innerHTML = '<span data-i18n="ping_btn">' + (T[activeLang]?.ping_retry || '⚡ Retry') + '</span>'; btn.disabled = false;
+  }
+
+  // ===== DISCORD MEMBER COUNT (cached 5 mins) =====
+  async function fetchDiscordCount() {
+    const CACHE_KEY = 'grimz_discord_count';
+    const CACHE_TTL = 5 * 60 * 1000; // 5 phút
+    try {
+      const cached = localStorage.getItem(CACHE_KEY);
+      if (cached) {
+        const { count, ts } = JSON.parse(cached);
+        if (Date.now() - ts < CACHE_TTL) {
+          const lang2 = activeLang || 'vi'; document.getElementById('discord-count').textContent = count.toLocaleString() + ' ' + (T[lang2]?.members || 'members');
+          return;
+        }
+      }
+      const res = await fetch('https://discord.com/api/v9/invites/Ct4Gw7GwJJ?with_counts=true');
+      const data = await res.json();
+      const count = data.approximate_member_count || 0;
+      localStorage.setItem(CACHE_KEY, JSON.stringify({ count, ts: Date.now() }));
+      const lang2 = activeLang || 'vi'; document.getElementById('discord-count').textContent = count.toLocaleString() + ' ' + (T[lang2]?.members || 'members');
+    } catch {
+      document.getElementById('discord-count').textContent = T[activeLang || 'vi']?.join_discord || 'Join Discord';
+    }
+  }
+  fetchDiscordCount();
+
+  // ===== CONFETTI =====
+  const canvas = document.getElementById('confetti-canvas');
+  const ctx = canvas.getContext('2d');
+  canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+  window.addEventListener('resize', () => {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  });
+  let confettiParticles = [];
+  function spawnConfetti() {
+    for (let i = 0; i < 80; i++) {
+      confettiParticles.push({
+        x: Math.random() * canvas.width, y: -10,
+        w: Math.random() * 8 + 4, h: Math.random() * 4 + 2,
+        color: ['#7c5cbf','#9b7fe8','#4ade80','#fbbf24','#f87171'][Math.floor(Math.random()*5)],
+        vx: (Math.random()-0.5)*4, vy: Math.random()*3+2,
+        rot: Math.random()*360, rotV: (Math.random()-0.5)*8,
+        life: 1
+      });
+    }
+  }
+  function animateConfetti() {
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    confettiParticles = confettiParticles.filter(p => p.life > 0);
+    confettiParticles.forEach(p => {
+      p.x += p.vx; p.y += p.vy; p.rot += p.rotV; p.life -= 0.008;
+      ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.rot * Math.PI/180);
+      ctx.globalAlpha = p.life; ctx.fillStyle = p.color;
+      ctx.fillRect(-p.w/2, -p.h/2, p.w, p.h);
+      ctx.restore();
+    });
+    requestAnimationFrame(animateConfetti);
+  }
+  animateConfetti();
+  // Confetti toggle
+  let confettiEnabled = true;
+  document.getElementById('confettiToggle').addEventListener('click', () => {
+    confettiEnabled = !confettiEnabled;
+    const lines = document.querySelectorAll('#confetti-icon line');
+    lines.forEach(l => l.style.opacity = confettiEnabled ? '1' : '0.2');
+    document.getElementById('confettiToggle').setAttribute('data-tip', confettiEnabled ? 'HIỆU ỨNG: BẬT' : 'HIỆU ỨNG: TẮT');
+    document.getElementById('confettiToggle').style.borderColor = confettiEnabled ? '' : 'rgba(248,113,113,0.3)';
+  });
+
+  // Trigger confetti on Discord button click
+  document.querySelectorAll('.btn-primary, .discord-btn').forEach(btn => {
+    btn.addEventListener('click', () => { if (confettiEnabled) spawnConfetti(); });
+  });
+
+  // ===== TYPING SOUND =====
+  let soundEnabled = false;
+  let audioCtx = null;
+  const soundToggle = document.getElementById('soundToggle');
+
+  // Khởi tạo AudioContext sau khi user tương tác lần đầu
+  function initAudio() {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+  }
+  document.addEventListener('click', initAudio, { once: true });
+
+  soundToggle.addEventListener('click', () => {
+    initAudio();
+    soundEnabled = !soundEnabled;
+    // Toggle X overlay
+    document.getElementById('sound-mute-x1').setAttribute('display', soundEnabled ? 'none' : 'block');
+    document.getElementById('sound-mute-x2').setAttribute('display', soundEnabled ? 'none' : 'block');
+    soundToggle.setAttribute('data-tip', soundEnabled ? 'ÂM THANH: BẬT' : 'ÂM THANH: TẮT');
+    // Animate bars when on
+    document.querySelectorAll('.wave-bar').forEach(b => {
+      b.style.animation = soundEnabled ? 'waveActive 0.5s ease infinite alternate' : 'none';
+    });
+  });
+
+  function playKeySound() {
+    if (!soundEnabled || !audioCtx) return;
+    try {
+      const o = audioCtx.createOscillator();
+      const g = audioCtx.createGain();
+      o.connect(g); g.connect(audioCtx.destination);
+      o.frequency.value = 800 + Math.random() * 200;
+      o.type = 'square';
+      g.gain.setValueAtTime(0.03, audioCtx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
+      o.start(); o.stop(audioCtx.currentTime + 0.05);
+    } catch {}
+  }
+  document.addEventListener('keydown', playKeySound);
+
+  // ===== PWA MANIFEST =====
+  const manifest = {
+    name: 'Grimz Cloud PC',
+    short_name: 'Grimz',
+    start_url: '/',
+    display: 'standalone',
+    background_color: '#09080f',
+    theme_color: '#7c5cbf',
+    icons: [{ src: '/favicon.ico', sizes: '64x64', type: 'image/x-icon' }]
+  };
+  const blob = new Blob([JSON.stringify(manifest)], {type:'application/json'});
+  const mLink = document.createElement('link');
+  mLink.rel = 'manifest'; mLink.href = URL.createObjectURL(blob);
+  document.head.appendChild(mLink);
+
+  // ===== ANIMATED FAVICON =====
+  (function() {
+    const fc = document.createElement('canvas');
+    fc.width = 32; fc.height = 32;
+    const fx = fc.getContext('2d');
+    let angle = 0;
+    function drawFavicon() {
+      fx.clearRect(0,0,32,32);
+      fx.fillStyle = '#09080f'; fx.fillRect(0,0,32,32);
+      fx.save(); fx.translate(16,16); fx.rotate(angle);
+      const grad = fx.createRadialGradient(0,0,2,0,0,12);
+      grad.addColorStop(0,'#9b7fe8'); grad.addColorStop(1,'#5a3fa0');
+      fx.fillStyle = grad;
+      fx.beginPath(); fx.moveTo(0,-12);
+      for(let i=0;i<6;i++) { fx.lineTo(Math.cos((i*2*Math.PI/6)-Math.PI/2)*12, Math.sin((i*2*Math.PI/6)-Math.PI/2)*12); }
+      fx.closePath(); fx.fill(); fx.restore();
+      angle += 0.03;
+      const link = document.querySelector("link[rel*='icon']") || document.createElement('link');
+      link.type = 'image/x-icon'; link.rel = 'shortcut icon'; link.href = fc.toDataURL();
+      document.head.appendChild(link);
+    }
+    setInterval(drawFavicon, 50);
+  })();
+
+  // Cookie consent
+  (function() {
+    if (!localStorage.getItem('grimz_cookie')) {
+      setTimeout(() => {
+        // Apply current lang to cookie banner before showing
+        const t = T[activeLang] || T.vi;
+        const cb = document.getElementById('cookie-text-span');
+        const ca = document.getElementById('cookie-accept-btn');
+        const cd = document.getElementById('cookie-decline-btn');
+        if (cb) cb.innerHTML = t.cookie_text + ' <a href="privacy.html">' + (t.footer_privacy || 'Privacy Policy') + '</a>.';
+        if (ca) ca.textContent = t.cookie_accept;
+        if (cd) cd.textContent = t.cookie_decline;
+        document.getElementById('cookieBanner').classList.add('show');
+      }, 1000);
+    }
+  })();
+  function cookieAccept() {
+    localStorage.setItem('grimz_cookie', 'accepted');
+    document.getElementById('cookieBanner').classList.remove('show');
+  }
+  function cookieDecline() {
+    localStorage.setItem('grimz_cookie', 'declined');
+    document.getElementById('cookieBanner').classList.remove('show');
+  }
+
+  // FAQ toggle
+  function toggleFaq(btn) {
+    const ans = btn.nextElementSibling;
+    const isOpen = ans.classList.contains('open');
+    document.querySelectorAll('.faq-a').forEach(a => a.classList.remove('open'));
+    document.querySelectorAll('.faq-q').forEach(q => q.classList.remove('open'));
+    if (!isOpen) { ans.classList.add('open'); btn.classList.add('open'); }
+  }
+</script>
+<div class="cookie-banner" id="cookieBanner">
+  <div class="cookie-text">
+    <span id="cookie-text-span"></span>
+  </div>
+  <div class="cookie-btns">
+    <button class="cookie-decline" id="cookie-decline-btn" onclick="cookieDecline()"></button>
+    <button class="cookie-accept" id="cookie-accept-btn" onclick="cookieAccept()"></button>
+  </div>
+</div>
+</body>
+</html>

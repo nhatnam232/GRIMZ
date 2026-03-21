@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Grimz Cloud PC — Dịch vụ cloud gaming tốc độ cao, server Singapore, RTX 3060+. Ra mắt 23/03/2026.">
+<meta property="og:title" content="Grimz Cloud PC — Sắp ra mắt">
+<meta property="og:description" content="Cloud gaming tốc độ cao · Server Singapore · RTX 3060+. Ra mắt 23/03/2026.">
+<title>Grimz Cloud PC — Sắp ra mắt</title>
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&family=Share+Tech+Mono&family=Exo+2:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="grimz-base.css">
+<style>
+  body {
+    background:var(--bg); color:var(--text);
+    font-family:'Exo 2',sans-serif;
+    min-height:100vh; display:flex; align-items:center; justify-content:center;
+    overflow-x:hidden;
+  }
+
+  /* Glow balls — index uses named classes glow1/glow2 */
+  .glow1 { position:fixed; width:500px; height:500px; border-radius:50%; background:radial-gradient(circle,rgba(124,92,191,0.08) 0%,transparent 70%); top:-100px; right:-100px; animation:pulse 5s ease-in-out infinite; pointer-events:none; }
+  .glow2 { position:fixed; width:400px; height:400px; border-radius:50%; background:radial-gradient(circle,rgba(90,63,160,0.06) 0%,transparent 70%); bottom:-100px; left:-100px; animation:pulse 7s ease-in-out infinite reverse; pointer-events:none; }
+
+  /* Lang switcher */
+  .lang-switcher { position:fixed; top:1.25rem; left:1.5rem; z-index:200; }
+  @media(max-width:480px) { .lang-switcher { top:0.6rem; left:0.75rem; } .logo { padding-top:0.5rem; } }
+  .lang-trigger { display:flex; align-items:center; gap:0.4rem; padding:0.35rem 0.75rem; background:rgba(9,8,15,0.85); border:1px solid rgba(124,92,191,0.25); color:#9b7fe8; font-family:'Share Tech Mono',monospace; font-size:0.65rem; letter-spacing:0.1em; text-transform:uppercase; cursor:pointer; transition:all 0.2s; backdrop-filter:blur(10px); user-select:none; }
+  .lang-trigger:hover { border-color:#7c5cbf; background:rgba(124,92,191,0.1); }
+  .lang-trigger .arrow { font-size:0.5rem; transition:transform 0.2s; }
+  .lang-trigger.open .arrow { transform:rotate(180deg); }
+  .lang-dropdown { position:absolute; top:calc(100% + 6px); left:0; background:rgba(9,8,15,0.97); border:1px solid rgba(124,92,191,0.25); backdrop-filter:blur(12px); min-width:150px; display:none; flex-direction:column; overflow:hidden; }
+  .lang-dropdown.open { display:flex; }
+  .lang-option { display:flex; align-items:center; gap:0.6rem; padding:0.6rem 0.85rem; font-family:'Share Tech Mono',monospace; font-size:0.65rem; letter-spacing:0.1em; color:#5a5470; cursor:pointer; transition:all 0.2s; border:none; background:none; text-transform:uppercase; width:100%; text-align:left; }
+  .lang-option:hover { background:rgba(124,92,191,0.08); color:#9b7fe8; }
+  .lang-option.selected { color:#9b7fe8; background:rgba(124,92,191,0.1); }
+  .lang-option.selected::after { content:'✓'; margin-left:auto; color:#7c5cbf; }
+  .lang-flag { font-size:1rem; line-height:1; }
+  .lang-divider { height:1px; background:rgba(124,92,191,0.1); margin:0; }
+
+  @keyframes scan { 0%{transform:translateY(-100%)} 100%{transform:translateY(100vh)} }
+  .scanline { position:fixed; top:0; left:0; right:0; height:2px; background:linear-gradient(90deg,transparent,rgba(124,92,191,0.1),transparent); animation:scan 5s linear infinite; pointer-events:none; z-index:99; }
+
+  .wrap { position:relative; z-index:1; text-align:center; padding:2rem; max-width:600px; width:100%; }
+
+  .logo { font-family:'Rajdhani',sans-serif; font-size:1.6rem; font-weight:700; letter-spacing:0.2em; text-transform:uppercase; color:#7c5cbf; text-shadow:0 0 24px rgba(124,92,191,0.5); margin-bottom:2.5rem; }
+  .logo span { color:#9b7fe8; }
+
+  .status-tag {
+    display:inline-flex; align-items:center; gap:0.5rem;
+    font-family:'Share Tech Mono',monospace; font-size:0.72rem;
+    color:#7c5cbf; letter-spacing:0.2em; text-transform:uppercase;
+    border:1px solid rgba(124,92,191,0.25); padding:0.35rem 0.85rem;
+    background:rgba(124,92,191,0.07); margin-bottom:2rem;
+  }
+  .status-tag::before { content:''; width:6px; height:6px; border-radius:50%; background:#7c5cbf; box-shadow:0 0 8px #7c5cbf; animation:blink 1.2s infinite; }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
+
+  h1 { font-family:'Rajdhani',sans-serif; font-size:clamp(2.5rem,7vw,5rem); font-weight:700; text-transform:uppercase; line-height:1; margin-bottom:1rem; }
+  h1 .line1 { color:#e4e0f0; display:block; }
+  h1 .line2 { color:#7c5cbf; text-shadow:0 0 30px rgba(124,92,191,0.5); display:block; }
+
+  .desc { color:#5a5470; font-size:0.95rem; line-height:1.7; font-weight:300; margin:1.5rem 0 2.5rem; }
+  .desc strong { color:#a09ab8; font-weight:500; }
+
+  /* Countdown */
+  .countdown-wrap { margin-bottom:2.5rem; }
+  .countdown-label { font-family:'Share Tech Mono',monospace; font-size:0.65rem; color:#5a5470; letter-spacing:0.2em; text-transform:uppercase; margin-bottom:1rem; }
+  .countdown { display:flex; align-items:center; justify-content:center; gap:0.5rem; }
+  .cd-unit { text-align:center; }
+  .cd-num {
+    font-family:'Share Tech Mono',monospace; font-size:clamp(2rem,6vw,3.5rem);
+    color:#9b7fe8; background:#100e1a; border:1px solid rgba(124,92,191,0.2);
+    padding:0.4rem 0.75rem; display:block; min-width:70px;
+    text-shadow:0 0 20px rgba(124,92,191,0.4);
+    transition:all 0.3s;
+  }
+  .cd-label { font-family:'Share Tech Mono',monospace; font-size:0.55rem; color:#5a5470; letter-spacing:0.15em; text-transform:uppercase; margin-top:0.4rem; display:block; }
+  .cd-sep { font-family:'Rajdhani',sans-serif; font-size:2.5rem; color:#2a2440; margin-bottom:1.5rem; }
+
+  /* Progress bar */
+  .progress-wrap { margin-bottom:2.5rem; }
+  .progress-labels { display:flex; justify-content:space-between; font-family:'Share Tech Mono',monospace; font-size:0.6rem; color:#5a5470; margin-bottom:0.5rem; }
+  .progress-bar { height:2px; background:#1c1830; border-radius:1px; overflow:hidden; }
+  .progress-fill { height:100%; background:linear-gradient(90deg,#5a3fa0,#9b7fe8); transition:width 1s; }
+
+  /* Discord button */
+  .discord-btn {
+    display:inline-flex; align-items:center; gap:0.75rem;
+    background:#5865F2; color:white; padding:0.85rem 2rem;
+    font-family:'Rajdhani',sans-serif; font-size:1rem; font-weight:700;
+    letter-spacing:0.1em; text-transform:uppercase; text-decoration:none;
+    transition:all 0.2s; clip-path:polygon(10px 0,100% 0,100% 100%,0 100%,0 10px);
+  }
+  .discord-btn:hover { background:#4752c4; transform:translateY(-2px); box-shadow:0 10px 30px rgba(88,101,242,0.4); }
+
+  .footer-note { margin-top:2rem; font-family:'Share Tech Mono',monospace; font-size:0.62rem; color:#2a2440; letter-spacing:0.12em; }
+</style>
+</head>
+<body>
+<div class="scanline"></div>
+<div class="lang-switcher" id="langSwitcher">
+  <div class="lang-trigger" id="langTrigger" onclick="toggleLangDropdown()">
+    <span class="lang-flag" id="currentFlag">🇻🇳</span>
+    <span id="currentLangLabel">VI</span>
+    <span class="arrow">▼</span>
+  </div>
+  <div class="lang-dropdown" id="langDropdown">
+    <button class="lang-option selected" id="btn-vi" onclick="manualSetLang('vi')"><span class="lang-flag">🇻🇳</span>Tiếng Việt</button>
+    <div class="lang-divider"></div>
+    <button class="lang-option" id="btn-en" onclick="manualSetLang('en')"><span class="lang-flag">🇬🇧</span>English</button>
+    <div class="lang-divider"></div>
+    <button class="lang-option" id="btn-id" onclick="manualSetLang('id')"><span class="lang-flag">🇮🇩</span>Indonesia</button>
+    <div class="lang-divider"></div>
+    <button class="lang-option" id="btn-hi" onclick="manualSetLang('hi')"><span class="lang-flag">🇮🇳</span>HI</button>
+  </div>
+</div>
+<div class="glow1"></div>
+<div class="glow2"></div>
+
+<div class="wrap">
+  <div class="logo">GRIMZ <span>CLOUD</span> PC</div>
+
+  <div class="status-tag" data-i18n="status">Đang triển khai</div>
+
+  <h1>
+    <span class="line1" data-i18n="headline">Sắp ra mắt</span>
+    <span class="line2">23.03.2026</span>
+  </h1>
+
+  <p class="desc" id="desc-text">
+    Grimz Cloud PC đang trong quá trình triển khai.<br>
+    <strong>Cloud gaming tốc độ cao · Server Singapore · RTX 3060+</strong><br>
+    Vào Discord để nhận thông báo khi ra mắt.
+  </p>
+
+  <div class="countdown-wrap">
+    <div class="countdown-label" data-i18n="launching">// Ra mắt sau</div>
+    <div class="countdown">
+      <div class="cd-unit"><span class="cd-num" id="cd-d">00</span><span class="cd-label" data-i18n="days">Ngày</span></div>
+      <span class="cd-sep">:</span>
+      <div class="cd-unit"><span class="cd-num" id="cd-h">00</span><span class="cd-label" data-i18n="hours">Giờ</span></div>
+      <span class="cd-sep">:</span>
+      <div class="cd-unit"><span class="cd-num" id="cd-m">00</span><span class="cd-label" data-i18n="mins">Phút</span></div>
+      <span class="cd-sep">:</span>
+      <div class="cd-unit"><span class="cd-num" id="cd-s">00</span><span class="cd-label" data-i18n="secs">Giây</span></div>
+    </div>
+  </div>
+
+  <div class="progress-wrap">
+    <div class="progress-labels">
+      <span data-i18n="progress">Tiến độ triển khai</span>
+      <span id="progress-pct">0%</span>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+  </div>
+
+  <a href="https://discord.gg/Ct4Gw7GwJJ" target="_blank" rel="noopener" class="discord-btn">
+    <svg width="20" height="16" viewBox="0 0 71 55" fill="currentColor"><path d="M60.1 4.9A58.5 58.5 0 0 0 45.4.9a40 40 0 0 0-1.8 3.6 54 54 0 0 0-16.2 0A38.4 38.4 0 0 0 25.6.9 58.4 58.4 0 0 0 10.9 5C1.6 18.7-1 32 .3 45a58.7 58.7 0 0 0 17.9 9 44 44 0 0 0 3.8-6.2 38.3 38.3 0 0 1-6-2.9l1.4-1.1a41.9 41.9 0 0 0 35.7 0l1.5 1.1a38.2 38.2 0 0 1-6 2.9 43.6 43.6 0 0 0 3.8 6.2 58.5 58.5 0 0 0 17.9-9C71.8 30 68.2 16.8 60.1 4.9ZM23.7 37.3c-3.5 0-6.4-3.2-6.4-7.1s2.8-7.2 6.4-7.2 6.5 3.2 6.4 7.2c0 3.9-2.8 7.1-6.4 7.1Zm23.6 0c-3.5 0-6.4-3.2-6.4-7.1s2.8-7.2 6.4-7.2 6.5 3.2 6.4 7.2c0 3.9-2.8 7.1-6.4 7.1Z"/></svg>
+    <span data-i18n="discord">Tham gia Discord</span>
+  </a>
+
+  <div class="footer-note">© <span id="yr"></span> GRIMZ CLOUD PC · VIETNAM</div>
+</div>
+
+<script>
+  document.getElementById('yr').textContent = new Date().getFullYear();
+
+  // Gate check — redirect về gate.html nếu chưa verify
+  const _isBot = /Googlebot|bingbot|Slurp|DuckDuckBot|Baiduspider|YandexBot|Sogou|facebookexternalhit|Twitterbot|LinkedInBot|crawler|spider|bot/i.test(navigator.userAgent);
+  if (!_isBot && sessionStorage.getItem('grimz_verified') !== '1') {
+    window.location.replace('gate.html?next=index.html');
+  }
+
+  // ===== LANG DROPDOWN =====
+  function manualSetLang(lang) {
+    localStorage.setItem('grimz_lang_set', '1');
+    setLang(lang);
+  }
+
+  function toggleLangDropdown() {
+    const trigger = document.getElementById('langTrigger');
+    const dropdown = document.getElementById('langDropdown');
+    trigger.classList.toggle('open');
+    dropdown.classList.toggle('open');
+  }
+  // Close on outside click
+  document.addEventListener('click', e => {
+    if (!document.getElementById('langSwitcher').contains(e.target)) {
+      document.getElementById('langTrigger').classList.remove('open');
+      document.getElementById('langDropdown').classList.remove('open');
+    }
+  });
+
+  // ===== I18N =====
+  const i18n = {
+    vi: {
+      status: 'Đang triển khai',
+      headline: 'Sắp ra mắt',
+      desc: 'Grimz Cloud PC đang trong quá trình triển khai.<br><strong>Cloud gaming tốc độ cao · Server Singapore · RTX 3060+</strong><br>Vào Discord để nhận thông báo khi ra mắt.',
+      launching: '// Ra mắt sau',
+      days: 'Ngày', hours: 'Giờ', mins: 'Phút', secs: 'Giây',
+      progress: 'Tiến độ triển khai',
+      discord: 'Tham gia Discord',
+    },
+    en: {
+      status: 'Coming Soon',
+      headline: 'Launching Soon',
+      desc: 'Grimz Cloud PC is currently being deployed.<br><strong>High-speed cloud gaming · Singapore Server · RTX 3060+</strong><br>Join Discord to get notified at launch.',
+      launching: '// Launching in',
+      days: 'Days', hours: 'Hours', mins: 'Mins', secs: 'Secs',
+      progress: 'Deployment Progress',
+      discord: 'Join Discord',
+    },
+    id: {
+      status: 'Segera Hadir',
+      headline: 'Segera Diluncurkan',
+      desc: 'Grimz Cloud PC sedang dalam proses persiapan.<br><strong>Cloud gaming kecepatan tinggi · Server Singapura · RTX 3060+</strong><br>Bergabung Discord untuk notifikasi peluncuran.',
+      launching: '// Diluncurkan dalam',
+      days: 'Hari', hours: 'Jam', mins: 'Menit', secs: 'Detik',
+      progress: 'Progres Persiapan',
+      discord: 'Bergabung Discord',
+    },
+    hi: {
+      status: 'जल्द आ रहा है',
+      headline: 'जल्द लॉन्च होगा',
+      desc: 'Grimz Cloud PC तैनाती जारी है।<br><strong>हाई-स्पीड क्लाउड गेमिंग · सिंगापुर सर्वर · RTX 3060+</strong><br>लॉन्च पर सूचना के लिए Discord जॉइन करें।',
+      launching: '// लॉन्च में',
+      days: 'दिन', hours: 'घंटे', mins: 'मिनट', secs: 'सेकंड',
+      progress: 'तैनाती प्रगति',
+      discord: 'Discord जॉइन करें',
+    }
+  };
+
+  let currentLang = localStorage.getItem('grimz_lang') || 'vi';
+
+  function setLang(lang) {
+    currentLang = lang;
+    localStorage.setItem('grimz_lang', lang);
+    const t = i18n[lang];
+
+    // Update all data-i18n elements
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const key = el.getAttribute('data-i18n');
+      if (t[key]) el.textContent = t[key];
+    });
+
+    // Update desc (has HTML)
+    document.getElementById('desc-text').innerHTML = t.desc;
+
+    // Update trigger
+    document.getElementById('currentFlag').textContent = {'vi':'🇻🇳','en':'🇬🇧','id':'🇮🇩','hi':'🇮🇳'}[lang];
+    document.getElementById('currentLangLabel').textContent = lang.toUpperCase();
+    // Update selected state
+    document.querySelectorAll('.lang-option').forEach(b => b.classList.remove('selected'));
+    document.getElementById('btn-' + lang).classList.add('selected');
+    // Close dropdown
+    document.getElementById('langTrigger').classList.remove('open');
+    document.getElementById('langDropdown').classList.remove('open');
+
+    // Update html lang
+    document.documentElement.lang = lang;
+  }
+
+  // Auto detect language by country (only on first visit)
+  async function autoDetectLang() {
+    // Nếu user đã chọn ngôn ngữ trước đó thì giữ nguyên
+    if (localStorage.getItem('grimz_lang_set')) {
+      setLang(currentLang);
+      return;
+    }
+    try {
+      const res = await fetch('https://ipapi.co/json/', { signal: AbortSignal.timeout(3000) });
+      const data = await res.json();
+      const country = data.country_code;
+      let lang = 'en'; // default
+      if (country === 'VN') lang = 'vi';
+      else if (country === 'ID') lang = 'id';
+      else if (country === 'IN') lang = 'hi';
+      setLang(lang);
+    } catch {
+      // Nếu lỗi thì dùng ngôn ngữ đã lưu hoặc VI
+      setLang(currentLang);
+    }
+  }
+  autoDetectLang();
+
+
+  const LAUNCH = new Date('2026-03-23T00:00:00+07:00');
+  const START  = new Date('2026-03-15T00:00:00+07:00'); // Ngày bắt đầu đếm progress
+
+  function pad(n) { return String(n).padStart(2, '0'); }
+
+  function tick() {
+    const now  = new Date();
+    const diff = LAUNCH - now;
+
+    if (diff <= 0) {
+      document.getElementById('cd-d').textContent = '00';
+      document.getElementById('cd-h').textContent = '00';
+      document.getElementById('cd-m').textContent = '00';
+      document.getElementById('cd-s').textContent = '00';
+      document.getElementById('progress-fill').style.width = '100%';
+      document.getElementById('progress-pct').textContent = '100%';
+      // Cập nhật UI khi đã ra mắt
+      document.querySelector('[data-i18n="status"]').textContent = '🟢 Đã ra mắt!';
+      document.querySelector('[data-i18n="headline"]').textContent = 'Đã ra mắt';
+      document.querySelector('.discord-btn').insertAdjacentHTML('beforebegin',
+        '<a href="grimz-login.html" class="discord-btn" style="background:var(--accent,#7c5cbf);margin-right:0.75rem">🚀 Đăng nhập ngay</a> '
+      );
+      return;
+    }
+
+    const d = Math.floor(diff / 86400000);
+    const h = Math.floor((diff % 86400000) / 3600000);
+    const m = Math.floor((diff % 3600000) / 60000);
+    const s = Math.floor((diff % 60000) / 1000);
+
+    document.getElementById('cd-d').textContent = pad(d);
+    document.getElementById('cd-h').textContent = pad(h);
+    document.getElementById('cd-m').textContent = pad(m);
+    document.getElementById('cd-s').textContent = pad(s);
+
+    // Progress từ START đến LAUNCH
+    const total   = LAUNCH - START;
+    const elapsed = now - START;
+    const pct     = Math.min(100, Math.max(0, Math.floor((elapsed / total) * 100)));
+    document.getElementById('progress-fill').style.width = pct + '%';
+    document.getElementById('progress-pct').textContent  = pct + '%';
+  }
+
+  tick();
+  setInterval(tick, 1000);
+</script>
+</body>
+</html>

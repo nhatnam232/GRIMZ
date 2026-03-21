@@ -1,0 +1,1723 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Grimz Cloud PC — Dashboard quản lý máy ảo và gói dịch vụ cloud gaming của bạn.">
+<meta name="robots" content="noindex,nofollow">
+<title>Grimz Cloud PC — Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@700&family=Rajdhani:wght@400;500;600;700&family=Poppins:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="grimz-base.css">
+<style>
+  body { background:var(--bg); color:var(--text); font-family:'Poppins',sans-serif; min-height:100vh; display:flex; overflow-x:hidden; }
+
+  /* ===== KANJI LOADER ===== */
+  #kanji-loader { position:fixed; inset:0; background:#09080f; z-index:9999; display:flex; flex-direction:column; align-items:center; justify-content:center; overflow:hidden; }
+  #kanji-loader.fade-out { animation:loaderOut 0.6s ease forwards; }
+  @keyframes loaderOut { to { opacity:0; pointer-events:none; } }
+  #kanji-rain { position:absolute; inset:0; }
+  .k-main { font-family:'Noto Sans JP','MS Gothic',monospace; font-size:clamp(3.5rem,12vw,7rem); font-weight:700; color:#9b7fe8; letter-spacing:0.3em; position:relative; z-index:2; text-align:center; text-shadow:0 0 30px rgba(124,92,191,0.8); opacity:0; transition:opacity 0.5s; }
+  .k-main.glitch { animation:kGlitch 0.12s infinite; }
+  @keyframes kGlitch {
+    0%  { text-shadow:2px 0 #f87171,-2px 0 #60a5fa; transform:translate(0); }
+    25% { text-shadow:-3px 0 #f87171,3px 0 #60a5fa; transform:translate(-2px,1px) skewX(-3deg); clip-path:polygon(0 30%,100% 30%,100% 50%,0 50%); }
+    50% { text-shadow:3px 2px #f87171,-3px -2px #60a5fa; transform:translate(2px,-1px); clip-path:none; }
+    75% { text-shadow:-2px 0 #f87171,2px 0 #60a5fa; transform:translate(0,2px); clip-path:polygon(0 60%,100% 60%,100% 80%,0 80%); }
+    100%{ text-shadow:2px 0 #f87171,-2px 0 #60a5fa; transform:translate(0); clip-path:none; }
+  }
+  .k-main.glitch-heavy { animation:kGlitchH 0.08s infinite; }
+  @keyframes kGlitchH {
+    0%  { text-shadow:4px 0 #f87171,-4px 0 #60a5fa,0 0 20px #9b7fe8; transform:translate(-3px,0) skewX(-5deg); clip-path:polygon(0 20%,100% 20%,100% 40%,0 40%); }
+    33% { text-shadow:-4px 0 #f87171,4px 0 #60a5fa; transform:translate(3px,2px) skewX(3deg); clip-path:polygon(0 60%,100% 60%,100% 80%,0 80%); }
+    66% { text-shadow:0 4px #f87171,0 -4px #60a5fa; transform:translate(0,-2px); clip-path:none; }
+    100%{ text-shadow:4px 0 #f87171,-4px 0 #60a5fa; transform:translate(0); clip-path:none; }
+  }
+  .k-sub { font-family:'JetBrains Mono',monospace; font-size:0.8rem; color:#3a3458; letter-spacing:0.3em; margin-top:1.5rem; position:relative; z-index:2; opacity:0; transition:opacity 0.4s,color 0.4s; }
+  .k-sub.vis { opacity:1; }
+  .k-sub.act { color:#9b7fe8; text-shadow:0 0 8px rgba(124,92,191,0.5); }
+  .k-bar { width:180px; height:1px; background:rgba(124,92,191,0.15); margin-top:2rem; position:relative; z-index:2; opacity:0; transition:opacity 0.3s; }
+  .k-bar.vis { opacity:1; }
+  .k-bar-fill { height:100%; background:linear-gradient(90deg,#5a3fa0,#9b7fe8); width:0%; transition:width 0.15s linear; }
+  .k-logo { font-family:'Rajdhani',sans-serif; font-size:1.2rem; font-weight:700; letter-spacing:0.2em; text-transform:uppercase; color:#7c5cbf; text-shadow:0 0 16px rgba(124,92,191,0.5); margin-top:1.5rem; position:relative; z-index:2; opacity:0; transition:opacity 0.5s; }
+  .k-logo span { color:#9b7fe8; }
+
+  /* ===== SIDEBAR ===== */
+  .sidebar { position:fixed; left:0; top:0; bottom:0; width:220px; background:var(--bg2); border-right:1px solid var(--border); display:flex; flex-direction:column; z-index:50; }
+  .sidebar-logo { padding:1.5rem 1.5rem 1rem; border-bottom:1px solid var(--border); }
+  .logo-text { font-family:'Rajdhani',sans-serif; font-size:1.15rem; font-weight:700; letter-spacing:0.15em; text-transform:uppercase; color:var(--accent2); text-shadow:0 0 16px rgba(124,92,191,0.4); }
+  .logo-sub { font-family:'JetBrains Mono',monospace; font-size:0.6rem; color:var(--muted); letter-spacing:0.2em; text-transform:uppercase; margin-top:0.2rem; }
+  .sidebar-user { padding:1.25rem 1.5rem; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:0.75rem; }
+  .user-avatar { width:48px; height:48px; background:linear-gradient(135deg,var(--accent),var(--accent2)); display:flex; align-items:center; justify-content:center; font-family:'Rajdhani',sans-serif; font-weight:700; font-size:1.1rem; color:var(--bg); flex-shrink:0; clip-path:polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,0 100%); border:1px solid rgba(124,92,191,0.3); }
+  .user-name { font-size:0.875rem; font-weight:600; color:var(--text); }
+  .user-plan { font-family:'JetBrains Mono',monospace; font-size:0.65rem; color:var(--accent2); letter-spacing:0.1em; }
+  .sidebar-nav { flex:1; padding:1rem 0; display:flex; flex-direction:column; gap:0.1rem; overflow-y:auto; }
+  .nav-section { padding:0.75rem 1.5rem 0.3rem; font-family:'JetBrains Mono',monospace; font-size:0.6rem; color:var(--muted); letter-spacing:0.2em; text-transform:uppercase; }
+  .nav-item { display:flex; align-items:center; gap:1rem; padding:0.75rem 1.5rem; font-size:0.875rem; font-weight:500; color:var(--muted); cursor:pointer; transition:all 0.2s; text-decoration:none; border-left:2px solid transparent; background:none; border-right:none; border-top:none; border-bottom:none; width:100%; text-align:left; font-family:'Poppins',sans-serif; }
+  .nav-item::after { content:''; position:absolute; left:0; top:0; width:100%; height:100%; background:radial-gradient(circle at 20% 50%,rgba(124,92,191,0.18),transparent 70%); opacity:0; transition:opacity 0.3s; pointer-events:none; }
+  .nav-item:hover { color:var(--text); }
+  .nav-item:hover::after { opacity:1; }
+  .nav-item:hover .nav-icon { transform:rotate(12deg) scale(1.2); }
+  .nav-item.active { color:var(--accent2); background:linear-gradient(90deg,rgba(124,92,191,0.15),transparent); border-left-color:var(--accent2); box-shadow:inset 0 0 12px rgba(124,92,191,0.15); }
+  .nav-item.danger { color:var(--red); }
+  .nav-item.danger:hover { background:rgba(248,113,113,0.07); }
+  .nav-icon { font-size:1rem; width:22px; text-align:center; display:inline-block; transition:all 0.3s; }
+  .nav-item:hover .nav-icon { transform:scale(1.2) rotate(5deg); color:var(--accent2); filter:drop-shadow(0 0 6px var(--accent2)); }
+  .nav-item.active .nav-icon { color:var(--accent2); filter:drop-shadow(0 0 4px var(--accent2)); }
+  .sidebar-bottom { padding:1rem 1.5rem; border-top:1px solid var(--border); }
+  .status-dot { display:flex; align-items:center; gap:0.5rem; font-family:'JetBrains Mono',monospace; font-size:0.65rem; color:var(--green); letter-spacing:0.1em; }
+  .status-dot::before { content:''; width:7px; height:7px; border-radius:50%; background:var(--green); animation:pulseGlow 1.5s infinite; }
+  @keyframes pulseGlow { 0%{box-shadow:0 0 0 0 rgba(74,222,128,0.7)} 70%{box-shadow:0 0 10px 5px rgba(74,222,128,0)} 100%{box-shadow:0 0 0 0 rgba(74,222,128,0)} }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+  /* ===== MAIN ===== */
+  .main { margin-left:220px; flex:1; position:relative; z-index:1; min-height:100vh; }
+  .topbar { height:56px; background:rgba(9,8,15,0.9); backdrop-filter:blur(10px); border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; padding:0 1rem 0 1.5rem; position:sticky; top:0; z-index:40; gap:0.75rem; }
+  .topbar-title { font-family:'Rajdhani',sans-serif; font-size:1rem; font-weight:600; letter-spacing:0.1em; text-transform:uppercase; }
+  .topbar-clock { font-family:'JetBrains Mono',monospace; font-size:0.75rem; color:var(--muted); letter-spacing:0.1em; }
+  .page { display:none; padding:2rem; flex-direction:column; gap:1.5rem; }
+  .page.active { display:flex; }
+
+  /* ===== CARDS ===== */
+  .card { background:var(--bg2); border:1px solid var(--border); padding:1.5rem; position:relative; overflow:hidden; transition:border-color 0.2s; }
+  .card:hover { border-color:rgba(124,92,191,0.3); }
+  .card-top-line::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:linear-gradient(90deg,var(--accent3),var(--accent2)); }
+  .card-label { font-family:'JetBrains Mono',monospace; font-size:0.62rem; color:var(--muted); letter-spacing:0.18em; text-transform:uppercase; margin-bottom:0.6rem; }
+  .card-title { font-family:'Rajdhani',sans-serif; font-size:1.1rem; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:1rem; }
+  .divider { height:1px; background:var(--border); margin:1rem 0; }
+
+  /* ===== MACHINE TITLE GLITCH ===== */
+  .machine-title-wrap { position:relative; }
+  .machine-title { font-family:'Rajdhani',sans-serif; font-size:1.3rem; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; color:var(--text); }
+  .machine-title.has-machine { color:transparent; -webkit-text-stroke:1px var(--accent2); }
+  .machine-title.has-machine::before { content:attr(data-text); position:absolute; left:-1px; top:-1px; color:#f87171; opacity:0.4; clip-path:polygon(0 0,100% 0,100% 45%,0 45%); }
+  .machine-title.has-machine::after { content:attr(data-text); position:absolute; left:1px; top:1px; color:#60a5fa; opacity:0.4; clip-path:polygon(0 55%,100% 55%,100% 100%,0 100%); }
+
+  /* ===== SPEC LIST (2 col fixed) ===== */
+  .spec-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:0; }
+  .spec-row { display:flex; justify-content:space-between; align-items:center; padding:0.6rem 0.75rem; border-bottom:1px solid rgba(124,92,191,0.08); gap:0.75rem; min-height:36px; }
+  .spec-row:nth-child(odd) { background:rgba(124,92,191,0.02); }
+  .spec-row:hover { background:rgba(124,92,191,0.06); }
+  .spec-label { font-family:'JetBrains Mono',monospace; font-size:0.6rem; color:var(--muted); letter-spacing:0.12em; text-transform:uppercase; flex-shrink:0; }
+  .spec-val { font-family:'Poppins',sans-serif; font-size:0.9rem; font-weight:600; color:var(--text); text-align:right; word-break:break-word; overflow-wrap:anywhere; max-width:60%; letter-spacing:0; }
+  .spec-val.empty { color:var(--muted); font-style:italic; font-size:0.82rem; }
+  @media(max-width:500px) { .spec-grid { grid-template-columns:1fr; } }
+
+  /* ===== BADGE ===== */
+  /* (badge styles from grimz-base.css) */
+
+  /* ===== STATS ROW ===== */
+  .stats-row { display:grid; grid-template-columns:repeat(3,1fr); gap:1.25rem; }
+  .stat-card { background:var(--bg2); border:1px solid var(--border); padding:1.25rem 1.5rem; transition:border-color 0.3s,transform 0.2s; }
+  .stat-card:hover { border-color:rgba(124,92,191,0.35); transform:translateY(-2px); }
+  .stat-label { font-family:'JetBrains Mono',monospace; font-size:0.6rem; color:var(--muted); letter-spacing:0.15em; text-transform:uppercase; margin-bottom:0.5rem; }
+  .stat-val { font-family:'Poppins',sans-serif; font-size:1.6rem; font-weight:700; color:var(--accent2); line-height:1; }
+  .stat-val.empty { color:var(--muted); font-size:1rem; font-style:italic; }
+  .stat-sub { font-size:0.78rem; color:var(--muted); margin-top:0.35rem; font-weight:400; }
+
+  /* ===== COUNTDOWN ===== */
+  .countdown { display:flex; align-items:center; gap:0.4rem; margin-top:0.4rem; flex-wrap:wrap; }
+  .cd-unit { text-align:center; }
+  .cd-num { font-family:'JetBrains Mono',monospace; font-size:1.4rem; color:var(--accent2); background:var(--bg3); border:1px solid var(--border); padding:0.2rem 0.45rem; display:block; min-width:40px; text-align:center; transition:color 0.3s,border-color 0.3s; }
+  .cd-label { font-size:0.55rem; color:var(--muted); letter-spacing:0.1em; text-transform:uppercase; margin-top:0.2rem; font-family:'JetBrains Mono',monospace; display:block; text-align:center; }
+  .cd-sep { font-family:'Rajdhani',sans-serif; font-size:1.4rem; color:var(--muted); margin-bottom:1rem; }
+  .countdown-expired .cd-num { color:var(--red) !important; border-color:rgba(248,113,113,0.3) !important; animation:blink 1s infinite; }
+
+  /* ===== EMPTY STATE ===== */
+  .empty-state { text-align:center; padding:2.5rem 1rem; display:flex; flex-direction:column; align-items:center; gap:1rem; }
+  .empty-robot { font-size:3rem; animation:float 3s ease-in-out infinite; }
+  .empty-text { font-family:'JetBrains Mono',monospace; font-size:0.72rem; color:var(--muted); letter-spacing:0.12em; line-height:2; }
+
+  /* ===== TABS ===== */
+  .tab-group { display:flex; border:1px solid var(--border); width:fit-content; }
+  .tab { padding:0.35rem 1rem; font-family:'JetBrains Mono',monospace; font-size:0.68rem; letter-spacing:0.1em; color:var(--muted); cursor:pointer; border:none; background:transparent; text-transform:uppercase; transition:all 0.2s; }
+  .tab.active { background:var(--accent); color:#fff; }
+  .tab:hover:not(.active) { color:var(--text); background:rgba(255,255,255,0.04); }
+  .tab-content { display:none; margin-top:1.25rem; }
+  .tab-content.active { display:block; }
+
+  /* ===== STEPS ===== */
+  .steps-list { display:flex; flex-direction:column; gap:0.75rem; }
+  .step-row { display:flex; gap:1rem; align-items:flex-start; }
+  .step-num-sm { width:24px; height:24px; border:1px solid var(--accent); color:var(--accent2); font-family:'JetBrains Mono',monospace; font-size:0.7rem; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:0.1rem; }
+  .step-text { font-size:0.875rem; color:var(--muted); line-height:1.6; font-weight:400; }
+  .step-text strong { color:var(--text); font-weight:500; }
+
+  /* ===== SUPPORT ===== */
+  .support-grid { display:grid; grid-template-columns:1fr 1fr; gap:1.25rem; }
+  .support-card { background:var(--bg2); border:1px solid var(--border); padding:1.5rem; display:flex; flex-direction:column; gap:0.75rem; transition:border-color 0.2s; }
+  .support-card:hover { border-color:rgba(124,92,191,0.3); }
+  .support-icon { font-size:1.75rem; }
+  .support-title { font-family:'Rajdhani',sans-serif; font-size:1rem; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; }
+  .support-desc { font-size:0.825rem; color:var(--muted); font-weight:400; line-height:1.6; flex:1; }
+
+  /* ===== BUTTONS ===== */
+  .btn { display:inline-flex; align-items:center; gap:0.5rem; padding:0.65rem 1.25rem; font-family:'Rajdhani',sans-serif; font-size:0.875rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; text-decoration:none; cursor:pointer; border:none; transition:all 0.2s; align-self:flex-start; clip-path:polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,0 100%); }
+  .btn-discord { background:#5865F2; color:white; }
+  .btn-discord:hover { background:#4752c4; transform:translateY(-1px); }
+  .btn-outline { background:transparent; border:1px solid var(--border); color:var(--text); clip-path:none; }
+  .btn-outline:hover { border-color:var(--accent2); color:var(--accent2); }
+
+  /* ===== COPY IP ===== */
+  .copy-ip { position:relative; background:none; border:1px solid var(--border); color:var(--accent2); font-size:0.65rem; padding:0.15rem 0.4rem; cursor:pointer; font-family:'JetBrains Mono',monospace; margin-left:0.4rem; transition:all 0.2s; vertical-align:middle; }
+  .copy-ip:hover { background:rgba(124,92,191,0.15); border-color:var(--accent); transform:scale(1.05); }
+  .copy-ip::before { content:'Copy'; position:absolute; bottom:calc(100% + 4px); left:50%; transform:translateX(-50%) scale(0); background:var(--bg3); border:1px solid var(--border); color:var(--accent2); font-size:0.55rem; padding:0.15rem 0.4rem; white-space:nowrap; transition:transform 0.15s; pointer-events:none; }
+  .copy-ip:hover::before { transform:translateX(-50%) scale(1); }
+
+
+
+
+  /* ===== HISTORY ===== */
+  .history-item { display:grid; grid-template-columns:1fr auto; gap:0.75rem; padding:0.85rem 1rem; border-bottom:1px solid rgba(124,92,191,0.08); transition:background 0.2s; align-items:center; }
+  .history-item:last-child { border-bottom:none; }
+  .history-item:hover { background:rgba(124,92,191,0.04); }
+  .history-plan { font-family:'Rajdhani',sans-serif; font-size:0.95rem; font-weight:700; color:var(--accent2); letter-spacing:0.05em; }
+  .history-gpu { font-family:'JetBrains Mono',monospace; font-size:0.68rem; color:var(--muted); margin-top:0.15rem; }
+  .history-dates { font-family:'JetBrains Mono',monospace; font-size:0.65rem; color:var(--muted); margin-top:0.25rem; }
+  .history-hours { font-family:'Rajdhani',sans-serif; font-size:1.3rem; font-weight:700; color:var(--text); text-align:right; white-space:nowrap; }
+  .history-hours span { font-size:0.7rem; color:var(--muted); font-family:'JetBrains Mono',monospace; }
+
+  /* ===== PROFILE MODAL ===== */
+  .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:500; display:none; align-items:center; justify-content:center; backdrop-filter:blur(4px); }
+  .modal-overlay.open { display:flex; animation:modalIn 0.2s ease; }
+  @keyframes modalIn { from{opacity:0;transform:scale(0.95)} to{opacity:1;transform:scale(1)} }
+  .modal-box { background:var(--bg2); border:1px solid rgba(124,92,191,0.3); padding:2rem; width:90%; max-width:400px; position:relative; }
+  .modal-box::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:linear-gradient(90deg,var(--accent3),var(--accent2)); }
+  .modal-title { font-family:'Rajdhani',sans-serif; font-size:1.1rem; font-weight:700; text-transform:uppercase; letter-spacing:0.1em; margin-bottom:1.25rem; color:var(--accent2); }
+  .modal-input { width:100%; background:var(--bg); border:1px solid var(--border); color:var(--text); font-family:'Poppins',sans-serif; font-size:0.875rem; padding:0.65rem 0.85rem; outline:none; transition:border-color 0.2s; margin-bottom:1rem; }
+  .modal-input:focus { border-color:var(--accent2); }
+  .modal-input::placeholder { color:var(--muted); }
+  .modal-footer { display:flex; gap:0.75rem; justify-content:flex-end; }
+  .modal-close { position:absolute; top:1rem; right:1rem; background:none; border:none; color:var(--muted); cursor:pointer; font-size:1rem; transition:color 0.2s; }
+  .modal-close:hover { color:var(--text); }
+  .user-edit-btn { background:none; border:none; color:var(--muted); cursor:pointer; font-size:0.7rem; padding:0.1rem 0.25rem; transition:color 0.2s; margin-left:0.3rem; vertical-align:middle; }
+  .user-edit-btn:hover { color:var(--accent2); }
+
+  /* ===== THEME SWITCHER ===== */
+  .theme-toggle { display:flex; align-items:center; gap:0.6rem; width:100%; padding:0.6rem 0.5rem; background:none; border:none; cursor:pointer; margin-top:0.75rem; border-radius:4px; transition:background 0.2s; }
+  .theme-toggle:hover { background:rgba(124,92,191,0.12); transform:translateX(2px); }
+  .theme-toggle:hover .theme-label { color:var(--accent2); }
+  .theme-toggle { position:relative; }
+  .lang-btn.active { border-color:var(--accent2) !important; color:var(--accent2) !important; background:rgba(124,92,191,0.1) !important; }
+  .lang-btn:hover { border-color:var(--accent) !important; color:var(--text) !important; }
+  .theme-toggle:hover::after { content:'Đổi theme'; position:absolute; left:calc(100% + 8px); top:50%; transform:translateY(-50%); background:var(--bg3); border:1px solid var(--border); color:var(--accent2); font-family:'JetBrains Mono',monospace; font-size:0.6rem; padding:0.2rem 0.5rem; white-space:nowrap; letter-spacing:0.08em; pointer-events:none; z-index:100; }
+  .theme-track { width:36px; height:20px; background:var(--bg4); border:1px solid var(--border); border-radius:10px; position:relative; transition:background 0.3s; flex-shrink:0; }
+  .theme-thumb { width:14px; height:14px; background:var(--muted); border-radius:50%; position:absolute; top:2px; left:2px; transition:all 0.3s; }
+  body.light-theme .theme-track { background:rgba(124,92,191,0.3); border-color:var(--accent); }
+  body.light-theme .theme-thumb { background:var(--accent2); transform:translateX(16px); }
+  .theme-label { font-family:'JetBrains Mono',monospace; font-size:0.62rem; color:var(--muted); letter-spacing:0.15em; text-transform:uppercase; transition:color 0.3s; }
+  .theme-icon { font-size:0.85rem; }
+
+  /* ===== LIGHT THEME ===== */
+  body.light-theme {
+    --bg:#f0eef8; --bg2:#ffffff; --bg3:#e8e5f5; --bg4:#d8d4ec;
+    --text:#2a2440; --muted:#6b6585; --border:rgba(124,92,191,0.25);
+  }
+  body.light-theme body::before { opacity:0.5; }
+  body.light-theme .sidebar { background:#fff; box-shadow:4px 0 16px rgba(0,0,0,0.06), 2px 0 6px rgba(124,92,191,0.08); }
+  body.light-theme .topbar { background:rgba(240,238,248,0.95); }
+  body.light-theme .card { background:#fff; box-shadow:0 4px 12px rgba(0,0,0,0.05), 0 1px 3px rgba(124,92,191,0.08); }
+  body.light-theme .stat-card { background:#fff; box-shadow:0 4px 12px rgba(0,0,0,0.05), 0 1px 3px rgba(124,92,191,0.08); }
+  body.light-theme .support-card { background:#fff; }
+  body.light-theme .spec-row:nth-child(odd) { background:rgba(124,92,191,0.04); }
+  body.light-theme .cd-num { background:var(--bg3); color:var(--accent); }
+  body.light-theme ::-webkit-scrollbar-track { background:var(--bg3); }
+  body.light-theme .badge-offline { background:rgba(124,92,191,0.08); }
+  body.light-theme .toast { background:#fff; box-shadow:0 4px 12px rgba(0,0,0,0.1); }
+
+
+  /* ===== PAGE TRANSITIONS ===== */
+  .page { animation:none; }
+  .page.active { display:flex; animation:pageIn 0.25s ease forwards; }
+  @keyframes pageIn {
+    from { opacity:0; transform:translateY(8px); }
+    to   { opacity:1; transform:translateY(0); }
+  }
+  .page.page-out { animation:pageOut 0.15s ease forwards; }
+  @keyframes pageOut {
+    from { opacity:1; }
+    to   { opacity:0; }
+  }
+
+
+  /* ===== SUPPORT CHAT (USER) ===== */
+  .support-chat-fab { position:fixed; bottom:2rem; right:5.5rem; z-index:200; }
+  .sc-fab-btn { width:44px; height:44px; background:var(--accent); border:none; color:#fff; font-size:1rem; cursor:pointer; display:flex; align-items:center; justify-content:center; clip-path:polygon(6px 0,100% 0,100% calc(100% - 6px),calc(100% - 6px) 100%,0 100%,0 6px); transition:all 0.2s; position:relative; }
+  .sc-fab-btn:hover { background:var(--accent2); transform:scale(1.05); }
+  .sc-fab-badge { position:absolute; top:-4px; right:-4px; background:var(--red); color:#fff; font-size:0.5rem; font-family:'JetBrains Mono',monospace; width:14px; height:14px; border-radius:50%; display:none; align-items:center; justify-content:center; }
+  .sc-fab-badge.show { display:flex; }
+
+  .sc-panel { position:fixed; bottom:5.5rem; right:1.5rem; width:min(320px,calc(100vw - 2rem)); background:var(--bg2); border:1px solid rgba(124,92,191,0.3); z-index:199; display:none; flex-direction:column; box-shadow:0 8px 32px rgba(0,0,0,0.4); max-height:440px; }
+  .sc-panel.open { display:flex; animation:scIn 0.2s ease; }
+  @keyframes scIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+  .sc-panel::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:linear-gradient(90deg,var(--accent3),var(--accent2)); }
+  .sc-header { display:flex; align-items:center; justify-content:space-between; padding:0.65rem 0.85rem; border-bottom:1px solid var(--border); }
+  .sc-header-title { font-family:'JetBrains Mono',monospace; font-size:0.62rem; color:var(--accent2); letter-spacing:0.12em; text-transform:uppercase; display:flex; align-items:center; gap:0.5rem; }
+  .sc-close { background:none; border:none; color:var(--muted); cursor:pointer; font-size:0.85rem; transition:color 0.2s; }
+  .sc-close:hover { color:var(--text); }
+  .sc-body { flex:1; overflow-y:auto; padding:0.75rem; display:flex; flex-direction:column; gap:0.5rem; min-height:200px; max-height:280px; }
+  .sc-msg { display:flex; flex-direction:column; gap:0.15rem; max-width:85%; }
+  .sc-msg.mine { align-self:flex-end; align-items:flex-end; }
+  .sc-msg.theirs { align-self:flex-start; }
+  .sc-bubble { padding:0.4rem 0.65rem; font-size:0.78rem; line-height:1.5; word-break:break-word; }
+  .sc-msg.mine .sc-bubble { background:rgba(124,92,191,0.25); border:1px solid rgba(124,92,191,0.3); color:var(--text); border-radius:0; }
+  .sc-msg.theirs .sc-bubble { background:var(--bg3); border:1px solid var(--border); color:var(--text); }
+  .sc-meta { font-family:'JetBrains Mono',monospace; font-size:0.52rem; color:var(--muted); }
+  .sc-empty { text-align:center; font-family:'JetBrains Mono',monospace; font-size:0.62rem; color:var(--muted); padding:2rem 1rem; letter-spacing:0.08em; line-height:2; }
+  .sc-input-wrap { display:flex; border-top:1px solid var(--border); }
+  .sc-input { flex:1; background:var(--bg3); border:none; color:var(--text); padding:0.6rem 0.75rem; font-family:'Poppins',sans-serif; font-size:0.8rem; outline:none; }
+  .sc-input::placeholder { color:var(--muted); }
+  .sc-send { background:var(--accent); border:none; color:#fff; padding:0 1rem; cursor:pointer; font-size:0.85rem; transition:background 0.2s; }
+  .sc-send:hover { background:var(--accent2); }
+
+
+  .sc-typing { display:flex; align-items:center; gap:0.4rem; padding:0.25rem 0.5rem; opacity:0; transition:opacity 0.2s; min-height:22px; }
+  .sc-typing.visible { opacity:1; }
+  .sc-typing-label { font-family:'JetBrains Mono',monospace; font-size:0.55rem; color:var(--muted); }
+  .sc-typing-dot { width:5px; height:5px; border-radius:50%; background:var(--accent); display:inline-block; animation:typingBounce 1s infinite; margin:0 1px; }
+  .sc-typing-dot:nth-child(2) { animation-delay:0.15s; }
+  .sc-typing-dot:nth-child(3) { animation-delay:0.3s; }
+  @keyframes typingBounce { 0%,100%{transform:translateY(0);opacity:0.4} 50%{transform:translateY(-4px);opacity:1} }
+  .sc-bubble-wrap { position:relative; }
+  .sc-img { max-width:180px; max-height:180px; object-fit:cover; cursor:pointer; border:1px solid var(--border); display:block; margin-top:0.3rem; }
+  .sc-attach-btn { background:none; border:none; color:var(--muted); cursor:pointer; padding:0 0.5rem; font-size:0.85rem; transition:color 0.2s; }
+  .sc-attach-btn:hover { color:var(--accent2); }
+
+  /* ===== CONNECTION MODAL ===== */
+  #conn-modal { position:fixed; inset:0; background:rgba(0,0,0,0.75); z-index:500; display:none; align-items:center; justify-content:center; backdrop-filter:blur(6px); padding:1rem; }
+  #conn-modal.open { display:flex; animation:mIn 0.3s ease; }
+  @keyframes mIn { from{opacity:0;transform:scale(0.95)} to{opacity:1;transform:scale(1)} }
+  .conn-box { background:var(--bg2); border:1px solid rgba(74,222,128,0.4); padding:2rem; width:100%; max-width:440px; position:relative; }
+  .conn-box::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:linear-gradient(90deg,#166534,var(--green)); }
+  .conn-title { font-family:'Rajdhani',sans-serif; font-size:1.2rem; font-weight:700; text-transform:uppercase; letter-spacing:0.1em; color:var(--green); margin-bottom:0.3rem; display:flex; align-items:center; gap:0.5rem; }
+  .conn-sub { font-family:'JetBrains Mono',monospace; font-size:0.65rem; color:var(--muted); letter-spacing:0.1em; margin-bottom:1.25rem; }
+  .conn-row { display:flex; align-items:center; justify-content:space-between; padding:0.65rem 0.85rem; background:var(--bg3); border:1px solid var(--border); margin-bottom:0.6rem; gap:0.5rem; }
+  .conn-row-label { font-family:'JetBrains Mono',monospace; font-size:0.6rem; color:var(--muted); letter-spacing:0.12em; text-transform:uppercase; flex-shrink:0; }
+  .conn-row-val { font-family:'JetBrains Mono',monospace; font-size:0.85rem; color:var(--text); font-weight:500; word-break:break-all; }
+  .conn-copy { background:rgba(124,92,191,0.15); border:1px solid rgba(124,92,191,0.3); color:var(--accent2); font-size:0.65rem; padding:0.2rem 0.5rem; cursor:pointer; transition:all 0.2s; flex-shrink:0; font-family:'JetBrains Mono',monospace; white-space:nowrap; }
+  .conn-copy:hover { background:rgba(124,92,191,0.3); }
+  .conn-copy.copied { background:rgba(74,222,128,0.15); border-color:rgba(74,222,128,0.3); color:var(--green); }
+  .conn-divider { height:1px; background:var(--border); margin:1rem 0; }
+  .conn-steps { display:flex; flex-direction:column; gap:0.4rem; margin-bottom:1.25rem; }
+  .conn-step { font-size:0.78rem; color:var(--muted); display:flex; gap:0.5rem; align-items:flex-start; }
+  .conn-step-num { font-family:'JetBrains Mono',monospace; font-size:0.65rem; color:var(--accent2); flex-shrink:0; margin-top:0.1rem; }
+  .conn-footer { display:flex; gap:0.75rem; justify-content:flex-end; }
+  .conn-countdown { font-family:'JetBrains Mono',monospace; font-size:0.6rem; color:var(--muted); text-align:center; margin-bottom:0.75rem; letter-spacing:0.1em; }
+
+  /* ===== MOBILE ===== */
+  .hamburger { display:none; background:none; border:none; color:var(--accent2); width:40px; height:40px; align-items:center; justify-content:center; font-size:1.3rem; cursor:pointer; flex-shrink:0; }
+  .sidebar-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:49; }
+  @media(max-width:768px) {
+    .sidebar{transform:translateX(-100%);transition:transform 0.3s;}
+    .sidebar.open{transform:translateX(0);}
+    .main{margin-left:0;}
+    #hamburger-btn{display:flex;}
+    .sidebar-overlay.open{display:block;}
+    .stats-row{grid-template-columns:1fr;}
+    .support-grid{grid-template-columns:1fr;}
+    .spec-grid{grid-template-columns:1fr;}
+    .spec-row{flex-direction:column;align-items:flex-start;gap:0.15rem;padding:0.65rem 0.75rem;}
+    .spec-val{text-align:left;font-size:1rem;max-width:100%;}
+    .spec-label{font-size:0.7rem;}
+    .stat-val{font-size:1.5rem;}
+    .card-label{font-size:0.68rem;}
+    .badge{font-size:0.7rem;}
+    .cd-num{font-size:1.1rem;min-width:32px;}
+    .page{padding:1rem;}
+    .card{padding:1.25rem;}
+  }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+<script>
+/**
+ * GRIMZ CLOUD PC — Page Guard
+ * Popup xác minh pass, lưu localStorage, countdown redirect
+ * Dùng chung cho tất cả trang cần bảo vệ
+ */
+document.addEventListener("DOMContentLoaded", function() { (function () {
+  // ── CONFIG ──────────────────────────────────────────────
+  const PASS_HASH   = '5c7bb507989ca82ca7591742fda70607a4d697097f31afc0d415ca3be45997fb';
+  const LAUNCH_DATE = new Date('2026-03-23T00:00:00+07:00');
+  // Tự động tắt guard sau ngày launch
+  if (new Date() >= LAUNCH_DATE) return;
+  const STORAGE_KEY = 'grimz_access';
+  const REDIRECT    = '/';          // redirect về đây nếu hết countdown
+  const COUNTDOWN   = 10;           // giây
+  // ────────────────────────────────────────────────────────
+
+  // Nếu đã có pass hợp lệ thì bỏ qua
+  if (localStorage.getItem(STORAGE_KEY) === PASS_HASH) return;
+
+  // Chặn scroll trang phía sau
+  document.documentElement.style.overflow = 'hidden';
+
+  // ── INJECT CSS ──────────────────────────────────────────
+  const style = document.createElement('style');
+  style.textContent = `
+    #grimz-guard-overlay {
+      position:fixed; inset:0; z-index:99999;
+      background:rgba(9,8,15,0.92);
+      backdrop-filter:blur(12px);
+      display:flex; align-items:center; justify-content:center;
+      padding:1.5rem;
+      animation:guardFadeIn 0.3s ease;
+    }
+    @keyframes guardFadeIn { from{opacity:0} to{opacity:1} }
+
+    #grimz-guard-box {
+      background:#100e1a;
+      border:1px solid rgba(124,92,191,0.25);
+      padding:2rem 2rem 1.75rem;
+      width:100%; max-width:380px;
+      position:relative;
+      clip-path:polygon(0 0,calc(100% - 16px) 0,100% 16px,100% 100%,16px 100%,0 calc(100% - 16px));
+      animation:guardSlideUp 0.35s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    @keyframes guardSlideUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+
+    #grimz-guard-box::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:2px;
+      background:linear-gradient(90deg,#5a3fa0,#9b7fe8,#5a3fa0);
+    }
+    #grimz-guard-box::after {
+      content:''; position:absolute; inset:0;
+      background:radial-gradient(ellipse at 50% 0%,rgba(124,92,191,0.06),transparent 60%);
+      pointer-events:none;
+    }
+
+    .gg-corner { position:absolute; width:7px; height:7px; }
+    .gg-corner-tl { top:4px; left:4px; border-top:1px solid #9b7fe8; border-left:1px solid #9b7fe8; }
+    .gg-corner-br { bottom:4px; right:4px; border-bottom:1px solid #9b7fe8; border-right:1px solid #9b7fe8; }
+
+    .gg-logo {
+      font-family:'Rajdhani',sans-serif; font-size:1rem; font-weight:700;
+      letter-spacing:0.2em; text-transform:uppercase; color:#7c5cbf;
+      text-shadow:0 0 16px rgba(124,92,191,0.5);
+      margin-bottom:1.25rem; position:relative; z-index:1;
+    }
+    .gg-logo span { color:#9b7fe8; }
+
+    .gg-title {
+      font-family:'Rajdhani',sans-serif; font-size:1rem; font-weight:700;
+      text-transform:uppercase; letter-spacing:0.08em; color:#e4e0f0;
+      margin-bottom:0.3rem; position:relative; z-index:1;
+    }
+    .gg-sub {
+      font-family:'JetBrains Mono',monospace; font-size:0.6rem;
+      color:#8a84a0; letter-spacing:0.12em; margin-bottom:1.5rem;
+      position:relative; z-index:1; line-height:1.8;
+    }
+
+    .gg-input-wrap {
+      position:relative; z-index:1; margin-bottom:0.75rem;
+    }
+    .gg-input-label {
+      font-family:'JetBrains Mono',monospace; font-size:0.58rem;
+      color:#8a84a0; letter-spacing:0.15em; text-transform:uppercase;
+      display:block; margin-bottom:0.4rem;
+    }
+    .gg-input-row { position:relative; }
+    #grimz-guard-input {
+      width:100%; padding:0.65rem 2.5rem 0.65rem 0.85rem;
+      background:#161323; border:1px solid rgba(124,92,191,0.18);
+      color:#e4e0f0; font-family:'JetBrains Mono',monospace; font-size:0.85rem;
+      outline:none; transition:border-color 0.2s, box-shadow 0.2s;
+      letter-spacing:0.1em;
+    }
+    #grimz-guard-input:focus {
+      border-color:#9b7fe8;
+      box-shadow:0 0 0 2px rgba(124,92,191,0.12);
+    }
+    #grimz-guard-input.shake {
+      animation:ggShake 0.35s ease;
+    }
+    @keyframes ggShake {
+      0%,100%{transform:translateX(0)}
+      20%{transform:translateX(-6px)}
+      40%{transform:translateX(6px)}
+      60%{transform:translateX(-4px)}
+      80%{transform:translateX(4px)}
+    }
+    #gg-toggle-pass {
+      position:absolute; right:0.65rem; top:50%; transform:translateY(-50%);
+      background:none; border:none; color:#8a84a0; cursor:pointer;
+      font-size:0.75rem; padding:0; transition:color 0.2s;
+    }
+    #gg-toggle-pass:hover { color:#9b7fe8; }
+
+    #grimz-guard-err {
+      font-family:'JetBrains Mono',monospace; font-size:0.6rem;
+      color:#f87171; letter-spacing:0.08em;
+      min-height:1.2em; margin-bottom:0.75rem;
+      position:relative; z-index:1;
+    }
+
+    #grimz-guard-btn {
+      width:100%; padding:0.7rem;
+      background:#7c5cbf; border:none; color:#fff;
+      font-family:'Rajdhani',sans-serif; font-size:0.95rem; font-weight:700;
+      letter-spacing:0.12em; text-transform:uppercase;
+      cursor:pointer; transition:all 0.2s cubic-bezier(0.34,1.56,0.64,1);
+      clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,0 100%);
+      position:relative; z-index:1; margin-bottom:1rem;
+    }
+    #grimz-guard-btn:hover { background:#9b7fe8; transform:translateY(-2px); box-shadow:0 6px 20px rgba(124,92,191,0.35); }
+    #grimz-guard-btn:active { transform:translateY(0); }
+
+    .gg-countdown-row {
+      display:flex; align-items:center; justify-content:space-between;
+      position:relative; z-index:1;
+    }
+    .gg-countdown-text {
+      font-family:'JetBrains Mono',monospace; font-size:0.58rem;
+      color:#5a5470; letter-spacing:0.1em;
+    }
+    .gg-countdown-text span { color:#f87171; font-weight:700; }
+
+    .gg-progress {
+      width:100%; height:1px; background:rgba(124,92,191,0.1);
+      margin-top:0.75rem; position:relative; z-index:1; overflow:hidden;
+    }
+    .gg-progress-fill {
+      height:100%; background:linear-gradient(90deg,#f87171,#fbbf24);
+      transition:width 1s linear;
+    }
+  `;
+  document.head.appendChild(style);
+
+  // ── INJECT HTML ─────────────────────────────────────────
+  const overlay = document.createElement('div');
+  overlay.id = 'grimz-guard-overlay';
+  overlay.innerHTML = `
+    <div id="grimz-guard-box">
+      <div class="gg-corner gg-corner-tl"></div>
+      <div class="gg-corner gg-corner-br"></div>
+      <div class="gg-logo">GRIMZ <span>CLOUD</span> PC</div>
+      <div class="gg-title">🔒 Khu vực giới hạn</div>
+      <div class="gg-sub">Trang này đang trong giai đoạn triển khai.<br>Nhập mật khẩu để tiếp tục.</div>
+      <div class="gg-input-wrap">
+        <label class="gg-input-label">// Mật khẩu truy cập</label>
+        <div class="gg-input-row">
+          <input id="grimz-guard-input" type="password" placeholder="••••••••" autocomplete="off" />
+          <button id="gg-toggle-pass" tabindex="-1">👁</button>
+        </div>
+      </div>
+      <div id="grimz-guard-err"></div>
+      <button id="grimz-guard-btn">Xác nhận</button>
+      <div class="gg-countdown-row">
+        <span class="gg-countdown-text">Tự động redirect sau <span id="gg-cd">${COUNTDOWN}</span>s</span>
+        <span class="gg-countdown-text" style="color:#5a5470">→ /home</span>
+      </div>
+      <div class="gg-progress">
+        <div class="gg-progress-fill" id="gg-progress" style="width:100%"></div>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+
+  // ── LOGIC ───────────────────────────────────────────────
+  const input   = document.getElementById('grimz-guard-input');
+  const btn     = document.getElementById('grimz-guard-btn');
+  const errEl   = document.getElementById('grimz-guard-err');
+  const cdEl    = document.getElementById('gg-cd');
+  const progEl  = document.getElementById('gg-progress');
+  const toggleBtn = document.getElementById('gg-toggle-pass');
+
+  // Show/hide password
+  toggleBtn.addEventListener('click', () => {
+    input.type = input.type === 'password' ? 'text' : 'password';
+    toggleBtn.textContent = input.type === 'password' ? '👁' : '🙈';
+  });
+
+  // Hash password (SHA-256 via Web Crypto)
+  async function hashPass(str) {
+    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+  }
+
+  async function verify() {
+    const val = input.value.trim();
+    if (!val) {
+      showErr(t('guard_empty'));
+      return;
+    }
+    const hash = await hashPass(val);
+    if (hash === PASS_HASH) {
+      localStorage.setItem(STORAGE_KEY, PASS_HASH);
+      errEl.textContent = '';
+      btn.textContent = t('btn_confirmed');
+      btn.style.background = 'rgba(74,222,128,0.8)';
+      clearInterval(cdInterval);
+      setTimeout(() => {
+        overlay.style.animation = 'guardFadeIn 0.3s ease reverse forwards';
+        setTimeout(() => overlay.remove(), 300);
+        document.documentElement.style.overflow = '';
+      }, 500);
+    } else {
+      showErr(t('guard_wrong'));
+      input.classList.add('shake');
+      setTimeout(() => input.classList.remove('shake'), 400);
+      input.value = '';
+      input.focus();
+    }
+  }
+
+  function showErr(msg) {
+    errEl.textContent = '⚠ ' + msg;
+  }
+
+  btn.addEventListener('click', verify);
+  input.addEventListener('keydown', e => { if (e.key === 'Enter') verify(); });
+  input.focus();
+
+  // Countdown
+  let remaining = COUNTDOWN;
+  const cdInterval = setInterval(() => {
+    remaining--;
+    cdEl.textContent = remaining;
+    progEl.style.width = (remaining / COUNTDOWN * 100) + '%';
+    if (remaining <= 0) {
+      clearInterval(cdInterval);
+      window.location.replace(REDIRECT);
+    }
+  }, 1000);
+
+})(); }, { once: true });
+
+</script>
+</head>
+<body>
+
+
+<!-- PROFILE MODAL -->
+<div class="modal-overlay" id="profileModal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeProfileModal()"><i class="fas fa-times"></i></button>
+    <div class="modal-title" data-i18n="modal_edit_profile">✏️ Chỉnh sửa profile</div>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:0.62rem;color:var(--muted);letter-spacing:0.12em;margin-bottom:0.75rem;" data-i18n="display_name_label">TÊN HIỂN THỊ</div>
+    <input class="modal-input" id="displayNameInput" type="text" placeholder="Nhập tên hiển thị..." maxlength="32" data-i18n-placeholder="display_name_ph">
+    <div style="font-size:0.75rem;color:var(--muted);margin-bottom:1.25rem;" data-i18n="display_name_note">Tên này chỉ hiển thị trên dashboard của bạn.</div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" style="padding:0.5rem 1rem;font-size:0.8rem;" onclick="closeProfileModal()" data-i18n="btn_cancel">Hủy</button>
+      <button class="btn btn-discord" style="padding:0.5rem 1.25rem;font-size:0.8rem;" onclick="saveProfile()">
+        <i class="fas fa-save"></i> <span data-i18n="btn_save">Lưu</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- KANJI LOADER -->
+<div id="kanji-loader">
+  <canvas id="kanji-rain"></canvas>
+  <div class="k-main" id="k-main">準備中</div>
+  <div class="k-sub" id="k-sub">接続中...</div>
+  <div class="k-bar" id="k-bar"><div class="k-bar-fill" id="k-fill"></div></div>
+  <div class="k-logo" id="k-logo">GRIMZ <span>CLOUD</span> PC</div>
+</div>
+
+<div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleSidebar()"></div>
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-text">Grimz Cloud</div>
+    <div class="logo-sub">User Portal</div>
+  </div>
+  <div class="sidebar-user">
+    <div class="user-avatar" id="userAvatar">?</div>
+    <div>
+      <div class="user-name" id="userName">—<button class="user-edit-btn" onclick="openProfileModal()" title="Chỉnh sửa"><i class="fas fa-pen"></i></button></div>
+      <div class="user-plan" id="userPlan">—</div>
+    </div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">// Main</div>
+    <button class="nav-item active" onclick="goTo('dashboard',this)"><span class="nav-icon"><i class="fas fa-th-large"></i></span> <span data-i18n="nav_dashboard">Dashboard</span></button>
+    <button class="nav-item" onclick="goTo('machine',this)"><span class="nav-icon"><i class="fas fa-server"></i></span> <span data-i18n="nav_machine">Máy của tôi</span></button>
+    <button class="nav-item" onclick="goTo('time',this)"><span class="nav-icon"><i class="fas fa-clock"></i></span> <span data-i18n="nav_time">Thời gian</span></button>
+    <button class="nav-item" onclick="goTo('history',this)"><span class="nav-icon"><i class="fas fa-history"></i></span> <span data-i18n="nav_history">Lịch sử thuê</span></button>
+    <div class="nav-section">// Support</div>
+    <button class="nav-item" onclick="goTo('connect',this)"><span class="nav-icon"><i class="fas fa-plug"></i></span> <span data-i18n="nav_connect">Hướng dẫn kết nối</span></button>
+    <button class="nav-item" onclick="goTo('support',this)"><span class="nav-icon"><i class="fas fa-headset"></i></span> <span data-i18n="nav_support">Hỗ trợ</span></button>
+    <div class="nav-section">// Account</div>
+    <a class="nav-item" href="index.html"><span class="nav-icon"><i class="fas fa-home"></i></span> <span data-i18n="nav_home">Trang chủ</span></a>
+    <button class="nav-item danger" onclick="doLogout()"><span class="nav-icon"><i class="fas fa-sign-out-alt"></i></span> <span data-i18n="nav_logout">Đăng xuất</span></button>
+  </nav>
+  <div class="sidebar-bottom">
+    <div class="status-dot">SERVER ONLINE</div>
+    <div class="lang-switch-row" style="display:flex;gap:0.35rem;margin-top:0.6rem;flex-wrap:wrap;">
+      <button class="lang-btn active" id="lbtn-vi" onclick="pickLang('vi')" style="background:none;border:1px solid var(--border);color:var(--muted);font-family:'JetBrains Mono',monospace;font-size:0.6rem;padding:0.2rem 0.45rem;cursor:pointer;transition:all 0.2s;letter-spacing:0.08em;">🇻🇳 VI</button>
+      <button class="lang-btn" id="lbtn-en" onclick="pickLang('en')" style="background:none;border:1px solid var(--border);color:var(--muted);font-family:'JetBrains Mono',monospace;font-size:0.6rem;padding:0.2rem 0.45rem;cursor:pointer;transition:all 0.2s;letter-spacing:0.08em;">🇬🇧 EN</button>
+      <button class="lang-btn" id="lbtn-id" onclick="pickLang('id')" style="background:none;border:1px solid var(--border);color:var(--muted);font-family:'JetBrains Mono',monospace;font-size:0.6rem;padding:0.2rem 0.45rem;cursor:pointer;transition:all 0.2s;letter-spacing:0.08em;">🇮🇩 ID</button>
+      <button class="lang-btn" id="lbtn-hi" onclick="pickLang('hi')" style="background:none;border:1px solid var(--border);color:var(--muted);font-family:'JetBrains Mono',monospace;font-size:0.6rem;padding:0.2rem 0.45rem;cursor:pointer;transition:all 0.2s;letter-spacing:0.08em;">🇮🇳 HI</button>
+    </div>
+    <button class="theme-toggle" onclick="toggleTheme()" title="Đổi theme">
+      <div class="theme-track"><div class="theme-thumb"></div></div>
+      <span class="theme-label"><span class="theme-icon">🌙</span> Theme</span>
+    </button>
+  </div>
+</aside>
+
+<div class="main">
+  <div class="topbar">
+    <button class="hamburger" id="hamburger-btn" onclick="toggleSidebar()">☰</button>
+    <div class="topbar-title" id="page-title">Dashboard</div>
+    <div class="topbar-clock" id="clock">--:--:--</div>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div class="page active" id="page-dashboard">
+    <div class="card card-top-line">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;flex-wrap:wrap;gap:0.75rem;">
+        <div>
+          <div class="card-label" data-i18n="lbl_current_machine">// Máy đang thuê</div>
+          <div class="machine-title-wrap">
+            <div class="machine-title" id="machineName" data-text="—">—</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:0.75rem;flex-wrap:wrap;">
+          <div class="badge badge-offline" id="machineStatus" data-i18n="status_no_machine">Chưa có máy</div>
+          <button id="show-conn-btn" onclick="showConnModalFromData()" style="display:none;background:rgba(74,222,128,0.1);border:1px solid rgba(74,222,128,0.25);color:var(--green);font-family:'JetBrains Mono',monospace;font-size:0.6rem;padding:0.25rem 0.65rem;cursor:pointer;letter-spacing:0.1em;transition:all 0.2s;" data-i18n="btn_conn_info">🔑 THÔNG TIN KẾT NỐI</button>
+        </div>
+      </div>
+      <div class="divider"></div>
+      <div class="spec-grid">
+        <div class="spec-row"><span class="spec-label" data-i18n="spec_ip">Địa chỉ IP</span><span class="spec-val empty" id="machineIp">—</span></div>
+        <div class="spec-row"><span class="spec-label">GPU</span><span class="spec-val empty" id="machineGpu">—</span></div>
+        <div class="spec-row"><span class="spec-label">RAM</span><span class="spec-val empty" id="machineRam">—</span></div>
+        <div class="spec-row"><span class="spec-label">CPU</span><span class="spec-val empty" id="machineCpu">—</span></div>
+        <div class="spec-row"><span class="spec-label">Storage</span><span class="spec-val empty" id="machineStorage">—</span></div>
+        <div class="spec-row"><span class="spec-label">OS</span><span class="spec-val empty" id="machineOs">—</span></div>
+      </div>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-label" data-i18n="lbl_plan_status">// Trạng thái gói</div>
+        <div class="stat-val empty" id="statPlan" data-i18n="status_none">Chưa có</div>
+        <div class="stat-sub" data-i18n="sub_buy_discord">Mua qua Discord để kích hoạt</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label" data-i18n="lbl_time_left">// Thời gian còn lại</div>
+        <div class="stat-val empty" id="statTime">—</div>
+        <div class="stat-sub" data-i18n="sub_no_data">Chưa có dữ liệu</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label" data-i18n="lbl_ping">// Ping tới server</div>
+        <div class="stat-val empty" id="ping-value">~30ms</div>
+        <div class="stat-sub">Singapore Node</div>
+      </div>
+    </div>
+
+    <div class="card" style="padding:1.25rem 1.5rem;">
+      <div class="card-label" data-i18n="lbl_user_id">// User ID của bạn</div>
+      <div style="display:flex;align-items:center;gap:0.75rem;margin-top:0.4rem;">
+        <div id="userUuid" style="font-family:'JetBrains Mono',monospace;font-size:0.75rem;color:var(--accent2);background:var(--bg);border:1px solid var(--border);padding:0.4rem 0.75rem;flex:1;word-break:break-all;">—</div>
+        <button onclick="copyUuid()" style="padding:0.4rem 0.85rem;background:var(--accent);border:none;color:#fff;font-family:'Rajdhani',sans-serif;font-size:0.8rem;font-weight:700;letter-spacing:0.1em;cursor:pointer;text-transform:uppercase;white-space:nowrap;transition:background 0.2s;">Copy</button>
+      </div>
+      <div style="font-size:0.72rem;color:var(--muted);margin-top:0.5rem;font-weight:400;" data-i18n="user_id_note">Gửi ID này cho staff khi tạo ticket để được gán máy.</div>
+    </div>
+
+    <div class="card" id="firstLoginNotice" style="padding:1.25rem 1.5rem;background:rgba(124,92,191,0.07);border:1px solid rgba(124,92,191,0.3);">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:0.7rem;color:var(--accent2);letter-spacing:0.15em;margin-bottom:0.4rem;" data-i18n="lbl_guide">// HƯỚNG DẪN</div>
+      <div style="font-size:0.9rem;color:var(--text);font-weight:500;margin-bottom:0.3rem;" data-i18n="guide_title">Liên hệ Admin để được gán máy!</div>
+      <div style="font-size:0.8rem;color:var(--muted);font-weight:400;" data-i18n-html="guide_desc">Copy <strong style="color:var(--accent2);">User ID</strong> bên trên → gửi cho staff qua Discord ticket → staff sẽ gán máy cho bạn.</div>
+    </div>
+
+    <div class="card" id="noBuyCard" style="padding:2rem;">
+      <div class="empty-state">
+        <div class="empty-robot">🤖</div>
+        <div class="empty-text" data-i18n-html="empty_no_machine">Chưa có máy nào được gán.<br>Mua dịch vụ qua Discord để bắt đầu.</div>
+        <a href="https://discord.gg/Ct4Gw7GwJJ" target="_blank" class="btn btn-discord">
+          <svg width="16" height="12" viewBox="0 0 71 55" fill="currentColor"><path d="M60.1 4.9A58.5 58.5 0 0 0 45.4.9a40 40 0 0 0-1.8 3.6 54 54 0 0 0-16.2 0A38.4 38.4 0 0 0 25.6.9 58.4 58.4 0 0 0 10.9 5C1.6 18.7-1 32 .3 45a58.7 58.7 0 0 0 17.9 9 44 44 0 0 0 3.8-6.2 38.3 38.3 0 0 1-6-2.9l1.4-1.1a41.9 41.9 0 0 0 35.7 0l1.5 1.1a38.2 38.2 0 0 1-6 2.9 43.6 43.6 0 0 0 3.8 6.2 58.5 58.5 0 0 0 17.9-9C71.8 30 68.2 16.8 60.1 4.9ZM23.7 37.3c-3.5 0-6.4-3.2-6.4-7.1s2.8-7.2 6.4-7.2 6.5 3.2 6.4 7.2c0 3.9-2.8 7.1-6.4 7.1Zm23.6 0c-3.5 0-6.4-3.2-6.4-7.1s2.8-7.2 6.4-7.2 6.5 3.2 6.4 7.2c0 3.9-2.8 7.1-6.4 7.1Z"/></svg>
+          <span data-i18n="btn_buy_discord">Mua qua Discord</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- MACHINE -->
+  <div class="page" id="page-machine">
+    <div class="card card-top-line">
+      <div class="card-label" data-i18n="lbl_machine_info">// Thông tin máy</div>
+      <div class="card-title" data-i18n="title_my_machine">Máy của tôi</div>
+      <div class="spec-grid">
+        <div class="spec-row"><span class="spec-label" data-i18n="spec_ip">Địa chỉ IP</span><span class="spec-val empty" id="m2Ip">—</span></div>
+        <div class="spec-row"><span class="spec-label">GPU</span><span class="spec-val empty" id="m2Gpu">—</span></div>
+        <div class="spec-row"><span class="spec-label">RAM</span><span class="spec-val empty" id="m2Ram">—</span></div>
+        <div class="spec-row"><span class="spec-label">CPU</span><span class="spec-val empty" id="m2Cpu">—</span></div>
+        <div class="spec-row"><span class="spec-label">Storage</span><span class="spec-val empty" id="m2Storage">—</span></div>
+        <div class="spec-row"><span class="spec-label">OS</span><span class="spec-val empty" id="m2Os">—</span></div>
+        <div class="spec-row"><span class="spec-label" data-i18n="spec_status">Trạng thái</span><span class="badge badge-offline" id="m2Status" data-i18n="status_no_machine">Chưa có máy</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TIME -->
+  <div class="page" id="page-time">
+    <div class="card card-top-line">
+      <div class="card-label" data-i18n="lbl_rental_time">// Thời gian thuê</div>
+      <div class="card-title" data-i18n="title_time_left">Thời gian còn lại</div>
+      <div class="divider"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;">
+        <div>
+          <div class="stat-label" data-i18n="title_time_left">Thời gian còn lại</div>
+          <div class="countdown" id="countdown-wrap">
+            <div class="cd-unit"><span class="cd-num" id="cd-d">--</span><span class="cd-label" data-i18n="cd_days">ngày</span></div>
+            <span class="cd-sep">:</span>
+            <div class="cd-unit"><span class="cd-num" id="cd-h">--</span><span class="cd-label" data-i18n="cd_hours">giờ</span></div>
+            <span class="cd-sep">:</span>
+            <div class="cd-unit"><span class="cd-num" id="cd-m">--</span><span class="cd-label" data-i18n="cd_mins">phút</span></div>
+            <span class="cd-sep">:</span>
+            <div class="cd-unit"><span class="cd-num" id="cd-s">--</span><span class="cd-label" data-i18n="cd_secs">giây</span></div>
+          </div>
+        </div>
+        <div>
+          <div class="stat-label" data-i18n="lbl_expiry_date">Ngày hết hạn</div>
+          <div class="spec-val empty" id="expiryDate" style="margin-top:0.5rem;">—</div>
+        </div>
+      </div>
+    </div>
+    <div class="card" style="display:flex;flex-direction:column;gap:1rem;align-items:flex-start;">
+      <div style="font-size:0.825rem;color:var(--muted);font-weight:400;" data-i18n="renew_note">Gia hạn qua Discord ticket.</div>
+      <a href="https://discord.gg/Ct4Gw7GwJJ" target="_blank" class="btn btn-discord" data-i18n="btn_renew_discord">Gia hạn qua Discord</a>
+    </div>
+  </div>
+
+
+  <!-- HISTORY -->
+  <div class="page" id="page-history">
+    <div class="card card-top-line">
+      <div class="card-label" data-i18n="lbl_stats_7d">// Thống kê 7 ngày</div>
+      <div class="card-title" style="margin-bottom:1.25rem;" data-i18n="title_usage_hours">Giờ sử dụng</div>
+      <div style="position:relative;height:180px;">
+        <canvas id="usageChart"></canvas>
+      </div>
+    </div>
+    <div class="card card-top-line">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;">
+        <div>
+          <div class="card-label" data-i18n="lbl_rental_history">// Lịch sử thuê máy</div>
+          <div class="card-title" style="margin-bottom:0;" data-i18n="title_sessions">Các phiên đã dùng</div>
+        </div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:0.65rem;color:var(--muted);" id="historyCount">— phiên</div>
+      </div>
+      <div id="historyList">
+        <div class="empty-state">
+          <div class="empty-robot">📋</div>
+          <div class="empty-text" data-i18n-html="empty_history">Chưa có lịch sử thuê.<br>Dữ liệu sẽ hiện sau khi hết hạn máy.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONNECT -->
+  <div class="page" id="page-connect">
+    <div class="card card-top-line">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;margin-bottom:1.25rem;">
+        <div><div class="card-label" data-i18n="lbl_guide">// Hướng dẫn</div><div class="card-title" style="margin-bottom:0;" data-i18n="title_connect_vm">Kết nối máy ảo</div></div>
+        <div class="tab-group">
+          <button class="tab active" onclick="switchTab('parsec',this)">Parsec</button>
+          <button class="tab" onclick="switchTab('moonlight',this)">Moonlight</button>
+        </div>
+      </div>
+      <div class="divider"></div>
+      <div class="tab-content active" id="tab-parsec">
+        <div class="steps-list">
+          <div class="step-row"><div class="step-num-sm">1</div><div class="step-text" data-i18n-html="parsec_s1">Tải và cài <strong>Parsec</strong> tại <strong>parsec.app</strong></div></div>
+          <div class="step-row"><div class="step-num-sm">2</div><div class="step-text" data-i18n-html="parsec_s2">Đăng nhập Parsec → tab <strong>Computers</strong> → nhập IP máy từ Discord</div></div>
+          <div class="step-row"><div class="step-num-sm">3</div><div class="step-text" data-i18n-html="parsec_s3">Nhập <strong>mật khẩu</strong> staff gửi qua Discord ticket</div></div>
+          <div class="step-row"><div class="step-num-sm">4</div><div class="step-text" data-i18n-html="parsec_s4">Cài đặt: <strong>H.264 · 50 Mbps · 1080p</strong></div></div>
+        </div>
+      </div>
+      <div class="tab-content" id="tab-moonlight">
+        <div class="steps-list">
+          <div class="step-row"><div class="step-num-sm">1</div><div class="step-text" data-i18n-html="moon_s1">Tải <strong>Moonlight</strong> tại <strong>moonlight-stream.org</strong></div></div>
+          <div class="step-row"><div class="step-num-sm">2</div><div class="step-text" data-i18n-html="moon_s2">Mở Moonlight → <strong>Add PC</strong> → nhập IP máy từ Discord</div></div>
+          <div class="step-row"><div class="step-num-sm">3</div><div class="step-text" data-i18n-html="moon_s3">Nhập <strong>PIN 4 số</strong> hiện trên Moonlight (nhờ staff nhập hộ)</div></div>
+          <div class="step-row"><div class="step-num-sm">4</div><div class="step-text" data-i18n-html="moon_s4">Cài đặt: <strong>H.264 · 50 Mbps · 1080p · 60fps</strong></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SUPPORT -->
+  <div class="page" id="page-support">
+    <div class="support-grid">
+      <div class="support-card"><div class="support-icon">💬</div><div class="support-title" data-i18n="sup_ticket">Tạo ticket hỗ trợ</div><div class="support-desc" data-i18n="sup_ticket_desc">Gặp vấn đề? Tạo ticket trong Discord, staff phản hồi trong vài phút.</div><a href="https://discord.gg/Ct4Gw7GwJJ" target="_blank" class="btn btn-discord" data-i18n="btn_open_discord">Mở Discord</a></div>
+      <div class="support-card"><div class="support-icon">🔄</div><div class="support-title" data-i18n="sup_renew">Gia hạn dịch vụ</div><div class="support-desc" data-i18n="sup_renew_desc">Gói sắp hết? Tạo ticket gia hạn trong Discord.</div><a href="https://discord.gg/Ct4Gw7GwJJ" target="_blank" class="btn btn-outline" data-i18n="btn_renew_ticket">Tạo ticket gia hạn →</a></div>
+      <div class="support-card"><div class="support-icon">❓</div><div class="support-title" data-i18n="sup_faq">Hỏi đáp</div><div class="support-desc" data-i18n="sup_faq_desc">Chưa biết cách kết nối? Xem hướng dẫn hoặc hỏi staff.</div><button class="btn btn-outline" onclick="goTo('connect',document.querySelector('[onclick*=connect]'))" data-i18n="btn_view_guide">Xem hướng dẫn →</button></div>
+      <div class="support-card"><div class="support-icon">🛒</div><div class="support-title" data-i18n="sup_buy_hours">Mua thêm giờ</div><div class="support-desc" data-i18n="sup_buy_hours_desc">Hết giờ? Nạp thêm bất cứ lúc nào qua Discord ticket.</div><a href="https://discord.gg/Ct4Gw7GwJJ" target="_blank" class="btn btn-outline" data-i18n="btn_add_hours">Nạp thêm giờ →</a></div>
+    </div>
+  </div>
+</div>
+
+
+
+<!-- CONNECTION MODAL -->
+<div id="conn-modal">
+  <div class="conn-box">
+    <div class="conn-title" data-i18n="conn_ready">🖥️ Máy đã sẵn sàng!</div>
+    <div class="conn-sub" data-i18n="conn_sub">// Dùng Parsec để kết nối · parsec.app</div>
+    <div class="conn-row">
+      <span class="conn-row-label">IP</span>
+      <span class="conn-row-val" id="conn-ip">—</span>
+      <button class="conn-copy" onclick="connCopy('conn-ip', this)">📋 Copy</button>
+    </div>
+    <div class="conn-row">
+      <span class="conn-row-label">Password</span>
+      <span class="conn-row-val" id="conn-pass">—</span>
+      <button class="conn-copy" onclick="connCopy('conn-pass', this)">📋 Copy</button>
+    </div>
+    <div class="conn-row">
+      <span class="conn-row-label">GPU</span>
+      <span class="conn-row-val" id="conn-gpu">—</span>
+    </div>
+    <div class="conn-row">
+      <span class="conn-row-label" data-i18n="lbl_expiry">Hết hạn</span>
+      <span class="conn-row-val" id="conn-expiry">—</span>
+    </div>
+    <div class="conn-divider"></div>
+    <div class="conn-steps">
+      <div class="conn-step"><span class="conn-step-num">01</span><span data-i18n-html="conn_s1">Tải <strong>Parsec</strong> tại <strong>parsec.app</strong> (miễn phí, không cần tạo tài khoản)</span></div>
+      <div class="conn-step"><span class="conn-step-num">02</span><span data-i18n-html="conn_s2">Mở Parsec → <strong>Computers</strong> → <strong>Connect</strong> → nhập IP bên trên</span></div>
+      <div class="conn-step"><span class="conn-step-num">03</span><span data-i18n-html="conn_s3">Nhập <strong>Password</strong> bên trên khi được hỏi → Done!</span></div>
+      <div class="conn-step"><span class="conn-step-num">💡</span><span data-i18n-html="conn_s4">Gặp lỗi? Bấm <strong>Hỗ trợ</strong> hoặc nhắn chat bên dưới.</span></div>
+    </div>
+    <div class="conn-countdown" id="conn-countdown"></div>
+    <div class="conn-footer">
+      <a href="https://discord.gg/Ct4Gw7GwJJ" target="_blank" class="btn btn-discord" style="font-size:0.8rem;padding:0.5rem 1rem;">
+        <i class="fas fa-headset"></i> Hỗ trợ
+      </a>
+      <button class="btn btn-outline" style="font-size:0.8rem;padding:0.5rem 1.25rem;" onclick="document.getElementById('conn-modal').classList.remove('open')">
+        Đóng
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- SUPPORT CHAT FAB -->
+<div class="support-chat-fab">
+  <button class="sc-fab-btn" onclick="toggleSupportChat()" title="Hỗ trợ">
+    <i class="fas fa-headset"></i>
+    <span class="sc-fab-badge" id="sc-badge"></span>
+  </button>
+</div>
+
+<!-- SUPPORT CHAT PANEL -->
+<div class="sc-panel" id="sc-panel">
+  <div class="sc-header">
+    <span class="sc-header-title"><i class="fas fa-headset"></i> <span data-i18n="chat_title">Hỗ trợ trực tiếp</span></span>
+    <button class="sc-close" onclick="toggleSupportChat()"><i class="fas fa-times"></i></button>
+  </div>
+  <div class="sc-body" id="sc-body">
+    <div class="sc-empty" data-i18n-html="chat_empty">💬 Nhắn tin để được hỗ trợ.<br>Staff sẽ phản hồi sớm nhất có thể.</div>
+  </div>
+  <div class="sc-typing" id="sc-typing"><span class="sc-typing-label" data-i18n="chat_typing">Staff đang nhập</span><span class="sc-typing-dot"></span><span class="sc-typing-dot"></span><span class="sc-typing-dot"></span></div>
+  <div class="sc-input-wrap">
+    <input class="sc-input" id="sc-input" placeholder="Nhập tin nhắn..." data-i18n-placeholder="chat_placeholder" onkeydown="if(event.key='Enter')sendSupportMsg()" oninput="userTyping()">
+    <label class="sc-attach-btn" title="Gửi ảnh"><i class="fas fa-image"></i><input type="file" accept="image/*" style="display:none;" onchange="sendSupportImage(this)"></label>
+    <button class="sc-send" onclick="sendSupportMsg()"><i class="fas fa-paper-plane"></i></button>
+  </div>
+</div>
+
+<div class="toast" id="toast" onclick="this.classList.remove('show')"></div>
+
+<script>
+  // ===== KANJI LOADER =====
+  (function(){
+    const loader = document.getElementById('kanji-loader');
+    const kMain  = document.getElementById('k-main');
+    const kSub   = document.getElementById('k-sub');
+    const kBar   = document.getElementById('k-bar');
+    const kFill  = document.getElementById('k-fill');
+    const kLogo  = document.getElementById('k-logo');
+    const canvas = document.getElementById('kanji-rain');
+    const ctx    = canvas.getContext('2d');
+    canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+    const chars = '雲雨電光準備中接続起動待機完了力水火風地天神龍剣刀夢影炎氷空海山川星月日闇霊';
+    const cols  = Math.floor(canvas.width / 20);
+    const drops = Array(cols).fill(0).map(() => Math.random() * -30);
+    function drawRain(){
+      ctx.fillStyle='rgba(9,8,15,0.06)'; ctx.fillRect(0,0,canvas.width,canvas.height);
+      ctx.fillStyle='rgba(124,92,191,0.5)'; ctx.font='13px monospace';
+      drops.forEach((y,i)=>{ ctx.fillText(chars[Math.floor(Math.random()*chars.length)],i*20,y*20); drops[i]=y>canvas.height/20+10?0:y+0.4; });
+    }
+    const rain = setInterval(drawRain, 50);
+    const subs = ['接続中...','起動中...','読み込み中...','待機中...','完了 ✓'];
+    let si = 0;
+    function nextSub(){ kSub.classList.remove('act'); setTimeout(()=>{ kSub.textContent=subs[si++%subs.length]; kSub.classList.add('act'); },150); }
+    setTimeout(()=>{ kMain.style.opacity='1'; },100);
+    setTimeout(()=>{ kMain.classList.add('glitch'); kSub.classList.add('vis'); kBar.classList.add('vis'); nextSub(); },500);
+    let p=0; const pi=setInterval(()=>{ p=Math.min(100,p+Math.random()*7+2); kFill.style.width=p+'%'; if(p>=40&&p<60)nextSub(); if(p>=100)clearInterval(pi); },100);
+    setTimeout(()=>{ kMain.classList.remove('glitch'); kMain.classList.add('glitch-heavy'); nextSub(); },1500);
+    setTimeout(()=>{ kMain.classList.remove('glitch-heavy'); kMain.style.textShadow='0 0 40px rgba(124,92,191,1)'; kFill.style.width='100%'; nextSub(); setTimeout(()=>kLogo.style.opacity='1',300); },2500);
+    // Show GRIMZ logo prominently for 3s before fade
+    setTimeout(()=>{
+      kMain.style.opacity='0.2';
+      kMain.style.transition='opacity 0.5s';
+      kSub.style.opacity='0';
+      kBar.style.opacity='0';
+      kLogo.style.fontSize='2.2rem';
+      kLogo.style.letterSpacing='0.35em';
+      kLogo.style.textShadow='0 0 40px rgba(124,92,191,0.8), 0 0 80px rgba(124,92,191,0.3)';
+      kLogo.style.transition='all 0.6s ease';
+    }, 3000);
+    setTimeout(()=>{ clearInterval(rain); loader.classList.add('fade-out'); setTimeout(()=>loader.style.display='none',600); },6200);
+  })();
+
+  // ===== I18N SYSTEM =====
+  const DT = {
+    vi: {
+      nav_dashboard:'Dashboard', nav_machine:'Máy của tôi', nav_time:'Thời gian', nav_history:'Lịch sử thuê',
+      nav_connect:'Hướng dẫn kết nối', nav_support:'Hỗ trợ', nav_home:'Trang chủ', nav_logout:'Đăng xuất',
+      lbl_current_machine:'// Máy đang thuê', status_no_machine:'Chưa có máy', btn_conn_info:'🔑 THÔNG TIN KẾT NỐI',
+      spec_ip:'Địa chỉ IP', spec_status:'Trạng thái',
+      lbl_plan_status:'// Trạng thái gói', status_none:'Chưa có', sub_buy_discord:'Mua qua Discord để kích hoạt',
+      lbl_time_left:'// Thời gian còn lại', sub_no_data:'Chưa có dữ liệu', lbl_ping:'// Ping tới server',
+      lbl_user_id:'// User ID của bạn', user_id_note:'Gửi ID này cho staff khi tạo ticket để được gán máy.',
+      lbl_guide:'// HƯỚNG DẪN', guide_title:'Liên hệ Admin để được gán máy!',
+      guide_desc:'Copy <strong style="color:var(--accent2);">User ID</strong> bên trên → gửi cho staff qua Discord ticket → staff sẽ gán máy cho bạn.',
+      empty_no_machine:'Chưa có máy nào được gán.<br>Mua dịch vụ qua Discord để bắt đầu.',
+      btn_buy_discord:'Mua qua Discord',
+      lbl_machine_info:'// Thông tin máy', title_my_machine:'Máy của tôi',
+      lbl_rental_time:'// Thời gian thuê', title_time_left:'Thời gian còn lại',
+      cd_days:'ngày', cd_hours:'giờ', cd_mins:'phút', cd_secs:'giây',
+      lbl_expiry_date:'Ngày hết hạn', renew_note:'Gia hạn qua Discord ticket.', btn_renew_discord:'Gia hạn qua Discord',
+      lbl_stats_7d:'// Thống kê 7 ngày', title_usage_hours:'Giờ sử dụng',
+      lbl_rental_history:'// Lịch sử thuê máy', title_sessions:'Các phiên đã dùng',
+      empty_history:'Chưa có lịch sử thuê.<br>Dữ liệu sẽ hiện sau khi hết hạn máy.',
+      title_connect_vm:'Kết nối máy ảo',
+      parsec_s1:'Tải và cài <strong>Parsec</strong> tại <strong>parsec.app</strong>',
+      parsec_s2:'Đăng nhập Parsec → tab <strong>Computers</strong> → nhập IP máy từ Discord',
+      parsec_s3:'Nhập <strong>mật khẩu</strong> staff gửi qua Discord ticket',
+      parsec_s4:'Cài đặt: <strong>H.264 · 50 Mbps · 1080p</strong>',
+      moon_s1:'Tải <strong>Moonlight</strong> tại <strong>moonlight-stream.org</strong>',
+      moon_s2:'Mở Moonlight → <strong>Add PC</strong> → nhập IP máy từ Discord',
+      moon_s3:'Nhập <strong>PIN 4 số</strong> hiện trên Moonlight (nhờ staff nhập hộ)',
+      moon_s4:'Cài đặt: <strong>H.264 · 50 Mbps · 1080p · 60fps</strong>',
+      sup_ticket:'Tạo ticket hỗ trợ', sup_ticket_desc:'Gặp vấn đề? Tạo ticket trong Discord, staff phản hồi trong vài phút.',
+      btn_open_discord:'Mở Discord',
+      sup_renew:'Gia hạn dịch vụ', sup_renew_desc:'Gói sắp hết? Tạo ticket gia hạn trong Discord.', btn_renew_ticket:'Tạo ticket gia hạn →',
+      sup_faq:'Hỏi đáp', sup_faq_desc:'Chưa biết cách kết nối? Xem hướng dẫn hoặc hỏi staff.', btn_view_guide:'Xem hướng dẫn →',
+      sup_buy_hours:'Mua thêm giờ', sup_buy_hours_desc:'Hết giờ? Nạp thêm bất cứ lúc nào qua Discord ticket.', btn_add_hours:'Nạp thêm giờ →',
+      conn_ready:'🖥️ Máy đã sẵn sàng!', conn_sub:'// Dùng Parsec để kết nối · parsec.app', lbl_expiry:'Hết hạn',
+      conn_s1:'Tải <strong>Parsec</strong> tại <strong>parsec.app</strong> (miễn phí, không cần tạo tài khoản)',
+      conn_s2:'Mở Parsec → <strong>Computers</strong> → <strong>Connect</strong> → nhập IP bên trên',
+      conn_s3:'Nhập <strong>Password</strong> bên trên khi được hỏi → Done!',
+      conn_s4:'Gặp lỗi? Bấm <strong>Hỗ trợ</strong> hoặc nhắn chat bên dưới.',
+      chat_title:'Hỗ trợ trực tiếp', chat_empty:'💬 Nhắn tin để được hỗ trợ.<br>Staff sẽ phản hồi sớm nhất có thể.',
+      chat_typing:'Staff đang nhập', chat_placeholder:'Nhập tin nhắn...',
+      modal_edit_profile:'✏️ Chỉnh sửa profile', display_name_label:'TÊN HIỂN THỊ',
+      display_name_ph:'Nhập tên hiển thị...', display_name_note:'Tên này chỉ hiển thị trên dashboard của bạn.',
+      btn_cancel:'Hủy', btn_save:'Lưu',
+      // JS strings
+      status_running:'Đang chạy', status_expired:'Đã hết hạn', status_no_pass:'(không có)',
+      toast_copied:'✓ Đã copy', toast_copied_id:'✓ Đã copy User ID', toast_name_saved:'✓ Đã cập nhật tên',
+      toast_updated:'🖥️ Máy của bạn đã được cập nhật!', toast_revoked:'⚠️ Máy của bạn đã bị thu hồi.',
+      toast_admin_reply:'💬 Admin đã reply tin nhắn của bạn!', toast_file_big:'File quá lớn (max 5MB)',
+      toast_warn_2h:'⏰ Còn dưới 2 giờ! Gia hạn ngay.', toast_warn_24h:'⏰ Còn dưới 24 giờ.',
+      auto_close:'Tự đóng sau', unit_sessions:'phiên', unit_hours:'giờ',
+      chat_you:'Bạn', btn_confirmed:'✓ Đúng rồi!', guard_wrong:'Mật khẩu không đúng.',
+      guard_empty:'Vui lòng nhập mật khẩu.',
+      titles:{dashboard:'Dashboard',machine:'Máy của tôi',time:'Thời gian',history:'Lịch sử thuê',connect:'Hướng dẫn kết nối',support:'Hỗ trợ'},
+    },
+    en: {
+      nav_dashboard:'Dashboard', nav_machine:'My Machine', nav_time:'Time', nav_history:'Rental History',
+      nav_connect:'Connection Guide', nav_support:'Support', nav_home:'Home', nav_logout:'Logout',
+      lbl_current_machine:'// Current Machine', status_no_machine:'No machine', btn_conn_info:'🔑 CONNECTION INFO',
+      spec_ip:'IP Address', spec_status:'Status',
+      lbl_plan_status:'// Plan Status', status_none:'None', sub_buy_discord:'Buy via Discord to activate',
+      lbl_time_left:'// Time Remaining', sub_no_data:'No data yet', lbl_ping:'// Server Ping',
+      lbl_user_id:'// Your User ID', user_id_note:'Send this ID to staff when creating a ticket to get assigned.',
+      lbl_guide:'// GUIDE', guide_title:'Contact Admin to get assigned!',
+      guide_desc:'Copy <strong style="color:var(--accent2);">User ID</strong> above → send to staff via Discord ticket → staff will assign your machine.',
+      empty_no_machine:'No machine assigned yet.<br>Buy service via Discord to start.',
+      btn_buy_discord:'Buy via Discord',
+      lbl_machine_info:'// Machine Info', title_my_machine:'My Machine',
+      lbl_rental_time:'// Rental Time', title_time_left:'Time Remaining',
+      cd_days:'days', cd_hours:'hours', cd_mins:'mins', cd_secs:'secs',
+      lbl_expiry_date:'Expiry Date', renew_note:'Renew via Discord ticket.', btn_renew_discord:'Renew via Discord',
+      lbl_stats_7d:'// Stats (7 days)', title_usage_hours:'Usage Hours',
+      lbl_rental_history:'// Rental History', title_sessions:'Past Sessions',
+      empty_history:'No rental history yet.<br>Data appears after machine expires.',
+      title_connect_vm:'Connect to VM',
+      parsec_s1:'Download & install <strong>Parsec</strong> at <strong>parsec.app</strong>',
+      parsec_s2:'Login Parsec → <strong>Computers</strong> tab → enter IP from Discord',
+      parsec_s3:'Enter <strong>password</strong> sent by staff via Discord ticket',
+      parsec_s4:'Settings: <strong>H.264 · 50 Mbps · 1080p</strong>',
+      moon_s1:'Download <strong>Moonlight</strong> at <strong>moonlight-stream.org</strong>',
+      moon_s2:'Open Moonlight → <strong>Add PC</strong> → enter IP from Discord',
+      moon_s3:'Enter <strong>4-digit PIN</strong> shown on Moonlight (ask staff to enter)',
+      moon_s4:'Settings: <strong>H.264 · 50 Mbps · 1080p · 60fps</strong>',
+      sup_ticket:'Create Support Ticket', sup_ticket_desc:'Having issues? Create a ticket in Discord, staff responds in minutes.',
+      btn_open_discord:'Open Discord',
+      sup_renew:'Renew Service', sup_renew_desc:'Plan expiring? Create a renewal ticket in Discord.', btn_renew_ticket:'Create Renewal Ticket →',
+      sup_faq:'FAQ', sup_faq_desc:'Not sure how to connect? Check the guide or ask staff.', btn_view_guide:'View Guide →',
+      sup_buy_hours:'Buy More Hours', sup_buy_hours_desc:'Out of hours? Top up anytime via Discord ticket.', btn_add_hours:'Add Hours →',
+      conn_ready:'🖥️ Machine Ready!', conn_sub:'// Use Parsec to connect · parsec.app', lbl_expiry:'Expires',
+      conn_s1:'Download <strong>Parsec</strong> at <strong>parsec.app</strong> (free, no account needed)',
+      conn_s2:'Open Parsec → <strong>Computers</strong> → <strong>Connect</strong> → enter IP above',
+      conn_s3:'Enter <strong>Password</strong> above when asked → Done!',
+      conn_s4:'Error? Click <strong>Support</strong> or chat below.',
+      chat_title:'Live Support', chat_empty:'💬 Send a message for support.<br>Staff will respond ASAP.',
+      chat_typing:'Staff is typing', chat_placeholder:'Type a message...',
+      modal_edit_profile:'✏️ Edit Profile', display_name_label:'DISPLAY NAME',
+      display_name_ph:'Enter display name...', display_name_note:'This name is only shown on your dashboard.',
+      btn_cancel:'Cancel', btn_save:'Save',
+      status_running:'Running', status_expired:'Expired', status_no_pass:'(none)',
+      toast_copied:'✓ Copied', toast_copied_id:'✓ Copied User ID', toast_name_saved:'✓ Name updated',
+      toast_updated:'🖥️ Your machine has been updated!', toast_revoked:'⚠️ Your machine has been revoked.',
+      toast_admin_reply:'💬 Admin replied to your message!', toast_file_big:'File too large (max 5MB)',
+      toast_warn_2h:'⏰ Less than 2 hours left! Renew now.', toast_warn_24h:'⏰ Less than 24 hours left.',
+      auto_close:'Auto-close in', unit_sessions:'sessions', unit_hours:'hours',
+      chat_you:'You', btn_confirmed:'✓ Correct!', guard_wrong:'Wrong password.',
+      guard_empty:'Please enter password.',
+      titles:{dashboard:'Dashboard',machine:'My Machine',time:'Time',history:'Rental History',connect:'Connection Guide',support:'Support'},
+    },
+    id: {
+      nav_dashboard:'Dashboard', nav_machine:'Mesin Saya', nav_time:'Waktu', nav_history:'Riwayat Sewa',
+      nav_connect:'Panduan Koneksi', nav_support:'Bantuan', nav_home:'Beranda', nav_logout:'Keluar',
+      lbl_current_machine:'// Mesin Aktif', status_no_machine:'Belum ada', btn_conn_info:'🔑 INFO KONEKSI',
+      spec_ip:'Alamat IP', spec_status:'Status',
+      lbl_plan_status:'// Status Paket', status_none:'Belum ada', sub_buy_discord:'Beli via Discord untuk aktivasi',
+      lbl_time_left:'// Waktu Tersisa', sub_no_data:'Belum ada data', lbl_ping:'// Ping Server',
+      lbl_user_id:'// User ID Anda', user_id_note:'Kirim ID ini ke staff saat buat tiket untuk dapat mesin.',
+      lbl_guide:'// PANDUAN', guide_title:'Hubungi Admin untuk mendapat mesin!',
+      guide_desc:'Copy <strong style="color:var(--accent2);">User ID</strong> di atas → kirim ke staff via tiket Discord → staff akan assign mesin.',
+      empty_no_machine:'Belum ada mesin yang di-assign.<br>Beli layanan via Discord untuk mulai.',
+      btn_buy_discord:'Beli via Discord',
+      lbl_machine_info:'// Info Mesin', title_my_machine:'Mesin Saya',
+      lbl_rental_time:'// Waktu Sewa', title_time_left:'Waktu Tersisa',
+      cd_days:'hari', cd_hours:'jam', cd_mins:'menit', cd_secs:'detik',
+      lbl_expiry_date:'Tanggal Habis', renew_note:'Perpanjang via tiket Discord.', btn_renew_discord:'Perpanjang via Discord',
+      lbl_stats_7d:'// Statistik 7 hari', title_usage_hours:'Jam Penggunaan',
+      lbl_rental_history:'// Riwayat Sewa', title_sessions:'Sesi Sebelumnya',
+      empty_history:'Belum ada riwayat sewa.<br>Data muncul setelah mesin habis.',
+      title_connect_vm:'Koneksi ke VM',
+      parsec_s1:'Unduh & install <strong>Parsec</strong> di <strong>parsec.app</strong>',
+      parsec_s2:'Login Parsec → tab <strong>Computers</strong> → masukkan IP dari Discord',
+      parsec_s3:'Masukkan <strong>password</strong> dari staff via tiket Discord',
+      parsec_s4:'Pengaturan: <strong>H.264 · 50 Mbps · 1080p</strong>',
+      moon_s1:'Unduh <strong>Moonlight</strong> di <strong>moonlight-stream.org</strong>',
+      moon_s2:'Buka Moonlight → <strong>Add PC</strong> → masukkan IP dari Discord',
+      moon_s3:'Masukkan <strong>PIN 4 digit</strong> di Moonlight (minta staff masukkan)',
+      moon_s4:'Pengaturan: <strong>H.264 · 50 Mbps · 1080p · 60fps</strong>',
+      sup_ticket:'Buat Tiket Bantuan', sup_ticket_desc:'Ada masalah? Buat tiket di Discord, staff respon dalam hitungan menit.',
+      btn_open_discord:'Buka Discord',
+      sup_renew:'Perpanjang Layanan', sup_renew_desc:'Paket mau habis? Buat tiket perpanjangan di Discord.', btn_renew_ticket:'Buat Tiket Perpanjangan →',
+      sup_faq:'FAQ', sup_faq_desc:'Belum tahu cara koneksi? Lihat panduan atau tanya staff.', btn_view_guide:'Lihat Panduan →',
+      sup_buy_hours:'Beli Jam Tambahan', sup_buy_hours_desc:'Habis jam? Top up kapan saja via tiket Discord.', btn_add_hours:'Tambah Jam →',
+      conn_ready:'🖥️ Mesin Siap!', conn_sub:'// Gunakan Parsec · parsec.app', lbl_expiry:'Habis',
+      conn_s1:'Unduh <strong>Parsec</strong> di <strong>parsec.app</strong> (gratis, tanpa akun)',
+      conn_s2:'Buka Parsec → <strong>Computers</strong> → <strong>Connect</strong> → masukkan IP di atas',
+      conn_s3:'Masukkan <strong>Password</strong> di atas saat diminta → Selesai!',
+      conn_s4:'Error? Klik <strong>Bantuan</strong> atau chat di bawah.',
+      chat_title:'Bantuan Langsung', chat_empty:'💬 Kirim pesan untuk bantuan.<br>Staff akan membalas secepatnya.',
+      chat_typing:'Staff sedang mengetik', chat_placeholder:'Ketik pesan...',
+      modal_edit_profile:'✏️ Edit Profil', display_name_label:'NAMA TAMPILAN',
+      display_name_ph:'Masukkan nama tampilan...', display_name_note:'Nama ini hanya tampil di dashboard Anda.',
+      btn_cancel:'Batal', btn_save:'Simpan',
+      status_running:'Berjalan', status_expired:'Habis', status_no_pass:'(tidak ada)',
+      toast_copied:'✓ Disalin', toast_copied_id:'✓ User ID disalin', toast_name_saved:'✓ Nama diperbarui',
+      toast_updated:'🖥️ Mesin Anda telah diperbarui!', toast_revoked:'⚠️ Mesin Anda telah dicabut.',
+      toast_admin_reply:'💬 Admin membalas pesan Anda!', toast_file_big:'File terlalu besar (maks 5MB)',
+      toast_warn_2h:'⏰ Kurang dari 2 jam! Perpanjang sekarang.', toast_warn_24h:'⏰ Kurang dari 24 jam.',
+      auto_close:'Tutup otomatis dalam', unit_sessions:'sesi', unit_hours:'jam',
+      chat_you:'Anda', btn_confirmed:'✓ Benar!', guard_wrong:'Password salah.',
+      guard_empty:'Silakan masukkan password.',
+      titles:{dashboard:'Dashboard',machine:'Mesin Saya',time:'Waktu',history:'Riwayat Sewa',connect:'Panduan Koneksi',support:'Bantuan'},
+    },
+    hi: {
+      nav_dashboard:'Dashboard', nav_machine:'मेरी मशीन', nav_time:'समय', nav_history:'किराया इतिहास',
+      nav_connect:'कनेक्शन गाइड', nav_support:'सहायता', nav_home:'होम', nav_logout:'लॉगआउट',
+      lbl_current_machine:'// वर्तमान मशीन', status_no_machine:'कोई मशीन नहीं', btn_conn_info:'🔑 कनेक्शन जानकारी',
+      spec_ip:'IP पता', spec_status:'स्थिति',
+      lbl_plan_status:'// प्लान स्थिति', status_none:'कोई नहीं', sub_buy_discord:'Discord से खरीदकर शुरू करें',
+      lbl_time_left:'// शेष समय', sub_no_data:'अभी कोई डेटा नहीं', lbl_ping:'// सर्वर Ping',
+      lbl_user_id:'// आपका User ID', user_id_note:'टिकट बनाते समय यह ID स्टाफ को भेजें।',
+      lbl_guide:'// गाइड', guide_title:'मशीन पाने के लिए Admin से संपर्क करें!',
+      guide_desc:'ऊपर <strong style="color:var(--accent2);">User ID</strong> कॉपी करें → Discord टिकट में स्टाफ को भेजें → स्टाफ मशीन असाइन करेगा।',
+      empty_no_machine:'कोई मशीन असाइन नहीं है।<br>शुरू करने के लिए Discord से खरीदें।',
+      btn_buy_discord:'Discord से खरीदें',
+      lbl_machine_info:'// मशीन जानकारी', title_my_machine:'मेरी मशीन',
+      lbl_rental_time:'// किराया समय', title_time_left:'शेष समय',
+      cd_days:'दिन', cd_hours:'घंटे', cd_mins:'मिनट', cd_secs:'सेकंड',
+      lbl_expiry_date:'समाप्ति तिथि', renew_note:'Discord टिकट से नवीनीकरण करें।', btn_renew_discord:'Discord से नवीनीकरण',
+      lbl_stats_7d:'// 7 दिन आँकड़े', title_usage_hours:'उपयोग घंटे',
+      lbl_rental_history:'// किराया इतिहास', title_sessions:'पिछले सेशन',
+      empty_history:'अभी कोई किराया इतिहास नहीं।<br>मशीन समाप्ति के बाद डेटा दिखेगा।',
+      title_connect_vm:'VM से कनेक्ट',
+      parsec_s1:'<strong>Parsec</strong> डाउनलोड करें <strong>parsec.app</strong> से',
+      parsec_s2:'Parsec लॉगिन → <strong>Computers</strong> टैब → Discord से IP डालें',
+      parsec_s3:'Discord टिकट से स्टाफ का <strong>पासवर्ड</strong> डालें',
+      parsec_s4:'सेटिंग: <strong>H.264 · 50 Mbps · 1080p</strong>',
+      moon_s1:'<strong>Moonlight</strong> डाउनलोड करें <strong>moonlight-stream.org</strong> से',
+      moon_s2:'Moonlight खोलें → <strong>Add PC</strong> → Discord से IP डालें',
+      moon_s3:'Moonlight पर दिखा <strong>4-अंक PIN</strong> डालें (स्टाफ से कहें)',
+      moon_s4:'सेटिंग: <strong>H.264 · 50 Mbps · 1080p · 60fps</strong>',
+      sup_ticket:'सहायता टिकट बनाएं', sup_ticket_desc:'समस्या? Discord में टिकट बनाएं, मिनटों में जवाब।',
+      btn_open_discord:'Discord खोलें',
+      sup_renew:'सेवा नवीनीकरण', sup_renew_desc:'प्लान समाप्त हो रहा? Discord में नवीनीकरण टिकट बनाएं।', btn_renew_ticket:'नवीनीकरण टिकट →',
+      sup_faq:'FAQ', sup_faq_desc:'कनेक्ट कैसे करें? गाइड देखें या स्टाफ से पूछें।', btn_view_guide:'गाइड देखें →',
+      sup_buy_hours:'और घंटे खरीदें', sup_buy_hours_desc:'घंटे खत्म? Discord टिकट से कभी भी टॉप अप।', btn_add_hours:'घंटे जोड़ें →',
+      conn_ready:'🖥️ मशीन तैयार!', conn_sub:'// Parsec से कनेक्ट करें · parsec.app', lbl_expiry:'समाप्ति',
+      conn_s1:'<strong>Parsec</strong> डाउनलोड करें <strong>parsec.app</strong> से (फ्री, अकाउंट नहीं चाहिए)',
+      conn_s2:'Parsec खोलें → <strong>Computers</strong> → <strong>Connect</strong> → ऊपर का IP डालें',
+      conn_s3:'पूछे जाने पर ऊपर का <strong>Password</strong> डालें → हो गया!',
+      conn_s4:'Error? <strong>सहायता</strong> क्लिक करें या नीचे चैट करें।',
+      chat_title:'लाइव सहायता', chat_empty:'💬 सहायता के लिए संदेश भेजें।<br>स्टाफ जल्द जवाब देगा।',
+      chat_typing:'स्टाफ टाइप कर रहा', chat_placeholder:'संदेश लिखें...',
+      modal_edit_profile:'✏️ प्रोफाइल संपादन', display_name_label:'प्रदर्शन नाम',
+      display_name_ph:'प्रदर्शन नाम दर्ज करें...', display_name_note:'यह नाम केवल आपके dashboard पर दिखता है।',
+      btn_cancel:'रद्द', btn_save:'सहेजें',
+      status_running:'चल रहा', status_expired:'समाप्त', status_no_pass:'(कोई नहीं)',
+      toast_copied:'✓ कॉपी हुआ', toast_copied_id:'✓ User ID कॉपी हुआ', toast_name_saved:'✓ नाम अपडेट हुआ',
+      toast_updated:'🖥️ आपकी मशीन अपडेट हुई!', toast_revoked:'⚠️ आपकी मशीन वापस ली गई।',
+      toast_admin_reply:'💬 Admin ने जवाब दिया!', toast_file_big:'फाइल बहुत बड़ी (max 5MB)',
+      toast_warn_2h:'⏰ 2 घंटे से कम! अभी नवीनीकरण करें।', toast_warn_24h:'⏰ 24 घंटे से कम।',
+      auto_close:'ऑटो बंद', unit_sessions:'सेशन', unit_hours:'घंटे',
+      chat_you:'आप', btn_confirmed:'✓ सही!', guard_wrong:'गलत पासवर्ड।',
+      guard_empty:'कृपया पासवर्ड दर्ज करें।',
+      titles:{dashboard:'Dashboard',machine:'मेरी मशीन',time:'समय',history:'किराया इतिहास',connect:'कनेक्शन गाइड',support:'सहायता'},
+    },
+  };
+
+  let dashLang = localStorage.getItem('grimz_lang') || 'vi';
+
+  function applyDashLang(lang) {
+    const t = DT[lang] || DT.vi;
+    // Update all data-i18n elements (text)
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const key = el.getAttribute('data-i18n');
+      if (t[key]) el.textContent = t[key];
+    });
+    // Update all data-i18n-html elements (innerHTML)
+    document.querySelectorAll('[data-i18n-html]').forEach(el => {
+      const key = el.getAttribute('data-i18n-html');
+      if (t[key]) el.innerHTML = t[key];
+    });
+    // Update placeholders
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+      const key = el.getAttribute('data-i18n-placeholder');
+      if (t[key]) el.placeholder = t[key];
+    });
+    // Update lang buttons
+    document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+    const btn = document.getElementById('lbtn-' + lang);
+    if (btn) btn.classList.add('active');
+  }
+
+  function pickLang(lang) {
+    dashLang = lang;
+    localStorage.setItem('grimz_lang', lang);
+    localStorage.setItem('grimz_lang_set', '1');
+    applyDashLang(lang);
+  }
+
+  // Auto detect
+  (async function autoDetectDashLang() {
+    if (localStorage.getItem('grimz_lang_set')) {
+      applyDashLang(dashLang);
+      return;
+    }
+    try {
+      const res = await fetch('https://ipapi.co/json/', { signal: AbortSignal.timeout(3000) });
+      const data = await res.json();
+      const cc = data.country_code;
+      let lang = 'en';
+      if (cc === 'VN') lang = 'vi';
+      else if (cc === 'ID') lang = 'id';
+      else if (cc === 'IN') lang = 'hi';
+      dashLang = lang;
+      localStorage.setItem('grimz_lang', lang);
+      applyDashLang(lang);
+    } catch {
+      applyDashLang(dashLang);
+    }
+  })();
+
+  // Helper to get translated string in JS
+  function t(key) { return (DT[dashLang] || DT.vi)[key] || (DT.vi)[key] || key; }
+
+
+
+
+
+  // ===== CONNECTION MODAL =====
+  function showConnModal(m) {
+    document.getElementById('conn-ip').textContent   = m.ip       || '—';
+    document.getElementById('conn-pass').textContent = m.password || t('status_no_pass');
+    document.getElementById('conn-gpu').textContent  = m.gpu      || '—';
+    document.getElementById('conn-expiry').textContent = m.expiry
+      ? new Date(m.expiry).toLocaleString('vi-VN',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'})
+      : '—';
+    document.getElementById('conn-modal').classList.add('open');
+    // Countdown auto-close 60s
+    let sec = 60;
+    const cdEl = document.getElementById('conn-countdown');
+    cdEl.textContent = t('auto_close') + ' ' + sec + 's';
+    const iv = setInterval(() => {
+      sec--;
+      cdEl.textContent = t('auto_close') + ' ' + sec + 's';
+      if(sec <= 0) { clearInterval(iv); document.getElementById('conn-modal').classList.remove('open'); cdEl.textContent=''; }
+    }, 1000);
+  }
+
+  function connCopy(elId, btn) {
+    const val = document.getElementById(elId).textContent;
+    navigator.clipboard.writeText(val).then(() => {
+      btn.textContent = '✓ Copied!';
+      btn.classList.add('copied');
+      setTimeout(() => { btn.textContent = '📋 Copy'; btn.classList.remove('copied'); }, 2000);
+    });
+  }
+
+  // ===== SUPPORT CHAT (USER) =====
+  let scOpen = false;
+  let scUserId = null;
+  let scSub = null;
+  let scMsgs = [];
+  let scLastSeen = parseInt(localStorage.getItem('grimz_sc_seen') || '0');
+
+  function toggleSupportChat() {
+    scOpen = !scOpen;
+    document.getElementById('sc-panel').classList.toggle('open', scOpen);
+    if(scOpen && scUserId) {
+      scLastSeen = Date.now();
+      localStorage.setItem('grimz_sc_seen', scLastSeen);
+      document.getElementById('sc-badge').classList.remove('show');
+      document.getElementById('sc-input').focus();
+    }
+  }
+
+  async function initSupportChat(userId) {
+    scUserId = userId;
+    initUserTypingChannel();
+    const { data } = await sb.from('support_chat').select('*').eq('user_id', userId).order('created_at', {ascending:true});
+    scMsgs = data || [];
+    renderScMsgs();
+    scSub = sb.channel('sc-live-'+userId)
+      .on('postgres_changes', {event:'INSERT', schema:'public', table:'support_chat',
+        filter:'user_id=eq.'+userId}, payload => {
+        scMsgs.push(payload.new);
+        renderScMsgs();
+        if(!scOpen && payload.new.sender === 'admin') {
+          document.getElementById('sc-badge').classList.add('show');
+          showToast(t('toast_admin_reply'), 3000, 'success');
+        }
+      }).subscribe();
+  }
+
+  function renderScMsgs() {
+    const body = document.getElementById('sc-body');
+    if(!scMsgs.length) {
+      body.innerHTML='<div class="sc-empty">'+t('chat_empty')+'</div>';
+      return;
+    }
+    body.innerHTML = scMsgs.map(m => {
+      const mine = m.sender === 'user';
+      const time = new Date(m.created_at).toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'});
+      const msgContent = m.is_image
+        ? `<img class="sc-img" src="${m.message}" onclick="window.open(this.src)">`
+        : String(m.message).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+      return `<div class="sc-msg ${mine?'mine':'theirs'}">
+        <div class="sc-meta">${mine?t('chat_you'):(m.alias||'Staff')} · ${time}</div>
+        <div class="sc-bubble-wrap"><div class="sc-bubble">${msgContent}</div></div>
+      </div>`;
+    }).join('');
+    body.scrollTop = body.scrollHeight;
+  }
+
+  async function sendSupportMsg() {
+    if(!scUserId) return;
+    const input = document.getElementById('sc-input');
+    const msg = input.value.trim();
+    if(!msg) return;
+    input.value = '';
+    await sb.from('support_chat').insert({ user_id: scUserId, sender: 'user', message: msg });
+  }
+
+
+
+  // Typing indicator (user side) - lazy init
+  let SC_TYPING_CH = null;
+  function initUserTypingChannel() {
+    if(SC_TYPING_CH) return;
+    SC_TYPING_CH = sb.channel('typing-support');
+    SC_TYPING_CH.on('broadcast', {event:'typing'}, ({payload}) => {
+      if(!payload.isAdmin) return;
+      const row = document.getElementById('sc-typing');
+      if(row) {
+        row.classList.add('visible');
+        clearTimeout(window._scTypingTimer);
+        window._scTypingTimer = setTimeout(() => row.classList.remove('visible'), 2500);
+      }
+    }).subscribe();
+  }
+
+  let _userTypingCooldown = false;
+  function userTyping() {
+    if(_userTypingCooldown || !scUserId || !SC_TYPING_CH) return;
+    _userTypingCooldown = true;
+    setTimeout(() => _userTypingCooldown = false, 1500);
+    SC_TYPING_CH.send({type:'broadcast', event:'typing', payload:{userId: scUserId, isAdmin: false}});
+  }
+
+  async function sendSupportImage(input) {
+    if(!scUserId || !input.files[0]) return;
+    const file = input.files[0];
+    if(file.size > 5*1024*1024) { showToast(t('toast_file_big'), 2000, 'error'); return; }
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      await sb.from('support_chat').insert({user_id: scUserId, sender:'user', message: e.target.result, is_image: true});
+    };
+    reader.readAsDataURL(file);
+    input.value = '';
+  }
+
+
+  // ===== HISTORY & CHART =====
+  let chartInstance = null;
+
+  async function loadHistory(userId) {
+    const { data, error } = await sb
+      .from('rental_history')
+      .select('*')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false })
+      .limit(20);
+
+    const list = document.getElementById('historyList');
+    const count = document.getElementById('historyCount');
+
+    if(!data || data.length === 0) {
+      count.textContent = '0 ' + t('unit_sessions');
+      return;
+    }
+
+    count.textContent = data.length + ' ' + t('unit_sessions');
+    list.innerHTML = data.map(r => {
+      const start = r.started_at ? new Date(r.started_at).toLocaleString('vi-VN') : '—';
+      const end   = r.ended_at   ? new Date(r.ended_at).toLocaleString('vi-VN')   : '—';
+      const hrs   = r.total_hours ? parseFloat(r.total_hours).toFixed(1) : '—';
+      return `<div class="history-item">
+        <div>
+          <div class="history-plan">${r.plan || 'G-NOVA'}</div>
+          <div class="history-gpu">${r.gpu || '—'}</div>
+          <div class="history-dates">${start} → ${end}</div>
+        </div>
+        <div class="history-hours">${hrs}<span> ${t('unit_hours')}</span></div>
+      </div>`;
+    }).join('');
+
+    // Build chart data - last 7 days
+    buildChart(data);
+  }
+
+  function buildChart(data) {
+    const days = [];
+    const hours = [];
+    for(let i = 6; i >= 0; i--) {
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      const label = d.toLocaleDateString('vi-VN', { day:'2-digit', month:'2-digit' });
+      days.push(label);
+      // Sum hours for this day
+      const dayStr = d.toISOString().slice(0, 10);
+      const total = data
+        .filter(r => r.started_at && r.started_at.startsWith(dayStr))
+        .reduce((sum, r) => sum + (parseFloat(r.total_hours) || 0), 0);
+      hours.push(parseFloat(total.toFixed(1)));
+    }
+
+    const ctx = document.getElementById('usageChart').getContext('2d');
+    if(chartInstance) chartInstance.destroy();
+
+    chartInstance = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: days,
+        datasets: [{
+          label: 'Giờ sử dụng',
+          data: hours,
+          backgroundColor: 'rgba(124,92,191,0.35)',
+          borderColor: 'rgba(155,127,232,0.8)',
+          borderWidth: 1,
+          borderRadius: 3,
+          hoverBackgroundColor: 'rgba(124,92,191,0.6)',
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            backgroundColor: 'rgba(22,19,35,0.95)',
+            borderColor: 'rgba(124,92,191,0.3)',
+            borderWidth: 1,
+            titleColor: '#9b7fe8',
+            bodyColor: '#e4e0f0',
+            titleFont: { family: 'JetBrains Mono', size: 11 },
+            bodyFont: { family: 'JetBrains Mono', size: 11 },
+            callbacks: { label: ctx => ctx.parsed.y + ' ' + t('unit_hours') }
+          }
+        },
+        scales: {
+          x: {
+            grid: { color: 'rgba(124,92,191,0.08)' },
+            ticks: { color: '#8a84a0', font: { family: 'JetBrains Mono', size: 10 } }
+          },
+          y: {
+            grid: { color: 'rgba(124,92,191,0.08)' },
+            ticks: { color: '#8a84a0', font: { family: 'JetBrains Mono', size: 10 }, stepSize: 1 },
+            beginAtZero: true
+          }
+        }
+      }
+    });
+  }
+
+  // ===== PROFILE MODAL =====
+  let currentUserId = null;
+  function openProfileModal(){
+    document.getElementById('displayNameInput').value = document.getElementById('userName').textContent.replace(/\s*$/, '').trim();
+    // Remove edit icon text from value
+    const nameEl = document.getElementById('userName');
+    const rawName = nameEl.childNodes[0]?.textContent?.trim() || '';
+    document.getElementById('displayNameInput').value = rawName;
+    document.getElementById('profileModal').classList.add('open');
+    setTimeout(()=>document.getElementById('displayNameInput').focus(), 100);
+  }
+  function closeProfileModal(){
+    document.getElementById('profileModal').classList.remove('open');
+  }
+  function saveProfile(){
+    const newName = document.getElementById('displayNameInput').value.trim();
+    if(!newName) return;
+    const nameEl = document.getElementById('userName');
+    nameEl.childNodes[0].textContent = newName + ' ';
+    document.getElementById('userAvatar').textContent = newName[0].toUpperCase();
+    if(currentUserId) localStorage.setItem('grimz_display_name_'+currentUserId, newName);
+    closeProfileModal();
+    showToast(t('toast_name_saved'), 2000, 'success');
+  }
+  // Close on overlay click
+  document.getElementById('profileModal').addEventListener('click', function(e){ if(e.target===this) closeProfileModal(); });
+  // Enter to save
+  document.getElementById('displayNameInput')?.addEventListener('keydown', e=>{ if(e.key==='Enter') saveProfile(); });
+
+  // ===== THEME =====
+  function toggleTheme(){
+    document.body.classList.toggle('light-theme');
+    const isLight = document.body.classList.contains('light-theme');
+    localStorage.setItem('grimz_theme', isLight ? 'light' : 'dark');
+    const icon = document.querySelector('.theme-icon');
+    if(icon) icon.textContent = isLight ? '☀️' : '🌙';
+  }
+  // Set initial icon
+  if(localStorage.getItem('grimz_theme')==='light'){
+    document.body.classList.add('light-theme');
+    document.addEventListener('DOMContentLoaded',()=>{ const i=document.querySelector('.theme-icon'); if(i) i.textContent='☀️'; });
+  }
+
+  // ===== MAIN =====
+  function toggleSidebar(){
+    document.getElementById('sidebar').classList.toggle('open');
+    document.getElementById('sidebar-overlay').classList.toggle('open');
+  }
+
+  const sb = window.supabase.createClient(
+    'https://vlwevojqfomophsdwsqd.supabase.co',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZsd2V2b2pxZm9tb3Boc2R3c3FkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM1NzE2NDgsImV4cCI6MjA4OTE0NzY0OH0.6NECwQqKKeZH2fIgqp8SkmA6kPAqtsc5dlhEdGVFgBE'
+  );
+
+  setInterval(()=>{ document.getElementById('clock').textContent=new Date().toLocaleTimeString('vi-VN',{hour12:false}); },1000);
+
+  (function pingLoop(){
+    const el=document.getElementById('ping-value');
+    if(el) el.textContent='~'+(28+Math.floor(Math.random()*8))+'ms';
+    setTimeout(pingLoop,1500+Math.random()*1000);
+  })();
+
+  function getTitles(){ return (DT[dashLang]||DT.vi).titles; }
+  function goTo(id,btn){
+    document.getElementById('sidebar').classList.remove('open');
+    document.getElementById('sidebar-overlay').classList.remove('open');
+    const current = document.querySelector('.page.active');
+    if(current && current.id !== 'page-'+id){
+      current.classList.add('page-out');
+      setTimeout(()=>{
+        document.querySelectorAll('.page').forEach(p=>{ p.classList.remove('active'); p.classList.remove('page-out'); });
+        document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+        document.getElementById('page-'+id).classList.add('active');
+        if(btn) btn.classList.add('active');
+        document.getElementById('page-title').textContent=getTitles()[id]||'';
+      }, 150);
+    } else {
+      document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+      if(btn) btn.classList.add('active');
+    }
+  }
+
+  function switchTab(id,btn){
+    document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    document.getElementById('tab-'+id).classList.add('active');
+    btn.classList.add('active');
+  }
+
+  function showToast(msg,duration,type){
+    const t=document.getElementById('toast');
+    t.textContent=msg;
+    t.className='toast show'+(type?' toast-'+type:'');
+    setTimeout(()=>t.classList.remove('show'),duration||2500);
+  }
+
+  function copyUuid(){
+    navigator.clipboard.writeText(document.getElementById('userUuid').textContent)
+      .then(()=>showToast(t('toast_copied_id'),2000,'success'));
+  }
+
+  function copyIp(ip){
+    navigator.clipboard.writeText(ip).then(()=>showToast(t('toast_copied')+' IP: '+ip,2000,'success'));
+  }
+
+  async function doLogout(){ await sb.auth.signOut(); window.location.href='grimz-login.html'; }
+
+  let countdownInterval=null, statInterval=null;
+  function startCountdown(expiry){
+    if(countdownInterval) clearInterval(countdownInterval);
+    function update(){
+      const diff=Math.max(0,new Date(expiry)-new Date());
+      const expired=diff<=0;
+      document.getElementById('countdown-wrap').classList.toggle('countdown-expired',expired);
+      const d=Math.floor(diff/86400000), h=Math.floor((diff%86400000)/3600000);
+      const m=Math.floor((diff%3600000)/60000), s=Math.floor((diff%60000)/1000);
+      document.getElementById('cd-d').textContent=String(d).padStart(2,'0');
+      document.getElementById('cd-h').textContent=String(h).padStart(2,'0');
+      document.getElementById('cd-m').textContent=String(m).padStart(2,'0');
+      document.getElementById('cd-s').textContent=String(s).padStart(2,'0');
+    }
+    update(); countdownInterval=setInterval(update,1000);
+  }
+
+  let _currentMachine = null;
+  function showConnModalFromData(){ if(_currentMachine) showConnModal(_currentMachine); }
+  function fillMachine(m){
+    _currentMachine = m;
+    // Dashboard specs
+    const ipEl=document.getElementById('machineIp');
+    ipEl.innerHTML=(m.ip||'—')+(m.ip?'<button class="copy-ip" onclick="copyIp(\''+m.ip+'\')">📋</button>':'');
+    ipEl.classList.remove('empty');
+    ['machineGpu','machineRam','machineCpu','machineStorage','machineOs'].forEach(id=>{
+      const key=id.replace('machine','').toLowerCase();
+      const el=document.getElementById(id);
+      el.textContent=m[key]||'—'; el.classList.remove('empty');
+    });
+    const nameEl=document.getElementById('machineName');
+    // Short display name: plan codename or stripped GPU
+    const shortName = m.plan || (m.gpu||'Cloud PC').replace('NVIDIA ','').replace(' 12GB','').replace(' 8GB','');
+    nameEl.textContent=shortName;
+    nameEl.setAttribute('data-text',shortName);
+    nameEl.classList.add('has-machine');
+    document.getElementById('machineStatus').className='badge badge-online';
+    document.getElementById('machineStatus').textContent=t('status_running');
+    const connBtn=document.getElementById('show-conn-btn'); if(connBtn && m.plan!=='G-ADMIN') connBtn.style.display='inline-flex';
+    document.getElementById('statPlan').textContent=m.plan||'ACTIVE';
+    document.getElementById('statPlan').classList.remove('empty');
+    document.getElementById('statPlan').style.color = m.plan==='G-ADMIN' ? 'var(--red)' : 'var(--green)';
+    document.getElementById('noBuyCard').style.display='none';
+    document.getElementById('firstLoginNotice').style.display='none';
+
+    // Machine page
+    ['m2Ip','m2Gpu','m2Ram','m2Cpu','m2Storage','m2Os'].forEach(id=>{
+      const key=id.replace('m2','').toLowerCase();
+      const el=document.getElementById(id);
+      el.textContent=m[key]||'—'; el.classList.remove('empty');
+    });
+    document.getElementById('m2Status').className='badge badge-online';
+    document.getElementById('m2Status').textContent=t('status_running');
+
+    // Time
+    if(m.expiry){
+      startCountdown(m.expiry);
+      document.getElementById('expiryDate').textContent=new Date(m.expiry).toLocaleDateString('vi-VN');
+      document.getElementById('expiryDate').classList.remove('empty');
+      document.getElementById('statTime').classList.remove('empty');
+      function updateStatTime(){
+        const diff=Math.max(0,new Date(m.expiry)-new Date());
+        const d=Math.floor(diff/86400000), h=Math.floor((diff%86400000)/3600000);
+        const mn=Math.floor((diff%3600000)/60000), s=Math.floor((diff%60000)/1000);
+        const txt=d>0?d+'n '+h+'g '+mn+'p':h>0?h+'g '+mn+'p '+s+'s':mn+'p '+s+'s';
+        document.getElementById('statTime').textContent=diff<=0?t('status_expired'):txt;
+        if(diff<=0) document.getElementById('statTime').style.color='var(--red)';
+      }
+      updateStatTime();
+      if(statInterval) clearInterval(statInterval);
+      statInterval=setInterval(updateStatTime,1000);
+    }
+    document.getElementById('userPlan').textContent=m.plan||'Active';
+  }
+
+  async function init(){
+    const{data:{session}}=await sb.auth.getSession();
+    if(!session){window.location.href='grimz-login.html';return;}
+    currentUserId=session.user.id;
+    loadHistory(session.user.id);
+    initSupportChat(session.user.id);
+    const email=session.user.email||'User';
+    const username=email.split('@')[0];
+    const IS_ADMIN = email === 'kobitnx223@gmail.com';
+    // Check for saved display name
+    const savedName = localStorage.getItem('grimz_display_name_'+session.user.id);
+    document.getElementById('userName').textContent=savedName||username;
+    // Color avatar by email hash
+    let hash=0; for(let i=0;i<email.length;i++) hash=email.charCodeAt(i)+((hash<<5)-hash);
+    const hue=Math.abs(hash%360);
+    const av=document.getElementById('userAvatar');
+    av.textContent=(savedName||username)[0].toUpperCase();
+    av.style.background=`linear-gradient(135deg,hsl(${hue},65%,55%),hsl(${hue+30},75%,35%))`;
+    document.getElementById('userUuid').textContent=session.user.id;
+
+    const{data:machine}=await sb.from('machines').select('*').eq('user_id',session.user.id).single();
+    if(IS_ADMIN && !machine) {
+      // Admin fake machine - infinite, top spec
+      fillMachine({
+        ip:'—', gpu:'NVIDIA RTX 4090 24GB', cpu:'Intel Core i9-13900K',
+        ram:'128GB DDR5', storage:'4TB SSD NVMe', os:'Windows 11',
+        expiry:'2099-12-31T00:00:00Z', plan:'G-ADMIN', password:null
+      });
+    } else if(machine) fillMachine(machine);
+
+    const machineChannel = sb.channel('machines-realtime-'+session.user.id)
+      .on('postgres_changes',{event:'INSERT',schema:'public',table:'machines',filter:'user_id=eq.'+session.user.id},payload=>{
+        fillMachine(payload.new);
+        showConnModal(payload.new);
+        const card = document.querySelector('.card.card-top-line');
+        if(card){ card.style.borderColor='rgba(74,222,128,0.6)'; setTimeout(()=>card.style.borderColor='',2000); }
+      })
+      .on('postgres_changes',{event:'UPDATE',schema:'public',table:'machines',filter:'user_id=eq.'+session.user.id},payload=>{
+        fillMachine(payload.new);
+        showToast(t('toast_updated'), 4000, 'success');
+      })
+      .on('postgres_changes',{event:'DELETE',schema:'public',table:'machines',filter:'user_id=eq.'+session.user.id},payload=>{
+        showToast(t('toast_revoked'), 5000, 'error');
+        setTimeout(()=>location.reload(), 1500);
+      })
+      .subscribe((status) => {
+        console.log('Realtime machines status:', status);
+      });
+
+    if(machine?.expiry){
+      const hours=(new Date(machine.expiry)-new Date())/3600000;
+      if(hours>0&&hours<=2) setTimeout(()=>showToast(t('toast_warn_2h'),6000,'warn'),3000);
+      else if(hours>0&&hours<=24) setTimeout(()=>showToast(t('toast_warn_24h'),5000,'warn'),3000);
+    }
+  }
+  init();
+</script>
+</body>
+</html>
